@@ -1,0 +1,27 @@
+{
+    "name": "university-system",
+    "version": "1.0.0",
+    "main": "index.js",
+    "license": "MIT",
+    "scripts": {
+        "start": "node ./dist/main.js",
+        "dev": "nodemon ./src/main.ts",
+        "build": "tsc -p ."
+    },
+    "dependencies": {
+        "@types/express": "^5.0.0",
+        "@types/node": "^22.13.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "nodemon": "^3.1.9",
+        "ts-node": "^10.9.2"
+    },
+    "devDependencies": {
+        "@types/react-syntax-highlighter": "^15.5.13",
+        "eslint": "^9.14.0",
+        "eslint-config-prettier": "^9.1.0",
+        "eslint-plugin-simple-import-sort": "^12.1.1",
+        "typescript": "^5.7.3",
+        "typescript-eslint": "^8.13.0"
+    }
+}
