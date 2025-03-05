@@ -6,11 +6,14 @@ import './app.module'
 
 import { type TCriticalAnyType, type TResponseMethodType } from './core/types/common.types'
 import ApplicationRoutes from './routes/index.routes'
+import { sequelizeConfig } from './core/config/database.config'
 
 dotenv.config()
 const app = express()
 const server = http.createServer(app)
 const PORT = process.env.PORT
+
+sequelizeConfig.sync({ alter: true })
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
