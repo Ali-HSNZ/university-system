@@ -1,22 +1,26 @@
 import { Dialect, Sequelize } from 'sequelize'
-import dotenv from 'dotenv'
-dotenv.config()
+import { APP_ENV } from './dotenv.config'
 
 const sequelizeConfig = new Sequelize({
-    dialect: process.env.DB_DIALECT as Dialect,
-    host: process.env.DB_HOST as string,
-    port: parseInt(process.env.DB_PORT as string),
-    username: process.env.DB_USER as string,
-    password: process.env.DB_PASSWORD as string,
-    database: process.env.DB_NAME as string
+    dialect: APP_ENV.database.dialect as Dialect,
+    host: APP_ENV.database.host,
+    port: parseInt(APP_ENV.database.port),
+    username: APP_ENV.database.user,
+    password: APP_ENV.database.password,
+    database: APP_ENV.database.name,
+    logging: false
 })
 
-sequelizeConfig
-    .authenticate()
-    .then(async () => {
-        console.log('Connected to the database')
-    })
-    .catch((err) => console.log('Error connecting to the database'))
+const connectToDatabase = async () => {
+    try {
+        await sequelizeConfig.authenticate()
+        console.log('Connected to DB Successfully')
+    } catch (error) {
+        console.error('\x1b[31mError connecting to DB')
+        process.exit(0)
+    }
+}
 
-export { sequelizeConfig }
- 
+connectToDatabase()
+
+export default sequelizeConfig
