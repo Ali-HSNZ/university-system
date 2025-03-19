@@ -23,4 +23,4 @@ const connectToDatabase = async () => {
 
 connectToDatabase()
 
-export default sequelizeConfig
+export { sequelizeConfig }

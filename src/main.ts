@@ -5,7 +5,7 @@ import './app.module'
 
 import { type TCriticalAnyType, type TResponseMethodType } from './core/types/common.types'
 import ApplicationRoutes from './routes/index.routes'
-import sequelizeConfig from './core/config/database.config'
+import { sequelizeConfig } from './core/config/database.config'
 import { APP_ENV } from './core/config/dotenv.config'
 import setupSwagger from './core/config/swagger.config' // Import Swagger config
 

@@ -30,7 +30,7 @@ const swaggerOptions = {
             }
         }
     },
-    apis: [path.join(__dirname, '../../docs/*.ts')] // ✅ Dynamic path resolution
+    apis: [path.join(__dirname, '../../docs/**/*.ts')]
 }
 
 const swaggerDocs = swaggerJSDoc(swaggerOptions)
@@ -38,6 +38,5 @@ const swaggerDocs = swaggerJSDoc(swaggerOptions)
 const setupSwagger = (app: Application) => {
     app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs))
 }
-
 
 export default setupSwagger
