@@ -7,6 +7,7 @@ import { type TCriticalAnyType, type TResponseMethodType } from './core/types/co
 import ApplicationRoutes from './routes/index.routes'
 import sequelizeConfig from './core/config/database.config'
 import { APP_ENV } from './core/config/dotenv.config'
+import setupSwagger from './core/config/swagger.config' // Import Swagger config
 
 const app = express()
 const server = http.createServer(app)
@@ -17,6 +18,8 @@ sequelizeConfig.sync({ alter: true })
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
 app.use(ApplicationRoutes)
+
+setupSwagger(app)
 
 app.use((req, res): TCriticalAnyType => {
     const response: TResponseMethodType = {
@@ -29,5 +32,4 @@ app.use((req, res): TCriticalAnyType => {
 server.listen(PORT, () => {
     console.log(`Server is running on http://localhost:${PORT}`)
 })
-
 
