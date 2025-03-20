@@ -5,7 +5,6 @@ import './app.module'
 
 import { type TCriticalAnyType, type TResponseMethodType } from './core/types/common.types'
 import ApplicationRoutes from './routes/index.routes'
-import { sequelizeConfig } from './core/config/database.config'
 import { APP_ENV } from './core/config/dotenv.config'
 import setupSwagger from './core/config/swagger.config' // Import Swagger config
 import path from 'path'
@@ -15,8 +14,6 @@ const server = http.createServer(app)
 const PORT = APP_ENV.application.port
 
 app.use('/', express.static(path.join(__dirname, '../public')))
-
-sequelizeConfig.sync({ alter: true })
 
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())

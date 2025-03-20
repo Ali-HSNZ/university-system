@@ -1,51 +1,47 @@
-import { Router } from 'express'
+import { Router, RequestHandler } from 'express'
 
-import { type TCriticalAnyType } from '../core/types/common.types'
+type TMethodType = 'get' | 'post' | 'put' | 'delete' | 'patch'
 
-const DecoratorRouter: Router = Router()
+type RouteDefinition = {
+    path: string
+    method: TMethodType
+    handler: RequestHandler
+}
 
-const Get = (path?: string) => {
-    return (target: TCriticalAnyType, propertyKey: string) => {
-        const route = path ? (path?.[0] === '/' ? path : `/${path}`) : `/${propertyKey}`
-        DecoratorRouter.get(route, target[propertyKey])
+const DecoratorRouter = Router()
+
+const Controller = (basePath: string = '') => {
+    return (target: any) => {
+        const router = Router()
+        const instance = new target()
+        const routes: RouteDefinition[] = target.prototype.__routes || []
+
+        routes.forEach(({ path, method, handler }) => {
+            router[method](path, handler.bind(instance))
+        })
+
+        DecoratorRouter.use(basePath, router)
     }
 }
 
-const Post = (path?: string) => {
-    return (target: TCriticalAnyType, propertyKey: string) => {
-        const route = path ? (path?.[0] === '/' ? path : `/${path}`) : `/${propertyKey}`
-        DecoratorRouter.post(route, target[propertyKey])
+const createMethodDecorator =
+    (method: TMethodType) =>
+    (path: string = '') => {
+        return (target: any, propertyKey: string) => {
+            if (!target.__routes) target.__routes = []
+            target.__routes.push({
+                path: path.startsWith('/') ? path : `/${path}`,
+                method,
+                handler: target[propertyKey]
+            })
+        }
     }
-}
 
-const Put = (path?: string) => {
-    return (target: TCriticalAnyType, propertyKey: string) => {
-        const route = path ? (path?.[0] === '/' ? path : `/${path}`) : `/${propertyKey}`
-        DecoratorRouter.put(route, target[propertyKey])
-    }
-}
-
-const Delete = (path?: string) => {
-    return (target: TCriticalAnyType, propertyKey: string) => {
-        const route = path ? (path?.[0] === '/' ? path : `/${path}`) : `/${propertyKey}`
-        DecoratorRouter.delete(route, target[propertyKey])
-    }
-}
-
-const Patch = (path?: string) => {
-    return (target: TCriticalAnyType, propertyKey: string) => {
-        const route = path ? (path?.[0] === '/' ? path : `/${path}`) : `/${propertyKey}`
-        DecoratorRouter.patch(route, target[propertyKey])
-    }
-}
-
-const Controller = (controllerPath?: string) => {
-    return (target: TCriticalAnyType) => {
-        if (controllerPath?.[0] !== '/') controllerPath = `/${controllerPath}`
-        const path = controllerPath || '/'
-        DecoratorRouter.use(path, DecoratorRouter)
-    }
-}
+const Get = createMethodDecorator('get')
+const Post = createMethodDecorator('post')
+const Put = createMethodDecorator('put')
+const Delete = createMethodDecorator('delete')
+const Patch = createMethodDecorator('patch')
 
 export default DecoratorRouter
 
