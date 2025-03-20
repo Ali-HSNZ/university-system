@@ -5,14 +5,33 @@
  *     summary: Register a new user
  *     description: |
  *       This endpoint allows a new user to register in the system.
+ *
  *       - **username**, **password** and **role** are required.
+ *
  *       - The `role` field determines the user's access level (e.g., student, professor, education_assistant, university_president).
+ *
  *       - If the user is a **student**:
  *         - `entry_year`, `degree_id` and `department_id` fields are **required**.
+ *
  *       - If the user is a **professor**:
  *         - `entry_year`, `degree_id` and `department_id` fields are **required**.
+ *
  *       - The `degree_id` and `department_id` fields are **foreign keys** linking to the respective tables.
+ *
  *       - `full_name` and `email` are **optional** fields.
+ *
+ *       - fa description for the fields
+ *
+ *       - `username` نام کاربری
+ *       - `password` رمز عبور
+ *       - `role` نقش کاربر
+ *       - `entry_year` سال ورود
+ *       - `degree_id` شناسه مقطع تحصیلی
+ *       - `department_id` شناسه گروه آموزشی
+ *       - `full_name` نام و نام خانوادگی
+ *       - `email` ایمیل
+ *       - `national_id` کد ملی
+ *
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -35,6 +54,7 @@
  *                 type: string
  *                 nullable: true
  *                 description: User's email (optional)
+ *                 example: example@example.com
  *               full_name:
  *                 type: string
  *                 nullable: true
@@ -49,6 +69,10 @@
  *               degree_id:
  *                 type: integer
  *                 description: Foreign key referencing the degree table
+ *               national_id:
+ *                 type: string
+ *                 description: National ID of user
+ *                 example: 1234567890
  *               department_id:
  *                 type: integer
  *                 description: Foreign key referencing the department table

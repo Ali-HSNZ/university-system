@@ -1,0 +1,23 @@
+@font-face {
+    font-family: 'IranYekan';
+    src: url('/fonts/iranyekanwebregularfanum.woff') format('woff');
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+}
+
+.swagger-ui .opblock-tag,
+.swagger-ui .opblock-description-wrapper p,
+.swagger-ui .opblock-summary-description,
+.swagger-ui .opblock-description-wrapper,
+.swagger-ui .responses-inner h4,
+.swagger-ui .responses-inner h5,
+.swagger-ui table thead tr th,
+.swagger-ui table tbody tr td,
+.swagger-ui .parameter__name,
+.swagger-ui strong,
+.swagger-ui .parameter__type,
+.swagger-ui .parameter__deprecated,
+.swagger-ui .parameter__in {
+    font-family: 'IranYekan', sans-serif !important;
+}
