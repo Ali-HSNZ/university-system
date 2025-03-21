@@ -3,8 +3,6 @@
  * /degrees:
  *   get:
  *     tags: [Degree]
- *     summary: Get all degrees
- *     description: Get all degrees from the database
  *     responses:
  *       200:
  *         description: A list of degrees
@@ -15,8 +13,6 @@
  * /degrees/{id}/info:
  *   get:
  *     tags: [Degree]
- *     summary: Get a degree by id
- *     description: Get a degree by id
  *     parameters:
  *       - name: id
  *         in: path
@@ -34,8 +30,6 @@
  * /degrees/create:
  *   post:
  *     tags: [Degree]
- *     summary: Create a new degree
- *     description: Create a new degree
  *     requestBody:
  *       required: true
  *       content:
@@ -58,11 +52,40 @@
 
 /**
  * @swagger
+ * /degrees/{id}/update:
+ *   put:
+ *     tags: [Degree]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: string
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/json:
+ *           schema:
+ *             type: object
+ *             properties:
+ *               name:
+ *                 type: string
+ *             required:
+ *               - name
+ *             example:
+ *               name: "Degree Name"
+ *     responses:
+ *       200:
+ *         description: A updated degree
+ *       400:
+ *         description: Bad Request
+ */
+
+/**
+ * @swagger
  * /degrees/{id}/delete:
  *   delete:
  *     tags: [Degree]
- *     summary: Delete a degree
- *     description: Delete a degree
+ *     description:  (در صورتی ک هیچ کاربری در این مقطع تحصیلی وجود نداشته باشد) حذف یک مقطع تحصیلی
  *     parameters:
  *       - name: id
  *         in: path

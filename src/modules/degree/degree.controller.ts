@@ -1,7 +1,7 @@
 import { Request, Response } from 'express'
 import httpStatus from 'http-status'
 import degreeServices from './degree.services'
-import { Controller, Delete, Get, Post } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 
 @Controller('/degrees')
 class DegreeController {
@@ -58,6 +58,30 @@ class DegreeController {
         })
     }
 
+    @Put('/:id/update')
+    async update(req: Request, res: Response) {
+        const { id } = req.params
+        const { name } = req.body
+        const existDegree = await degreeServices.checkExistId(id)
+        if (!existDegree) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                message: 'مقطع تحصیلی یافت نشد'
+            })
+        }
+        const updatedDegree = await degreeServices.update(id, name)
+        if (!updatedDegree) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                message: 'عملیات با مشکل مواجه شد'
+            })
+        }
+        res.status(httpStatus.OK).json({
+            status: httpStatus.OK,
+            message: 'مقطع تحصیلی با موفقیت به روز شد'
+        })
+    }
+
     @Delete('/:id/delete')
     async delete(req: Request, res: Response) {
         const { id } = req.params
@@ -67,6 +91,17 @@ class DegreeController {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
                 message: 'مقطع تحصیلی یافت نشد'
+            })
+        }
+
+        const users = await degreeServices.checkUsersWithDegree(id)
+        if (users) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                data: {
+                    dependencies: users
+                },
+                message: 'مقطع تحصیلی دارای کاربر است'
             })
         }
 

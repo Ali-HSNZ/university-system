@@ -16,6 +16,7 @@
 .swagger-ui table tbody tr td,
 .swagger-ui .parameter__name,
 .swagger-ui strong,
+.swagger-ui .renderedMarkdown p,
 .swagger-ui .parameter__type,
 .swagger-ui .parameter__deprecated,
 .swagger-ui .parameter__in {

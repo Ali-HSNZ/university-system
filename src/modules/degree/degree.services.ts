@@ -1,4 +1,5 @@
 import { DegreeModel } from '../../models/degree.model'
+import { UserModel } from '../../models/user.model'
 
 const degreeServices = {
     findAll: async () => {
@@ -22,6 +23,17 @@ const degreeServices = {
     delete: async (id: string) => {
         const degree = await DegreeModel.destroy({ where: { id: Number(id) } })
         return degree
+    },
+    update: async (id: string, name: string) => {
+        const degree = await DegreeModel.update({ degree_name: name }, { where: { id: Number(id) } })
+        return degree
+    },
+    checkUsersWithDegree: async (id: string) => {
+        const users = await UserModel.findOne({
+            where: { degree_id: Number(id) },
+            attributes: ['id', 'username', 'full_name', 'role']
+        })
+        return users
     }
 }
 

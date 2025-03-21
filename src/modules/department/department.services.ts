@@ -24,7 +24,7 @@ const departmentServices = {
         await DepartmentModel.destroy({ where: { id } })
         return true
     },
-    update: async ({ id, name }: { id: string; name: string }) => {
+    update: async (id: string, name: string) => {
         const department = await DepartmentModel.findByPk(id)
         if (!department) {
             return false

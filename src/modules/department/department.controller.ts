@@ -75,7 +75,7 @@ class DepartmentController {
                 message: 'این گروه آموزشی قبلا ثبت شده است'
             })
         }
-        const updatedDepartment = await departmentServices.update({ id, name })
+        const updatedDepartment = await departmentServices.update(id, name)
         if (updatedDepartment) {
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,

@@ -3,8 +3,6 @@
  * /departments:
  *   get:
  *     tags: [Department]
- *     summary: Get all departments
- *     description: Get all departments from the database
  *     responses:
  *       200:
  *         description: A list of departments
@@ -15,8 +13,6 @@
  * /departments/{id}/info:
  *   get:
  *     tags: [Department]
- *     summary: Get department by id
- *     description: Get department by id
  *     parameters:
  *       - name: id
  *         in: path
@@ -34,8 +30,6 @@
  * /departments/create:
  *   post:
  *     tags: [Department]
- *     summary: Create a new department
- *     description: Create a new department
  *     requestBody:
  *       required: true
  *       content:
@@ -58,8 +52,6 @@
  * /departments/{id}/update:
  *   put:
  *     tags: [Department]
- *     summary: Update a department
- *     description: Update a department
  *     parameters:
  *       - name: id
  *         in: path
@@ -87,8 +79,7 @@
  * /departments/{id}/delete:
  *   delete:
  *     tags: [Department]
- *     summary: Delete a department
- *     description: Delete a department
+ *     description: (در صورتی ک هیچ کاربری در این گروه آموزشی وجود نداشته باشد) حذف یک گروه آموزشی
  *     parameters:
  *       - name: id
  *         in: path
