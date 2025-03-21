@@ -2,27 +2,27 @@
  * @swagger
  * tags:
  *   - name: Authentication
- *     description: Operations related to user authentication (login, registration, logout)
+ *     description: عملیات مربوط به احراز هویت کاربر (ورود، ثبت نام، خروج)
  *   - name: User
- *     description: Managing users, including students, professors, and administrators
+ *     description: مدیریت کاربران، از جمله دانشجویان، استادها و مدیران
  *   - name: Course
- *     description: Operations related to educational courses
+ *     description: مدیریت دروس
  *   - name: Class
- *     description: Managing university classes
+ *     description: مدیریت کلاس ها
  *   - name: Enrollment
- *     description: Student enrollment in classes
+ *     description: مدیریت دانشجویان در کلاس ها
  *   - name: Attendance
- *     description: Managing student attendance
+ *     description: مدیریت حضور و غیاب دانشجویان
  *   - name: Grade
- *     description: Recording and managing student grades
+ *     description: مدیریت نمرات دانشجویان
  *   - name: Semester
- *     description: Operations related to academic semesters
+ *     description: مدیریت ترم ها
  *   - name: ImportantDates
- *     description: Managing important dates such as semester start and end
+ *     description: مدیریت تاریخ های مهم مانند شروع و پایان ترم
  *   - name: Department
- *     description: Managing academic departments
+ *     description: مدیریت گروه های آموزشی
  *   - name: Degree
- *     description: Managing academic degrees
+ *     description: مدیریت مقاطع تحصیلی
  *   - name: EntryYearCourse
- *     description: Registering eligible courses for each entry year
+ *     description: مدیریت دروس مناسب برای هر سال ورود
  */
