@@ -5,7 +5,21 @@ type TMethodType = 'get' | 'post' | 'put' | 'delete' | 'patch'
 type RouteDefinition = {
     path: string
     method: TMethodType
-    handler: RequestHandler
+    handler: CustomRequestHandler
+}
+
+type CustomRequestHandler = RequestHandler & {
+    __middleware?: RequestHandler[]
+}
+
+const UseMiddleware = (...middlewares: RequestHandler[]) => {
+    return (target: any, propertyKey: string) => {
+        const handler = target[propertyKey] as CustomRequestHandler
+        if (!handler.__middleware) {
+            handler.__middleware = []
+        }
+        handler.__middleware.push(...middlewares)
+    }
 }
 
 const DecoratorRouter = Router()
@@ -17,7 +31,9 @@ const Controller = (basePath: string = '') => {
         const routes: RouteDefinition[] = target.prototype.__routes || []
 
         routes.forEach(({ path, method, handler }) => {
-            router[method](path, handler.bind(instance))
+            const boundHandler = handler.bind(instance)
+            const middleware = handler.__middleware ? [...handler.__middleware, boundHandler] : [boundHandler]
+            router[method](path, ...middleware)
         })
 
         DecoratorRouter.use(basePath, router)
@@ -32,7 +48,7 @@ const createMethodDecorator =
             target.__routes.push({
                 path: path.startsWith('/') ? path : `/${path}`,
                 method,
-                handler: target[propertyKey]
+                handler: target[propertyKey] as CustomRequestHandler // Cast to custom type
             })
         }
     }
@@ -45,4 +61,4 @@ const Patch = createMethodDecorator('patch')
 
 export default DecoratorRouter
 
-export { Controller, Get, Post, Put, Delete, Patch }
+export { Controller, Get, Post, Put, Delete, Patch, UseMiddleware }
