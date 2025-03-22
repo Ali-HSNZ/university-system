@@ -22,3 +22,6 @@
 .swagger-ui .parameter__in {
     font-family: 'IranYekan', sans-serif !important;
 }
+.swagger-ui .renderedMarkdown li {
+    padding: 3px 0 !important;
+}
