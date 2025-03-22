@@ -3,15 +3,13 @@ import http from 'http'
 import httpStatus from 'http-status'
 import './app.module'
 
-import { type TCriticalAnyType, type TResponseMethodType } from './core/types/common.types'
-import ApplicationRoutes from './routes/index.routes'
+import { type TCriticalAnyType } from './core/types/common.types'
+import ApplicationRoutes from './index.routes'
 import { APP_ENV } from './core/config/dotenv.config'
 import setupSwagger from './core/config/swagger.config' // Import Swagger config
 import path from 'path'
-
 const app = express()
 const server = http.createServer(app)
-const PORT = APP_ENV.application.port
 
 app.use('/', express.static(path.join(__dirname, '../public')))
 
@@ -22,14 +20,13 @@ app.use(ApplicationRoutes)
 setupSwagger(app)
 
 app.use((req, res): TCriticalAnyType => {
-    const response: TResponseMethodType = {
+    return res.status(httpStatus.NOT_FOUND).json({
         statusCode: httpStatus.NOT_FOUND,
         message: 'Not Found Page'
-    }
-    return res.status(httpStatus.NOT_FOUND).json(response)
+    })
 })
 
-server.listen(PORT, () => {
-    console.log(`Server is running on http://localhost:${PORT}`)
+server.listen(APP_ENV.application.port, () => {
+    console.log(`Server is running on http://localhost:${APP_ENV.application.port}`)
 })
 

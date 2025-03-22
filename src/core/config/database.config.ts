@@ -13,7 +13,12 @@ const sequelizeConfig = new Sequelize({
 
 const connectToDatabase = async () => {
     try {
-        await sequelizeConfig.authenticate()
+        await sequelizeConfig.authenticate().then(() => {
+            sequelizeConfig
+                .sync({ alter: true })
+                .then(() => console.log('Database Synced successfully'))
+                .catch((error) => console.error('Error Syncing Database', error))
+        })
         console.log('Connected to DB Successfully')
     } catch (error) {
         console.error('\x1b[31mError connecting to DB')
