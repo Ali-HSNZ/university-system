@@ -3,7 +3,7 @@ import { UserModel } from '../../models/user.model'
 
 const degreeServices = {
     findAll: async () => {
-        const degrees = await DegreeModel.findAndCountAll({
+        const degrees = await DegreeModel.findAll({
             attributes: ['id', 'degree_name']
         })
         return degrees

@@ -37,7 +37,7 @@
  *           schema:
  *             type: object
  *             properties:
- *               department_name:
+ *               name:
  *                 type: string
  *                 example: 'مهندسی کامپیوتر'
  *     responses:

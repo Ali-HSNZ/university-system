@@ -2,58 +2,86 @@ import { Request, Response } from 'express'
 import httpStatus from 'http-status'
 import departmentServices from './department.services'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
+import validationHandling from '../../core/utils/validation-handling/validation-handling.utils'
+import { createDepartmentValidation } from './department.validations'
+import { errorHandling } from '../../core/utils/error-handling'
 
 @Controller('/departments')
 class DepartmentController {
     @Get()
     async getAllDepartments(req: Request, res: Response) {
-        const departments = await departmentServices.findAll()
-        res.status(httpStatus.OK).json({
-            status: httpStatus.OK,
-            message: 'عملیات با موفقیت انجام شد',
-            data: departments
-        })
+        try {
+            const departments = await departmentServices.findAll()
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: departments
+            })
+        } catch (error) {
+            errorHandling(error, res)
+        }
     }
 
     @Get('/:id/info')
     async getDepartmentById(req: Request, res: Response) {
-        const { id } = req.params
-        const department = await departmentServices.checkExistId(id)
-        if (!department) {
-            return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'گروه آموزشی یافت نشد'
+        try {
+            const { id } = req.params
+
+            //  check valid id
+            if (isNaN(Number(id))) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'شناسه نامعتبر است'
+                })
+            }
+
+            const department = await departmentServices.checkExistId(id)
+            if (!department) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'گروه آموزشی یافت نشد'
+                })
+            }
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: department
             })
+        } catch (error) {
+            errorHandling(error, res)
         }
-        res.status(httpStatus.OK).json({
-            status: httpStatus.OK,
-            message: 'عملیات با موفقیت انجام شد',
-            data: department
-        })
     }
 
     @Post('/create')
     async createDepartment(req: Request, res: Response) {
-        const { department_name } = req.body
-        const existDepartment = await departmentServices.checkExistName(department_name)
+        try {
+            const { name } = await validationHandling(req.body, createDepartmentValidation)
 
-        if (existDepartment) {
-            return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'این گروه آموزشی قبلا ثبت شده است'
-            })
-        }
-        const department = await departmentServices.create(department_name)
-        if (department) {
-            res.status(httpStatus.CREATED).json({
-                status: httpStatus.CREATED,
-                message: 'گروه آموزشی با موفقیت ایجاد شد'
-            })
-        } else {
-            res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'عملیات با مشکل مواجه شد'
-            })
+            if (name) {
+                const existDepartment = await departmentServices.checkExistName(name)
+
+                if (existDepartment) {
+                    return res.status(httpStatus.BAD_REQUEST).json({
+                        status: httpStatus.BAD_REQUEST,
+                        message: 'این گروه آموزشی قبلا ثبت شده است'
+                    })
+                }
+                const department = await departmentServices.create(name)
+                if (department) {
+                    res.status(httpStatus.CREATED).json({
+                        status: httpStatus.CREATED,
+                        message: 'گروه آموزشی با موفقیت ایجاد شد'
+                    })
+                } else {
+                    res.status(httpStatus.BAD_REQUEST).json({
+                        status: httpStatus.BAD_REQUEST,
+                        message: 'عملیات با مشکل مواجه شد'
+                    })
+                }
+            }
+        } catch (error) {
+            errorHandling(error, res)
         }
     }
 

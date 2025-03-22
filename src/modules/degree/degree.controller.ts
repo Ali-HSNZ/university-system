@@ -35,8 +35,8 @@ class DegreeController {
 
     @Post('/create')
     async create(req: Request, res: Response) {
-        const { degree_name } = req.body
-        const existDegree = await degreeServices.checkExistName(degree_name)
+        const { name } = req.body
+        const existDegree = await degreeServices.checkExistName(name)
         if (existDegree) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
@@ -44,7 +44,7 @@ class DegreeController {
             })
         }
 
-        const degree = await degreeServices.create(degree_name)
+        const degree = await degreeServices.create(name)
 
         if (!degree) {
             return res.status(httpStatus.BAD_REQUEST).json({

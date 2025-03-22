@@ -37,12 +37,12 @@
  *           schema:
  *             type: object
  *             properties:
- *               degree_name:
+ *               name:
  *                 type: string
  *             required:
- *               - degree_name
+ *               - name
  *             example:
- *               degree_name: "Degree Name"
+ *               name: "Degree Name"
  *     responses:
  *       201:
  *         description: A new degree

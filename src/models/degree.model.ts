@@ -5,7 +5,7 @@ const DegreeModel = sequelizeConfig.define(
     'degree',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        degree_name: { type: DataTypes.STRING(50), allowNull: false, unique: true }
+        degree_name: { type: DataTypes.STRING(50), allowNull: false }
     },
     { freezeTableName: true, modelName: 'degree' }
 )

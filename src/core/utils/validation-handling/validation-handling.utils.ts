@@ -7,7 +7,8 @@ const validationHandling = async <T extends Record<string, any>>(data: T, schema
         if (error instanceof ValidationError) {
             throw new ValidationError(error)
         } else {
-            throw new Error('خطایی نامشخصsdv رخ داده است')
+            console.error(error)
+            throw new Error('خطایی نامشخص رخ داده است')
         }
     }
 }
