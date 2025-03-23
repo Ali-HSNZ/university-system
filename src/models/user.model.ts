@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
 import { DegreeModel } from './degree.model'
 import { DepartmentModel } from './department.model'
+import { APP_ENV } from '../core/config/dotenv.config'
 
 const UserModel = sequelizeConfig.define(
     'users',
@@ -44,6 +45,24 @@ const UserModel = sequelizeConfig.define(
     },
     { timestamps: true, freezeTableName: true }
 )
+
+const PROTOCOL = APP_ENV.application.protocol
+const HOST = APP_ENV.application.host
+const PORT = APP_ENV.application.port
+
+const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
+
+const serializeUserModel = (user: any) => {
+    if (user.avatar) user.avatar = BASE_URL + user.avatar
+    if (user.national_code_image) user.national_code_image = BASE_URL + user.national_code_image
+    if (user.military_image) user.military_image = BASE_URL + user.military_image
+    return user
+}
+
+UserModel.addHook('afterFind', (result: any) => {
+    if (Array.isArray(result)) result.forEach((user) => serializeUserModel(user))
+    else if (result) serializeUserModel(result)
+})
 
 UserModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'SET NULL' })
 UserModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'SET NULL' })

@@ -1,4 +1,5 @@
-import { TGetValidRegisterDataType, TRegisterDataType } from './auth.types'
+import { hashString } from '../../core/utils/hash-string'
+import { TGetSpecialUserDataType, TGetValidRegisterDataType, TRegisterDataType } from './auth.types'
 
 const authUtils = {
     getFilePath: (path?: string): string | null => {
@@ -7,6 +8,26 @@ const authUtils = {
         const filePath = path.replace(/\\/g, '/')
         const index = filePath.indexOf('/uploads/')
         return filePath.slice(index)
+    },
+
+    getSpecialUserData: function ({ data, usersCount }: TGetSpecialUserDataType): TRegisterDataType {
+        const national_code_image = authUtils.getFilePath(data.national_code_image?.path) || null
+        const military_image = authUtils.getFilePath(data.military_image?.path) || null
+        const avatar = authUtils.getFilePath(data.avatar?.path) || null
+
+        const validData = {
+            ...data,
+            usersCount,
+            national_code_image,
+            military_image,
+            avatar,
+            password: hashString(data.password || '')
+        }
+
+        if (data.role === 'student') return this.getStudentData(validData)
+        if (data.role === 'professor') return this.getProfessorData(validData)
+        if (data.role === 'education_assistant') return this.getEducationAssistantData(validData)
+        return this.getUniversityPresidentData(validData)
     },
 
     getStudentData: function (data: TGetValidRegisterDataType): TRegisterDataType {
@@ -74,16 +95,16 @@ const authUtils = {
         const training_course_code = data.training_course_code
         const university_code = 255
         const degree_id = data.degree_id
-        const studentCode = data.allUsersCount + 1
+        const studentCode = data.usersCount + 1
         return `${year}${semester}${training_course_code}${university_code}${degree_id}${studentCode}`
     },
     generateProfessorCode: function (data: TGetValidRegisterDataType): string {
         const year = data.entry_date?.toString().slice(2, 4)
-        return `${year}${data.allUsersCount + 1}${new Date().getTime()}`
+        return `${year}${data.usersCount + 1}${new Date().getTime()}`
     },
     generateDeputyCode: function (data: TGetValidRegisterDataType): string {
         const year = data.entry_date?.toString().slice(2, 4)
-        return `${year}${data.allUsersCount + 1}${new Date().getTime()}`
+        return `${year}${data.usersCount + 1}${new Date().getTime()}`
     }
 }
 

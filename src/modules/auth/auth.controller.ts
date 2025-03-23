@@ -1,12 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 import { Controller, Post, UseMiddleware } from '../../decorators/router.decorator'
 import registerValidation from './auth.validation'
-import { errorHandling } from '../../core/utils/error-handling'
 import httpStatus from 'http-status'
 import authServices from './auth.services'
 import { fileUpload } from '../../core/utils/file-upload'
 import { TRegisterFilesType } from './auth.types'
 import userServices from '../user/user.services'
+import authUtils from './auth.utils'
+import { validationHandling } from '../../core/utils/validation-handling'
 
 @Controller('/auth')
 class AuthController {
@@ -26,9 +27,7 @@ class AuthController {
             req.body.military_image = files?.['military_image']?.[0]
             req.body.avatar = files?.['avatar']?.[0]
 
-            await registerValidation(req.body.role, req.body.gender).validate(req.body, {
-                abortEarly: false
-            })
+            await validationHandling(req.body, registerValidation(req.body.role, req.body.gender))
 
             const existUser = await authServices.checkExistUser({
                 national_code: req.body.national_code,
@@ -37,37 +36,28 @@ class AuthController {
             })
 
             if (existUser) {
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    status: httpStatus.BAD_REQUEST,
-                    message: 'کاربر وارد شده قبلا ثبت نام کرده است'
-                })
+                throw new Error('کاربر وارد شده قبلا ثبت نام کرده است')
             }
 
             if (req.body?.degree_id) {
                 const existDegree = await authServices.checkExistDegree(req.body.degree_id)
                 if (!existDegree) {
-                    return res.status(httpStatus.BAD_REQUEST).json({
-                        status: httpStatus.BAD_REQUEST,
-                        message: 'مقطع تحصیلی وارد شده وجود ندارد'
-                    })
+                    throw new Error('مقطع تحصیلی وارد شده وجود ندارد')
                 }
             }
 
             if (req.body?.department_id) {
                 const existDepartment = await authServices.checkExistDepartment(req.body.department_id)
                 if (!existDepartment) {
-                    return res.status(httpStatus.BAD_REQUEST).json({
-                        status: httpStatus.BAD_REQUEST,
-                        message: 'گروه آموزشی وارد شده وجود ندارد'
-                    })
+                    throw new Error('گروه آموزشی وارد شده وجود ندارد')
                 }
             }
 
-            const allUsersCount = await userServices.getUsersCount()
+            const usersCount = await userServices.getUsersCount()
 
-            const userData = authServices.getSpecialUserData({
+            const userData = authUtils.getSpecialUserData({
                 data: req.body,
-                allUsersCount
+                usersCount
             })
 
             const createdUser = await authServices.create(userData!)
@@ -77,12 +67,10 @@ class AuthController {
                     .status(httpStatus.CREATED)
                     .json({ status: httpStatus.CREATED, message: 'ثبت نام با موفقیت انجام شد' })
             } else {
-                return res
-                    .status(httpStatus.BAD_REQUEST)
-                    .json({ status: httpStatus.BAD_REQUEST, message: 'ثبت نام با مشکل مواجه شد' })
+                throw new Error('ثبت نام با مشکل مواجه شد')
             }
         } catch (error) {
-            errorHandling(error, res)
+            next(error)
         }
     }
 }

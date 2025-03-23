@@ -4,7 +4,9 @@ dotenv.config()
 
 const APP_ENV = {
     application: {
-        port: process.env.PORT
+        port: process.env.PORT,
+        protocol: process.env.PROTOCOL,
+        host: process.env.HOST
     },
     database: {
         dialect: process.env.DB_DIALECT,

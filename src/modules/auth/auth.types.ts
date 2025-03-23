@@ -34,7 +34,7 @@ type TRegisterDataType = Omit<TRegisterValidationType, 'national_code_image' | '
 
 type TGetSpecialUserDataType = {
     data: TRegisterValidationType
-    allUsersCount: number
+    usersCount: number
 }
 
 type TRegisterFilesType = {
@@ -53,7 +53,7 @@ type TGetValidRegisterDataType = Omit<TRegisterValidationType, 'national_code_im
     national_code_image: string | null
     military_image: string | null
     avatar: string | null
-    allUsersCount: number
+    usersCount: number
 }
 
 export type {
