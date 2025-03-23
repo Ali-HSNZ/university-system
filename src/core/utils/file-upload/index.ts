@@ -1,1 +1,1 @@
-export { default as fileUpload } from './file-upload'
+export { default as fileUpload } from './file-upload.utils'

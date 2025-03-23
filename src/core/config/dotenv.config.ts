@@ -1,5 +1,5 @@
 import dotenv from 'dotenv'
-
+import { StringValue } from 'ms'
 dotenv.config()
 
 const APP_ENV = {
@@ -7,6 +7,10 @@ const APP_ENV = {
         port: process.env.PORT,
         protocol: process.env.PROTOCOL,
         host: process.env.HOST
+    },
+    token: {
+        secretKey: (process.env.JWT_SECRET_KEY || 'secret-key') as string,
+        expiresIn: (process.env.JWT_EXPIRES_IN || '1d') as StringValue
     },
     database: {
         dialect: process.env.DB_DIALECT,

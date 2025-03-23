@@ -8,6 +8,7 @@ import { TRegisterFilesType } from './auth.types'
 import userServices from '../user/user.services'
 import authUtils from './auth.utils'
 import { validationHandling } from '../../core/utils/validation-handling'
+import { tokenGenerator } from '../../core/utils/token-generator'
 
 @Controller('/auth')
 class AuthController {
@@ -36,7 +37,7 @@ class AuthController {
             })
 
             if (existUser) {
-                throw new Error('کاربر وارد شده قبلا ثبت نام کرده است')
+                throw new Error('کاربر در سیستم وجود دارد')
             }
 
             if (req.body?.degree_id) {
@@ -62,10 +63,16 @@ class AuthController {
 
             const createdUser = await authServices.create(userData!)
 
+            const token = tokenGenerator({
+                nationalCode: userData?.national_code
+            })
+
             if (createdUser) {
-                return res
-                    .status(httpStatus.CREATED)
-                    .json({ status: httpStatus.CREATED, message: 'ثبت نام با موفقیت انجام شد' })
+                return res.status(httpStatus.CREATED).json({
+                    status: httpStatus.CREATED,
+                    data: { token },
+                    message: 'ثبت نام با موفقیت انجام شد'
+                })
             } else {
                 throw new Error('ثبت نام با مشکل مواجه شد')
             }

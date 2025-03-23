@@ -164,21 +164,9 @@
  *   post:
  *     summary: Logout the current user
  *     tags: [Authentication]
- *     security:
- *       - bearerAuth: []
  *     responses:
  *       200:
  *         description: Successfully logged out
  *       401:
  *         description: Unauthorized
- */
-
-/**
- * @swagger
- * components:
- *   securitySchemes:
- *     bearerAuth:
- *       type: http
- *       scheme: bearer
- *       bearerFormat: JWT
  */
