@@ -1,15 +1,14 @@
-import { Request, Response } from 'express'
+import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
 import departmentServices from './department.services'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import validationHandling from '../../core/utils/validation-handling/validation-handling.utils'
 import { createDepartmentValidation } from './department.validations'
-import { errorHandling } from '../../core/utils/error-handling'
 
 @Controller('/departments')
 class DepartmentController {
     @Get()
-    async getAllDepartments(req: Request, res: Response) {
+    async getAllDepartments(req: Request, res: Response, next: NextFunction) {
         try {
             const departments = await departmentServices.findAll()
             res.status(httpStatus.OK).json({
@@ -18,12 +17,12 @@ class DepartmentController {
                 data: departments
             })
         } catch (error) {
-            errorHandling(error, res)
+            next(error)
         }
     }
 
     @Get('/:id/info')
-    async getDepartmentById(req: Request, res: Response) {
+    async getDepartmentById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
 
@@ -49,12 +48,12 @@ class DepartmentController {
                 data: department
             })
         } catch (error) {
-            errorHandling(error, res)
+            next(error)
         }
     }
 
     @Post('/create')
-    async createDepartment(req: Request, res: Response) {
+    async createDepartment(req: Request, res: Response, next: NextFunction) {
         try {
             const { name } = await validationHandling(req.body, createDepartmentValidation)
 
@@ -81,39 +80,43 @@ class DepartmentController {
                 }
             }
         } catch (error) {
-            errorHandling(error, res)
+            next(error)
         }
     }
 
     @Put('/:id/update')
-    async updateDepartment(req: Request, res: Response) {
-        const { id } = req.params
-        const { name } = req.body
-        const department = await departmentServices.checkExistId(id)
-        if (!department) {
-            return res.status(httpStatus.NOT_FOUND).json({
-                status: httpStatus.NOT_FOUND,
-                message: 'گروه آموزشی یافت نشد'
-            })
-        }
-        const existDepartment = await departmentServices.checkExistName(name)
-        if (existDepartment) {
-            return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'این گروه آموزشی قبلا ثبت شده است'
-            })
-        }
-        const updatedDepartment = await departmentServices.update(id, name)
-        if (updatedDepartment) {
-            res.status(httpStatus.OK).json({
-                status: httpStatus.OK,
-                message: 'گروه آموزشی با موفقیت به روز شد'
-            })
-        } else {
-            res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'عملیات با مشکل مواجه شد'
-            })
+    async updateDepartment(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params
+            const { name } = req.body
+            const department = await departmentServices.checkExistId(id)
+            if (!department) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'گروه آموزشی یافت نشد'
+                })
+            }
+            const existDepartment = await departmentServices.checkExistName(name)
+            if (existDepartment) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'این گروه آموزشی قبلا ثبت شده است'
+                })
+            }
+            const updatedDepartment = await departmentServices.update(id, name)
+            if (updatedDepartment) {
+                res.status(httpStatus.OK).json({
+                    status: httpStatus.OK,
+                    message: 'گروه آموزشی با موفقیت به روز شد'
+                })
+            } else {
+                res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'عملیات با مشکل مواجه شد'
+                })
+            }
+        } catch (error) {
+            next(error)
         }
     }
 
