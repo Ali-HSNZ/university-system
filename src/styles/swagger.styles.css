@@ -19,9 +19,11 @@
 .swagger-ui .renderedMarkdown p,
 .swagger-ui .parameter__type,
 .swagger-ui .parameter__deprecated,
-.swagger-ui .parameter__in {
+.swagger-ui .parameter__in,
+.swagger-ui input {
     font-family: 'IranYekan', sans-serif !important;
 }
+
 .swagger-ui .renderedMarkdown li {
     padding: 3px 0 !important;
 }
