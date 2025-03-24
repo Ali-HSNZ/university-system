@@ -7,7 +7,7 @@ const EntryYearCourseModel = sequelizeConfig.define(
     'entry_year_course',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        entry_year: { type: DataTypes.STRING, allowNull: false }
+        year: { type: DataTypes.STRING, allowNull: false }
     },
     { timestamps: false, freezeTableName: true }
 )
