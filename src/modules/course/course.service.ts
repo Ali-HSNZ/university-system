@@ -1,6 +1,6 @@
 import { Op } from 'sequelize'
 import { CourseModel } from '../../models/course.model'
-import { TCreateCourseType, TUpdateCourseType } from './course.types'
+import TCreateCourseType from './course.types'
 
 const courseService = {
     getAll: async () => {
@@ -19,11 +19,11 @@ const courseService = {
         const count = await CourseModel.count()
         return count
     },
-    create: async (courseDTO: TCreateCourseType) => {
+    create: async (courseDTO: TCreateCourseType & { code: string }) => {
         const course = await CourseModel.create(courseDTO)
         return course
     },
-    update: async (courseDTO: TUpdateCourseType, id: number) => {
+    update: async (courseDTO: TCreateCourseType, id: number) => {
         const course = await CourseModel.update(courseDTO, { where: { id } })
         return course
     },

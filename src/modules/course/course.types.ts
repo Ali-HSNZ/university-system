@@ -1,10 +1,7 @@
 type TCreateCourseType = {
     name: string
-    code: string
-    theory_unit: number
-    practical_unit: number
+    theory_unit: string
+    practical_unit: string
 }
 
-type TUpdateCourseType = Omit<TCreateCourseType, 'code'>
-
-export { TCreateCourseType, TUpdateCourseType }
+export default TCreateCourseType

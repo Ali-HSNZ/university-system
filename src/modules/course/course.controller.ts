@@ -5,6 +5,7 @@ import courseService from './course.service'
 import { validationHandling } from '../../core/utils/validation-handling'
 import createCourseSchema from './course.validation'
 import { checkValidId } from '../../core/utils/check-valid-id'
+import TCreateCourseType from './course.types'
 
 @Controller('/courses')
 class CourseController {
