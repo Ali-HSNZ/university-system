@@ -4,6 +4,7 @@ import departmentServices from './department.services'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import validationHandling from '../../core/utils/validation-handling/validation-handling.utils'
 import { createDepartmentValidation } from './department.validations'
+import { checkValidId } from '../../core/utils/check-valid-id'
 
 @Controller('/departments')
 class DepartmentController {
@@ -25,14 +26,7 @@ class DepartmentController {
     async getDepartmentById(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
-
-            //  check valid id
-            if (isNaN(Number(id))) {
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    status: httpStatus.BAD_REQUEST,
-                    message: 'شناسه نامعتبر است'
-                })
-            }
+            checkValidId(id)
 
             const department = await departmentServices.checkExistId(id)
             if (!department) {
@@ -88,6 +82,8 @@ class DepartmentController {
     async updateDepartment(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
+            checkValidId(id)
+
             const { name } = req.body
             const department = await departmentServices.checkExistId(id)
             if (!department) {
@@ -123,6 +119,8 @@ class DepartmentController {
     @Delete('/:id/delete')
     async deleteDepartment(req: Request, res: Response) {
         const { id } = req.params
+        checkValidId(id)
+
         const department = await departmentServices.checkExistId(id)
         if (!department) {
             return res.status(httpStatus.NOT_FOUND).json({

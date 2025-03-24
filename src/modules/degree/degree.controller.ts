@@ -2,6 +2,7 @@ import { Request, Response } from 'express'
 import httpStatus from 'http-status'
 import degreeServices from './degree.services'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
+import { checkValidId } from '../../core/utils/check-valid-id'
 
 @Controller('/degrees')
 class DegreeController {
@@ -18,6 +19,8 @@ class DegreeController {
     @Get('/:id/info')
     async getById(req: Request, res: Response) {
         const { id } = req.params
+        checkValidId(id)
+
         const degree = await degreeServices.checkExistId(id)
 
         if (!degree) {
@@ -61,6 +64,8 @@ class DegreeController {
     @Put('/:id/update')
     async update(req: Request, res: Response) {
         const { id } = req.params
+        checkValidId(id)
+
         const { name } = req.body
         const existDegree = await degreeServices.checkExistId(id)
         if (!existDegree) {
@@ -85,6 +90,7 @@ class DegreeController {
     @Delete('/:id/delete')
     async delete(req: Request, res: Response) {
         const { id } = req.params
+        checkValidId(id)
 
         const existDegree = await degreeServices.checkExistId(id)
         if (!existDegree) {
