@@ -4,7 +4,7 @@ import { UserModel } from '../../models/user.model'
 const degreeServices = {
     findAll: async () => {
         const degrees = await DegreeModel.findAll({
-            attributes: ['id', 'degree_name']
+            attributes: ['id', 'name']
         })
         return degrees
     },
@@ -15,15 +15,15 @@ const degreeServices = {
         return !!degree
     },
     create: async (name: string) => {
-        const degree = await DegreeModel.create({ degree_name: name })
+        const degree = await DegreeModel.create({ name })
         return degree
     },
     checkExistName: async (name: string) => {
-        const degree = await DegreeModel.findOne({ where: { degree_name: name }, attributes: ['id', 'degree_name'] })
+        const degree = await DegreeModel.findOne({ where: { name }, attributes: ['id', 'name'] })
         return degree
     },
     checkExistId: async (id: string) => {
-        const degree = await DegreeModel.findOne({ where: { id: id }, attributes: ['id', 'degree_name'] })
+        const degree = await DegreeModel.findOne({ where: { id }, attributes: ['id', 'name'] })
         return degree
     },
     delete: async (id: string) => {
@@ -31,7 +31,7 @@ const degreeServices = {
         return degree
     },
     update: async (id: string, name: string) => {
-        const degree = await DegreeModel.update({ degree_name: name }, { where: { id: Number(id) } })
+        const degree = await DegreeModel.update({ name }, { where: { id: Number(id) } })
         return degree
     },
     checkUsersWithDegree: async (id: string) => {

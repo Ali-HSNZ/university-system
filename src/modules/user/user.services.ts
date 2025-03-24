@@ -9,8 +9,8 @@ const userServices = {
         const users = await UserModel.findAll({
             attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'degree_id', 'department_id'] },
             include: [
-                { model: DegreeModel, attributes: ['id', 'degree_name'] },
-                { model: DepartmentModel, attributes: ['id', 'department_name'] }
+                { model: DegreeModel, attributes: ['id', 'name'] },
+                { model: DepartmentModel, attributes: ['id', 'name'] }
             ]
         })
         return users
@@ -50,8 +50,8 @@ const userServices = {
         const user = await UserModel.findByPk(id, {
             attributes: { exclude: ['password', 'degree_id', 'department_id'] },
             include: [
-                { model: DegreeModel, attributes: ['id', 'degree_name'] },
-                { model: DepartmentModel, attributes: ['id', 'department_name'] }
+                { model: DegreeModel, attributes: ['id', 'name'] },
+                { model: DepartmentModel, attributes: ['id', 'name'] }
             ]
         })
         return user

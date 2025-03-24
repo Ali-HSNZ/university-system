@@ -4,16 +4,16 @@ import { UserModel } from '../../models/user.model'
 const departmentServices = {
     findAll: async () => {
         const departments = await DepartmentModel.findAll({
-            attributes: ['id', 'department_name']
+            attributes: ['id', 'name']
         })
         return departments
     },
-    create: async (department_name: string) => {
-        const department = await DepartmentModel.create({ department_name })
+    create: async (name: string) => {
+        const department = await DepartmentModel.create({ name })
         return department
     },
-    checkExistName: async (department_name: string) => {
-        const department = await DepartmentModel.findOne({ where: { department_name } })
+    checkExistName: async (name: string) => {
+        const department = await DepartmentModel.findOne({ where: { name } })
         return !!department
     },
     checkExistId: async (id: string) => {
@@ -29,7 +29,7 @@ const departmentServices = {
         if (!department) {
             return false
         }
-        await department.update({ department_name: name })
+        await department.update({ name })
         return true
     },
     checkUsersInDepartment: async (id: string) => {
@@ -44,7 +44,7 @@ const departmentServices = {
 
         const department = await DepartmentModel.findByPk(department_id.toString().trim())
         return !!department
-    },
+    }
 }
 
 export default departmentServices
