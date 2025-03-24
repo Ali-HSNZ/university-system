@@ -9,6 +9,8 @@ import userServices from '../user/user.services'
 import authUtils from './auth.utils'
 import { validationHandling } from '../../core/utils/validation-handling'
 import { tokenGenerator } from '../../core/utils/token-generator'
+import degreeServices from '../degree/degree.services'
+import departmentServices from '../department/department.services'
 
 @Controller('/auth')
 class AuthController {
@@ -30,7 +32,7 @@ class AuthController {
 
             await validationHandling(req.body, registerValidation(req.body.role, req.body.gender))
 
-            const existUser = await authServices.checkExistUser({
+            const existUser = await userServices.findOne({
                 national_code: req.body.national_code,
                 phone: req.body.phone,
                 email: req.body.email
@@ -41,41 +43,41 @@ class AuthController {
             }
 
             if (req.body?.degree_id) {
-                const existDegree = await authServices.checkExistDegree(req.body.degree_id)
+                const existDegree = await degreeServices.checkExist(req.body.degree_id)
                 if (!existDegree) {
                     throw new Error('مقطع تحصیلی وارد شده وجود ندارد')
                 }
             }
 
             if (req.body?.department_id) {
-                const existDepartment = await authServices.checkExistDepartment(req.body.department_id)
+                const existDepartment = await departmentServices.checkExist(req.body.department_id)
                 if (!existDepartment) {
                     throw new Error('گروه آموزشی وارد شده وجود ندارد')
                 }
             }
 
-            const usersCount = await userServices.getUsersCount()
+            const usersCount = await userServices.count()
 
             const userData = authUtils.getSpecialUserData({
                 data: req.body,
                 usersCount
             })
 
-            const createdUser = await authServices.create(userData!)
+            const register = await authServices.register(userData!)
 
             const token = tokenGenerator({
                 nationalCode: userData?.national_code
             })
 
-            if (createdUser) {
+            if (register) {
                 return res.status(httpStatus.CREATED).json({
                     status: httpStatus.CREATED,
                     data: { token },
                     message: 'ثبت نام با موفقیت انجام شد'
                 })
-            } else {
-                throw new Error('ثبت نام با مشکل مواجه شد')
             }
+
+            throw new Error('ثبت نام با مشکل مواجه شد')
         } catch (error) {
             next(error)
         }

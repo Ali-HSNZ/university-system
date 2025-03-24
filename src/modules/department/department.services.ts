@@ -38,7 +38,13 @@ const departmentServices = {
             attributes: ['id', 'username', 'full_name', 'role']
         })
         return users
-    }
+    },
+    checkExist: async (department_id: string | undefined) => {
+        if (!department_id) return false
+
+        const department = await DepartmentModel.findByPk(department_id.toString().trim())
+        return !!department
+    },
 }
 
 export default departmentServices

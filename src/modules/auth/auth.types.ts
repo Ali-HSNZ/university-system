@@ -43,12 +43,6 @@ type TRegisterFilesType = {
     avatar: Express.Multer.File[] | undefined
 }
 
-type TCheckExistUserType = {
-    national_code?: string
-    phone?: string
-    email?: string
-}
-
 type TGetValidRegisterDataType = Omit<TRegisterValidationType, 'national_code_image' | 'military_image' | 'avatar'> & {
     national_code_image: string | null
     military_image: string | null
@@ -59,9 +53,9 @@ type TGetValidRegisterDataType = Omit<TRegisterValidationType, 'national_code_im
 export type {
     TRegisterFilesType,
     TRegisterDataType,
-    TCheckExistUserType,
     TGetValidRegisterDataType,
     TGetSpecialUserDataType,
     TUserRoleType,
-    TUserGenderType
+    TUserGenderType,
+    TRegisterValidationType
 }
