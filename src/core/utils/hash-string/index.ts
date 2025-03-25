@@ -1,1 +1,1 @@
-export { default as hashString } from './hash-string.utils'
+export { hashString, compareHash } from './hash-string.utils'

@@ -5,4 +5,8 @@ const hashString = (value: string) => {
     return bcrypt.hashSync(value, salt)
 }
 
-export default hashString
+const compareHash = (current: string, hashed: string) => {
+    return bcrypt.compareSync(current, hashed)
+}
+
+export { hashString, compareHash }
