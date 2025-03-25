@@ -138,20 +138,22 @@
  *     requestBody:
  *       required: true
  *       content:
- *         application/json:
+ *         application/x-www-form-urlencoded:
  *           schema:
  *             type: object
  *             required:
- *               - username
+ *               - national_code
  *               - password
  *             properties:
- *               username:
+ *               national_code:
  *                 type: string
+ *                 default: ''
  *               password:
  *                 type: string
+ *                 default: ''
  *     responses:
  *       200:
- *         description: Login successful, returns token
+ *         description: Login successful
  *       401:
  *         description: Unauthorized, invalid credentials
  *       404:

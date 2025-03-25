@@ -2,6 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
 import { DegreeModel } from './degree.model'
 import { CourseModel } from './course.model'
+import { DepartmentModel } from './department.model'
 
 const EntryYearCourseModel = sequelizeConfig.define(
     'entry_year_course',
@@ -14,5 +15,6 @@ const EntryYearCourseModel = sequelizeConfig.define(
 
 EntryYearCourseModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
 EntryYearCourseModel.belongsTo(CourseModel, { foreignKey: 'course_id', onDelete: 'CASCADE' })
+EntryYearCourseModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 
 export { EntryYearCourseModel }

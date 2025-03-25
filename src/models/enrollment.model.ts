@@ -1,12 +1,14 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
-import { UserModel } from './user.model'
+import { UserModel } from './user.model' // دانشجویان
 import { ClassModel } from './class.model'
 
 const EnrollmentModel = sequelizeConfig.define(
     'enrollment',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        student_id: { type: DataTypes.INTEGER, allowNull: false },
+        class_id: { type: DataTypes.INTEGER, allowNull: false },
         status: {
             type: DataTypes.ENUM('pending', 'approved', 'rejected'),
             defaultValue: 'pending'
