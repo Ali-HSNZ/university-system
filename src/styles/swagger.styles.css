@@ -24,6 +24,14 @@
     font-family: 'IranYekan', sans-serif !important;
 }
 
+.swagger-ui .opblock-description-wrapper .renderedMarkdown {
+    direction: rtl !important;
+}
+
+.swagger-ui .opblock-description-wrapper .renderedMarkdown pre {
+    direction: ltr !important;
+}
+
 .swagger-ui .renderedMarkdown li {
     padding: 3px 0 !important;
 }
