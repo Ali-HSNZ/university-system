@@ -16,20 +16,12 @@
 .swagger-ui table tbody tr td,
 .swagger-ui .parameter__name,
 .swagger-ui strong,
-.swagger-ui .renderedMarkdown p,
+.swagger-ui .renderedMarkdown,
 .swagger-ui .parameter__type,
 .swagger-ui .parameter__deprecated,
 .swagger-ui .parameter__in,
 .swagger-ui input {
     font-family: 'IranYekan', sans-serif !important;
-}
-
-.swagger-ui .opblock-description-wrapper .renderedMarkdown {
-    direction: rtl !important;
-}
-
-.swagger-ui .opblock-description-wrapper .renderedMarkdown pre {
-    direction: ltr !important;
 }
 
 .swagger-ui .renderedMarkdown li {

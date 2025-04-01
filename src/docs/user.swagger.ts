@@ -4,7 +4,7 @@
  *   get:
  *     tags: [User]
  *     responses:
- *       200:
+ *       200:   
  *         description: A list of users
  */
 
@@ -42,7 +42,6 @@
  *         description: Bad Request
  */
 
-
 /**
  * @swagger
  * /users/{id}/info:
@@ -59,7 +58,6 @@
  *       404:
  *         description: User not found
  */
-
 
 /**
  * @swagger
@@ -129,7 +127,6 @@
  *       400:
  *         description: Bad Request
  */
-
 
 /**
  * @swagger

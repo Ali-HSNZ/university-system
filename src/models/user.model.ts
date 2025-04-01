@@ -1,5 +1,6 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
+import { APP_ENV } from '../core/config/dotenv.config'
 
 const UserModel = sequelizeConfig.define(
     'users',
@@ -34,8 +35,8 @@ const UserModel = sequelizeConfig.define(
     {
         timestamps: true,
         freezeTableName: true,
-        paranoid: true, // حذف نرم
-        deletedAt: 'deleted_at', // ذخیره زمان حذف
+        paranoid: true,
+        deletedAt: 'deleted_at',
         createdAt: 'created_at',
         updatedAt: 'updated_at',
         defaultScope: {
@@ -43,5 +44,23 @@ const UserModel = sequelizeConfig.define(
         }
     }
 )
+
+const PROTOCOL = APP_ENV.application.protocol
+const HOST = APP_ENV.application.host
+const PORT = APP_ENV.application.port
+
+const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
+
+const serializeUserModel = (user: any) => {
+    if (user.avatar) user.avatar = BASE_URL + user.avatar
+    return user
+}
+
+// i want to get user with "user_id" in "students" table
+
+UserModel.addHook('afterFind', (result: any) => {
+    if (Array.isArray(result)) result.forEach((user) => serializeUserModel(user))
+    else if (result) serializeUserModel(result)
+})
 
 export { UserModel }

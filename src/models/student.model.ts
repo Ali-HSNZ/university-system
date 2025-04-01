@@ -3,12 +3,14 @@ import { sequelizeConfig } from '../core/config/database.config'
 import { UserModel } from './user.model'
 import { DegreeModel } from './degree.model'
 import { DepartmentModel } from './department.model'
+import { HighSchoolDiplomaModel } from './highSchoolDiploma.model'
+import { APP_ENV } from '../core/config/dotenv.config'
 
 const StudentModel = sequelizeConfig.define(
     'students',
     {
         student_code: { type: DataTypes.STRING(10), allowNull: false },
-        degree_id: { type: DataTypes.INTEGER, allowNull: false },
+        pre_degree_id: { type: DataTypes.INTEGER, allowNull: false },
         department_id: { type: DataTypes.INTEGER, allowNull: false },
         entry_year: { type: DataTypes.INTEGER, allowNull: false },
         entry_semester: { type: DataTypes.ENUM('1', '2'), allowNull: false },
@@ -29,8 +31,12 @@ const StudentModel = sequelizeConfig.define(
         },
         guardian_name: { type: DataTypes.STRING(100), allowNull: true },
         guardian_phone: { type: DataTypes.STRING(11), allowNull: true },
-        high_school_diploma: { type: DataTypes.STRING(255), allowNull: true },
-        pre_university_certificate: { type: DataTypes.STRING(255), allowNull: true },
+        high_school_diploma_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: { model: 'high_school_diplomas', key: 'id' },
+            onDelete: 'SET NULL'
+        },
         national_card_image: { type: DataTypes.STRING(255), allowNull: true },
         birth_certificate_image: { type: DataTypes.STRING(255), allowNull: true },
         military_service_image: { type: DataTypes.STRING(255), allowNull: true }
@@ -39,7 +45,29 @@ const StudentModel = sequelizeConfig.define(
 )
 
 StudentModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
-StudentModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
 StudentModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
+StudentModel.belongsTo(HighSchoolDiplomaModel, { foreignKey: 'high_school_diploma_id', onDelete: 'SET NULL' })
+StudentModel.belongsTo(DegreeModel, { foreignKey: 'pre_degree_id', onDelete: 'CASCADE' })
 
+const protocol = APP_ENV.application.protocol
+const host = APP_ENV.application.host
+const port = APP_ENV.application.port
+
+const BASE_URL = `${protocol}://${host}:${port}`
+
+const files = ['national_card_image', 'birth_certificate_image', 'military_service_image']
+
+const populateStudentData = async (student: any) => {
+    if (!student) return
+
+    files.forEach((field) => {
+        if (student[field]) student[field] = `${BASE_URL}${student[field]}`
+    })
+}
+
+StudentModel.addHook('afterFind', async (result: any) => {
+    if (!result) return
+    if (Array.isArray(result)) await Promise.all(result.map(populateStudentData))
+    else await populateStudentData(result)
+})
 export { StudentModel }

@@ -1,10 +1,15 @@
+import { StudentModel } from '../../models/student.model'
 import { UserModel } from '../../models/user.model'
-import { TRegisterDataType } from './auth.types'
+import { TRegisterStudentType, TRegisterUserType, TUserRoleType } from './auth.types'
 
 const authServices = {
-    register: async (data: TRegisterDataType) => {
+    registerUser: async (data: TRegisterUserType & { role: TUserRoleType; password: string }) => {
         const user = await UserModel.create(data)
         return user
+    },
+    registerStudent: async (data: TRegisterStudentType & { user_id: number }) => {
+        const student = await StudentModel.create(data)
+        return student
     }
 }
 

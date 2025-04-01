@@ -9,7 +9,7 @@
  *     description: مدیریت دانشجویان
  *   - name: Professor
  *     description: مدیریت استادها
- *   - name: EducationAssistant
+ *   - name: Education Assistant
  *     description: مدیریت کارشناس آموزشی
  *   - name: Course
  *     description: مدیریت دروس
@@ -23,12 +23,14 @@
  *     description: مدیریت نمرات دانشجویان
  *   - name: Semester
  *     description: مدیریت ترم ها
- *   - name: ImportantDates
+ *   - name: Important Dates
  *     description: مدیریت تاریخ های مهم مانند شروع و پایان ترم
  *   - name: Department
  *     description: مدیریت گروه های آموزشی
  *   - name: Degree
  *     description: مدیریت مقاطع تحصیلی
- *   - name: EntryYearCourse
+ *   - name: Entry Year Course
  *     description: مدیریت دروس مناسب برای هر سال ورود
+ *   - name: University Certificate
+ *     description: مدیریت مدارک تحص
  */

@@ -9,7 +9,6 @@ const authUtils = {
         const index = filePath.indexOf('/uploads/')
         return filePath.slice(index)
     },
-
     getSpecialUserData: function ({ data, usersCount }: TGetSpecialUserDataType): TRegisterDataType {
         const national_code_image = authUtils.getFilePath(data.national_code_image?.path) || null
         const military_image = authUtils.getFilePath(data.military_image?.path) || null

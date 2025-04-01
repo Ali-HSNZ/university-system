@@ -1,5 +1,3 @@
-import { DegreeModel } from '../../models/degree.model'
-import { DepartmentModel } from '../../models/department.model'
 import { UserModel } from '../../models/user.model'
 import { Op } from 'sequelize'
 import { TCheckExistUserType, TUpdateUserDataType } from './user.types'
@@ -7,11 +5,7 @@ import { TCheckExistUserType, TUpdateUserDataType } from './user.types'
 const userServices = {
     getAll: async () => {
         const users = await UserModel.findAll({
-            attributes: { exclude: ['password', 'createdAt', 'updatedAt', 'degree_id', 'department_id'] },
-            include: [
-                { model: DegreeModel, attributes: ['id', 'name'] },
-                { model: DepartmentModel, attributes: ['id', 'name'] }
-            ]
+            attributes: { exclude: ['password'] }
         })
         return users
     },
@@ -48,16 +42,16 @@ const userServices = {
     },
     getById: async (id: number) => {
         const user = await UserModel.findByPk(id, {
-            attributes: { exclude: ['password', 'degree_id', 'department_id'] },
-            include: [
-                { model: DegreeModel, attributes: ['id', 'name'] },
-                { model: DepartmentModel, attributes: ['id', 'name'] }
-            ]
+            attributes: { exclude: ['password'] }
         })
         return user
     },
-    checkExist: async (id: number) => {
+    checkExistById: async (id: number) => {
         const user = await UserModel.findByPk(id)
+        return user
+    },
+    checkExistByNationalCode: async (national_code: string) => {
+        const user = await UserModel.findOne({ where: { national_code } })
         return user
     },
     findOne: async (data: TCheckExistUserType) => {
