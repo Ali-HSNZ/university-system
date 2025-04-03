@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from 'express'
+import { Request, Response } from 'express'
 import { Controller, Delete, Get, Put } from '../../decorators/router.decorator'
-import userServices from './user.services'
+import userServices from './user.service'
 import httpStatus from 'http-status'
 
 @Controller('/user')

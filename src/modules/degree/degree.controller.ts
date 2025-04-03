@@ -1,6 +1,6 @@
 import { Request, Response } from 'express'
 import httpStatus from 'http-status'
-import degreeServices from './degree.services'
+import degreeServices from './degree.service'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import { checkValidId } from '../../core/utils/check-valid-id'
 

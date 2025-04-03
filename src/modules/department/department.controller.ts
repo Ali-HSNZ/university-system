@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
-import departmentServices from './department.services'
+import departmentServices from './department.service'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import validationHandling from '../../core/utils/validation-handling/validation-handling.utils'
 import { createDepartmentValidation } from './department.validations'

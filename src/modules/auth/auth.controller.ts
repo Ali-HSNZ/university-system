@@ -7,7 +7,7 @@ import {
     registerUniversityPresidentValidation
 } from './auth.validation'
 import httpStatus from 'http-status'
-import authServices from './auth.services'
+import authServices from './auth.service'
 import { fileUpload } from '../../core/utils/file-upload'
 import {
     TRegisterEducationAssistantFilesType,
@@ -19,14 +19,14 @@ import {
     TRegisterUniversityPresidentFilesType,
     TRegisterUniversityPresidentInferType
 } from './auth.types'
-import userServices from '../user/user.services'
+import userServices from '../user/user.service'
 import { validationHandling } from '../../core/utils/validation-handling'
 import { tokenGenerator } from '../../core/utils/token-generator'
-import degreeServices from '../degree/degree.services'
-import { compareHash, hashString } from '../../core/utils/hash-string'
-import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.services'
+import degreeServices from '../degree/degree.service'
+import { hashString } from '../../core/utils/hash-string'
+import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
 import { serializeArray } from '../../core/middleware/serialize-array'
-import departmentServices from '../department/department.services'
+import departmentServices from '../department/department.service'
 import { serializeFilePath } from '../../core/utils/serialize-file-path'
 
 @Controller('/auth')

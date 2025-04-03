@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Controller, Get } from '../../decorators/router.decorator'
-import professorServices from './professor.services'
+import professorServices from './professor.service'
 import httpStatus from 'http-status'
 
 @Controller('/professor')
