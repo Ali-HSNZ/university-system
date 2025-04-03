@@ -270,45 +270,120 @@
  */
 
 
-
 /**
  * @swagger
- * /auth/login:
+ * /auth/register/education-assistant:
  *   post:
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
  *       content:
- *         application/x-www-form-urlencoded:
+ *         multipart/form-data:
  *           schema:
  *             type: object
  *             required:
+ *               - first_name
+ *               - last_name
+ *               - email
+ *               - phone
  *               - national_code
- *               - password
+ *               - birth_date
+ *               - gender
+ *               - avatar
+ *               - department_id
+ *               - degree_id
+ *               - work_experience_years
+ *               - hire_date
+ *               - national_card_image
+ *               - birth_certificate_image
+ *               - military_service_image
  *             properties:
- *               national_code:
- *                 type: string
- *                 default: ''
- *               password:
- *                 type: string
- *                 default: ''
+ *                first_name:
+ *                  type: string
+ *                  description: "نام"
+ *                  example: "Ali"
+ *                last_name:
+ *                  type: string
+ *                  description: "نام خانوادگی"
+ *                  example: "Rezaei"
+ *                email:
+ *                  type: string
+ *                  description: "ایمیل"
+ *                  example: "ali.rezaei@example.com"
+ *                phone:
+ *                  type: string
+ *                  description: "شماره تماس"
+ *                  example: "09123456789"
+ *                national_code:
+ *                  type: string
+ *                  description: "کد ملی"
+ *                  example: "1234567890"
+ *                birth_date:
+ *                  type: string
+ *                  format: date
+ *                  description: "تاریخ تولد"
+ *                  example: "2000-01-01"
+ *                gender:
+ *                  type: enum
+ *                  enum: ["male", "female"]
+ *                  description: "جنسیت"
+ *                  example: "male"
+ *                department_id:
+ *                  type: integer
+ *                  description: "شناسه گروه آموزشی"
+ *                  example: 1
+ *                degree_id:
+ *                  type: integer
+ *                  description: "شناسه مقطع تحصیلی"
+ *                  example: 1
+ *                work_experience_years:
+ *                  type: integer
+ *                  description: "سابقه کاری"
+ *                  example: 5
+ *                office_phone:
+ *                  type: string
+ *                  description: "تلفن دفتر"
+ *                  example: "09123456789"
+ *                office_address:
+ *                  type: string
+ *                  description: "آدرس دفتر"
+ *                  example: "Tehran, Iran"
+ *                hire_date:
+ *                  type: string
+ *                  format: date
+ *                  description: "تاریخ استخدام"
+ *                  example: "2025-03-22"
+ *                responsibilities:
+ *                  type: string
+ *                  description: "وظایف"
+ *                  example: "Responsibilities"
+ *                avatar:
+ *                  type: string
+ *                  format: binary
+ *                  description: "عکس پرسنلی"
+ *                national_card_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر کارت ملی"
+ *                birth_certificate_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر شناسنامه"
+ *                military_service_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر کارت پایان خدمت"
+ *                employment_contract_file:
+ *                  type: string
+ *                  format: binary
+ *                  description: "قرارداد کاری"
  *     responses:
- *       200:
- *         description: Login successful
- *       401:
- *         description: Unauthorized, invalid credentials
- *       404:
- *         description: User not found
+ *       201:
+ *         description: "معاون آموزشی با موفقیت ثبت شد"
+ *       400:
+ *         description: "درخواست نامعتبر (خطا در داده‌های ورودی)"
+ *       500:
+ *         description: "خطای داخلی سرور"
  */
 
-/**
- * @swagger
- * /auth/logout:
- *   post:
- *     tags: [Authentication]
- *     responses:
- *       200:
- *         description: Successfully logged out
- *       401:
- *         description: Unauthorized
- */
+

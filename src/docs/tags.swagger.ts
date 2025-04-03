@@ -3,13 +3,9 @@
  * tags:
  *   - name: Authentication
  *   - name: User
- *     description: مدیریت کاربران، از جمله دانشجویان، استادها و مدیران
  *   - name: Student
- *     description: مدیریت دانشجویان
  *   - name: Professor
- *     description: مدیریت استادها
  *   - name: Education Assistant
- *     description: مدیریت کارشناس آموزشی
  *   - name: Course
  *     description: مدیریت دروس
  *   - name: Class

@@ -1,11 +1,17 @@
 import { InferType } from 'yup'
-import { registerProfessorValidation, registerStudentValidation } from './auth.validation'
+import {
+    registerEducationAssistantValidation,
+    registerProfessorValidation,
+    registerStudentValidation
+} from './auth.validation'
 
 type TUserGenderType = 'male' | 'female'
 
 type TRegisterStudentInferType = InferType<typeof registerStudentValidation>
 
 type TRegisterProfessorInferType = InferType<typeof registerProfessorValidation>
+
+type TRegisterEducationAssistantInferType = InferType<typeof registerEducationAssistantValidation>
 
 type TBaseUserDataType = {
     first_name: string
@@ -38,11 +44,21 @@ type TRegisterProfessorFilesType = {
     employment_contract_file: Express.Multer.File[] | undefined
 }
 
+type TRegisterEducationAssistantFilesType = {
+    avatar: Express.Multer.File[] | undefined
+    national_card_image: Express.Multer.File[] | undefined
+    birth_certificate_image: Express.Multer.File[] | undefined
+    military_service_image: Express.Multer.File[] | undefined
+    employment_contract_file: Express.Multer.File[] | undefined
+}
+
 export type {
     TRegisterStudentFilesType,
-    TUserGenderType,
-    TBaseUserDataType,
-    TRegisterStudentInferType,
+    TRegisterEducationAssistantFilesType,
     TRegisterProfessorFilesType,
-    TRegisterProfessorInferType
+    TRegisterStudentInferType,
+    TRegisterProfessorInferType,
+    TRegisterEducationAssistantInferType,
+    TUserGenderType,
+    TBaseUserDataType
 }

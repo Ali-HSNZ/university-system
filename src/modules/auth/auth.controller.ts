@@ -1,10 +1,16 @@
 import { Request, Response, NextFunction } from 'express'
 import { Controller, Post, UseMiddleware } from '../../decorators/router.decorator'
-import { loginValidation, registerProfessorValidation, registerStudentValidation } from './auth.validation'
+import {
+    registerEducationAssistantValidation,
+    registerProfessorValidation,
+    registerStudentValidation
+} from './auth.validation'
 import httpStatus from 'http-status'
 import authServices from './auth.services'
 import { fileUpload } from '../../core/utils/file-upload'
 import {
+    TRegisterEducationAssistantFilesType,
+    TRegisterEducationAssistantInferType,
     TRegisterProfessorFilesType,
     TRegisterProfessorInferType,
     TRegisterStudentFilesType,
@@ -93,12 +99,7 @@ class AuthController {
                 student_status: 'active',
                 total_passed_units: 0,
                 current_term_units: 0,
-                birth_date: data.birth_date,
                 diploma_date: data.diploma_date,
-                first_name: data.first_name,
-                last_name: data.last_name,
-                national_code: data.national_code,
-                gender: data.gender,
                 probation_terms: 0,
                 term_gpa: null,
                 total_gpa: null,
@@ -160,7 +161,7 @@ class AuthController {
             })
             if (existUser) throw new Error('کاربر در سیستم وجود دارد')
 
-            const existDepartment = await departmentServices.checkExist(data.department_id)
+            const existDepartment = await departmentServices.checkExist(Number(data.department_id))
             if (!existDepartment) throw new Error('گروه آموزشی موجود نمی باشد')
 
             const existDegree = await degreeServices.checkExist(data.degree_id)
@@ -198,16 +199,7 @@ class AuthController {
 
             const professor = await authServices.registerProfessor({
                 user_id: user.dataValues.id,
-                first_name: data.first_name,
-                last_name: data.last_name,
                 professor_code: professorCode,
-                national_code: data.national_code,
-                gender: data.gender,
-                birth_date: data.birth_date,
-                phone: data.phone || undefined,
-                email: data.email || undefined,
-                address: data.address || undefined,
-                avatar: images?.avatar,
                 academic_rank: data.academic_rank,
                 hire_date: data.hire_date,
                 degree_id: data.degree_id,
@@ -239,36 +231,94 @@ class AuthController {
         }
     }
 
-    @Post('/login')
-    async login(req: Request, res: Response, next: NextFunction) {
+    @Post('/register/education-assistant')
+    @UseMiddleware(
+        fileUpload.fields([
+            { name: 'avatar', maxCount: 1 },
+            { name: 'national_card_image', maxCount: 1 },
+            { name: 'birth_certificate_image', maxCount: 1 },
+            { name: 'military_service_image', maxCount: 1 },
+            { name: 'employment_contract_file', maxCount: 1 }
+        ])
+    )
+    async registerEducationAssistant(req: Request, res: Response, next: NextFunction) {
         try {
-            const { national_code, password } = req.body
-            await validationHandling(req.body, loginValidation)
+            const files = req.files as TRegisterEducationAssistantFilesType
 
-            const user = await userServices.checkExistByNationalCode(national_code.trim())
+            req.body.avatar = files?.['avatar']?.[0]
+            req.body.national_card_image = files?.['national_card_image']?.[0]
+            req.body.birth_certificate_image = files?.['birth_certificate_image']?.[0]
+            req.body.military_service_image = files?.['military_service_image']?.[0]
+            req.body.employment_contract_file = files?.['employment_contract_file']?.[0]
 
-            if (!user) {
-                return res.status(httpStatus.UNAUTHORIZED).json({
-                    status: httpStatus.UNAUTHORIZED,
-                    message: 'نام کاربری اشتباه می باشد'
-                })
+            const data = await validationHandling<TRegisterEducationAssistantInferType>(
+                req.body,
+                registerEducationAssistantValidation
+            )
+
+            const existUser = await userServices.findOne({
+                national_code: data.national_code,
+                phone: data.phone || undefined,
+                email: data.email || undefined
+            })
+
+            if (existUser) throw new Error('کاربر در سیستم وجود دارد')
+
+            const existDepartment = await departmentServices.checkExist(data.department_id)
+            if (!existDepartment) throw new Error('گروه آموزشی موجود نمی باشد')
+
+            const existDegree = await degreeServices.checkExist(Number(data.degree_id))
+            if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
+
+            const images = {
+                avatar: serializeFilePath(req.body.avatar?.path) || undefined,
+                national_card_image: serializeFilePath(req.body.national_card_image?.path) || undefined,
+                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path) || undefined,
+                military_service_image: serializeFilePath(req.body.military_service_image?.path) || undefined,
+                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path) || undefined
             }
 
-            const compareResult = compareHash(password, user.dataValues.password)
+            const hashedPassword = hashString(data.national_code)
 
-            if (!compareResult) {
-                return res.status(httpStatus.UNAUTHORIZED).json({
-                    status: httpStatus.UNAUTHORIZED,
-                    message: 'نام کاربری یا رمز عبور اشتباه می باشد'
-                })
-            }
+            const user = await authServices.registerUser({
+                first_name: data.first_name,
+                last_name: data.last_name,
+                national_code: data.national_code,
+                gender: data.gender,
+                birth_date: data.birth_date,
+                role: 'education_assistant',
+                password: hashedPassword
+            })
+
+            if (!user || !user?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
+
+            const educationAssistantCode = `${data.national_code}${user.dataValues.id}`
+
+            const educationAssistant = await authServices.registerEducationAssistant({
+                user_id: user.dataValues.id,
+                education_assistant_code: educationAssistantCode,
+                department_id: data.department_id,
+                degree_id: data.degree_id,
+                national_card_image: images?.national_card_image,
+                work_experience_years: data.work_experience_years,
+                hire_date: data.hire_date,
+                responsibilities: data.responsibilities,
+                employment_contract_file: images?.employment_contract_file,
+                birth_certificate_image: images?.birth_certificate_image,
+                military_service_image: images?.military_service_image,
+                office_address: data.office_address,
+                office_phone: data.office_phone,
+                status: 'inactive'
+            })
+
+            if (!educationAssistant || !educationAssistant?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
 
             const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
 
-            return res.status(httpStatus.OK).json({
-                status: httpStatus.OK,
+            return res.status(httpStatus.CREATED).json({
+                status: httpStatus.CREATED,
                 data: { token },
-                message: 'ورود با موفقیت انجام شد'
+                message: 'ثبت نام با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)

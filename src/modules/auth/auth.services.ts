@@ -1,20 +1,25 @@
+import { EducationAssistantModel } from '../../models/educationAssistant.model'
 import { ProfessorModel } from '../../models/professor.model'
 import { StudentModel } from '../../models/student.model'
 import { UserModel } from '../../models/user.model'
-import { TRegisterProfessorInferType, TRegisterStudentInferType, TBaseUserDataType } from './auth.types'
+import { TRegisterProfessorInferType, TRegisterStudentInferType, TBaseUserDataType, TRegisterEducationAssistantInferType } from './auth.types'
 
 const authServices = {
     registerUser: async (data: TBaseUserDataType) => {
         const user = await UserModel.create(data)
         return user
     },
-    registerStudent: async (data: TRegisterStudentInferType & { user_id: number }) => {
+    registerStudent: async (data: Omit<TRegisterStudentInferType, keyof TBaseUserDataType> & { user_id: number }) => {
         const student = await StudentModel.create(data)
         return student
     },
-    registerProfessor: async (data: TRegisterProfessorInferType & { user_id: number }) => {
+    registerProfessor: async (data: Omit<TRegisterProfessorInferType, keyof TBaseUserDataType> & { user_id: number }) => {
         const professor = await ProfessorModel.create(data)
         return professor
+    },
+    registerEducationAssistant: async (data: Omit<TRegisterEducationAssistantInferType, keyof TBaseUserDataType> & { user_id: number }) => {
+        const educationAssistant = await EducationAssistantModel.create(data)
+        return educationAssistant
     }
 }
 

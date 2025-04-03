@@ -152,12 +152,56 @@ const registerProfessorValidation = Yup.object({
     })
 })
 
-const loginValidation = Yup.object({
-    national_code: Yup.string().length(10, 'کد ملی باید 10 رقم باشد').required('کد ملی الزامی است'),
-    password: Yup.string()
-        .min(6, 'رمز عبور باید حداقل 6 کاراکتر باشد')
-        .max(32, 'رمز عبور باید حداکثر 32 کاراکتر باشد')
-        .required('رمز عبور الزامی است')
+const registerEducationAssistantValidation = Yup.object({
+    first_name: Yup.string().required('نام الزامی است'),
+    last_name: Yup.string().required('نام خانوادگی الزامی است'),
+    national_code: Yup.string().required('کد ملی الزامی است'),
+    gender: Yup.string().oneOf(['male', 'female'], 'جنسیت معتبر نیست').required('جنسیت الزامی است'),
+    birth_date: Yup.string().required('تاریخ تولد الزامی است'),
+    phone: Yup.string().nullable(),
+    email: Yup.string().email('ایمیل معتبر نیست').nullable(),
+    address: Yup.string().nullable(),
+    department_id: Yup.number().required('شناسه گروه آموزشی الزامی است'),
+    degree_id: Yup.number().required('شناسه مقطع تحصیلی الزامی است'),
+    work_experience_years: Yup.number().required('سابقه کاری الزامی است').positive('سابقه کاری معتبر نیست'),
+    hire_date: Yup.string().required('تاریخ استخدام الزامی است'),
+    education_assistant_code: Yup.string().nullable(),
+    responsibilities: Yup.string().required('وظایف الزامی است'),
+    status: Yup.string().oneOf(['active', 'inactive'], 'وضعیت معتبر نیست').nullable(),
+    office_phone: Yup.string().nullable(),
+    office_address: Yup.string().nullable(),
+    avatar: validateFile({
+        title: 'تصویر پروفایل',
+        uniqueTitle: 'check-auth-student-avatar',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    national_card_image: validateFile({
+        title: 'کارت ملی',
+        uniqueTitle: 'check-auth-education-assistant-national-card-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    birth_certificate_image: validateFile({
+        title: 'شناسنامه',
+        uniqueTitle: 'check-auth-education-assistant-birth-certificate-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    military_service_image: validateFile({
+        title: 'نظام وظیفه',
+        uniqueTitle: 'check-auth-education-assistant-military-service-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    employment_contract_file: validateFile({
+        title: 'قرارداد کاری',
+        uniqueTitle: 'check-auth-education-assistant-employment-contract-file',
+        validTypes: ['pdf'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
+    })
+
 })
 
-export { loginValidation, registerStudentValidation, registerProfessorValidation }
+export { registerStudentValidation, registerProfessorValidation, registerEducationAssistantValidation }

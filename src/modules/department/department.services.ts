@@ -39,7 +39,7 @@ const departmentServices = {
         })
         return users
     },
-    checkExist: async (department_id: string | undefined) => {
+    checkExist: async (department_id: number | undefined) => {
         if (!department_id) return false
 
         const department = await DepartmentModel.findByPk(department_id.toString().trim())
