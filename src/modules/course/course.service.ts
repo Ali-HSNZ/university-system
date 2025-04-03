@@ -7,6 +7,12 @@ const courseService = {
         const courses = await CourseModel.findAll()
         return courses
     },
+
+    checkExistCode: async (code: string) => {
+        const course = await CourseModel.findOne({ where: { code: code.trim() } })
+        return course
+    },
+
     getInfo: async (id: number) => {
         const course = await CourseModel.findByPk(id)
         return course

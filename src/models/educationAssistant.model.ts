@@ -14,7 +14,7 @@ const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
 const EducationAssistantModel = sequelizeConfig.define(
     'education_assistants',
     {
-        education_assistant_code: { type: DataTypes.STRING(10), allowNull: false, unique: true },
+        education_assistant_code: { type: DataTypes.STRING(10), allowNull: false },
         department_id: { type: DataTypes.INTEGER, allowNull: false },
         work_experience_years: { type: DataTypes.INTEGER, allowNull: false },
         office_phone: { type: DataTypes.STRING(11), allowNull: true },

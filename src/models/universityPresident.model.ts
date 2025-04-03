@@ -11,7 +11,7 @@ const PORT = APP_ENV.application.port
 const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
 
 const UniversityPresidentModel = sequelizeConfig.define('UniversityPresident', {
-    president_code: { type: DataTypes.STRING(10), allowNull: false, unique: true },
+    president_code: { type: DataTypes.STRING(10), allowNull: false },
     work_experience_years: { type: DataTypes.INTEGER, allowNull: false },
     office_phone: { type: DataTypes.STRING(11), allowNull: true },
     office_address: { type: DataTypes.STRING(255), allowNull: true },
