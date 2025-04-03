@@ -6,9 +6,9 @@ import validationHandling from '../../core/utils/validation-handling/validation-
 import { createDepartmentValidation } from './department.validations'
 import { checkValidId } from '../../core/utils/check-valid-id'
 
-@Controller('/departments')
+@Controller('/department')
 class DepartmentController {
-    @Get()
+    @Get('/list')
     async getAllDepartments(req: Request, res: Response, next: NextFunction) {
         try {
             const departments = await departmentServices.findAll()

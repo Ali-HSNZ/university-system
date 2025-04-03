@@ -275,7 +275,6 @@
  * @swagger
  * /auth/login:
  *   post:
- *     summary: User login
  *     tags: [Authentication]
  *     requestBody:
  *       required: true
@@ -306,7 +305,6 @@
  * @swagger
  * /auth/logout:
  *   post:
- *     summary: Logout the current user
  *     tags: [Authentication]
  *     responses:
  *       200:

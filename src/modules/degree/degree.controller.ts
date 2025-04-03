@@ -4,9 +4,9 @@ import degreeServices from './degree.services'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import { checkValidId } from '../../core/utils/check-valid-id'
 
-@Controller('/degrees')
+@Controller('/degree')
 class DegreeController {
-    @Get()
+    @Get('/list')
     async getAll(req: Request, res: Response) {
         const degrees = await degreeServices.findAll()
         res.status(httpStatus.OK).json({

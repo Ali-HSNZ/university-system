@@ -1,16 +1,16 @@
 /**
  * @swagger
- * /users:
+ * /user/list:
  *   get:
  *     tags: [User]
  *     responses:
- *       200:   
+ *       200:
  *         description: A list of users
  */
 
 /**
  * @swagger
- * /users/search:
+ * /user/search:
  *   get:
  *     tags: [User]
  *     summary: Find user by first_name, last_name, email, phone, national_code
@@ -44,7 +44,7 @@
 
 /**
  * @swagger
- * /users/{id}/info:
+ * /user/{id}/info:
  *   get:
  *     tags: [User]
  *     parameters:
@@ -61,7 +61,7 @@
 
 /**
  * @swagger
- * /users/{id}/update:
+ * /user/{id}/update:
  *   put:
  *     tags: [User]
  *     parameters:
@@ -130,7 +130,7 @@
 
 /**
  * @swagger
- * /users/{id}/delete:
+ * /user/{id}/delete:
  *   delete:
  *     tags: [User]
  *     parameters:

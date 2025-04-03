@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /departments:
+ * /department/list:
  *   get:
  *     tags: [Department]
  *     responses:
@@ -10,7 +10,7 @@
 
 /**
  * @swagger
- * /departments/{id}/info:
+ * /department/{id}/info:
  *   get:
  *     tags: [Department]
  *     parameters:
@@ -27,7 +27,7 @@
 
 /**
  * @swagger
- * /departments/create:
+ * /department/create:
  *   post:
  *     tags: [Department]
  *     requestBody:
@@ -49,7 +49,7 @@
 
 /**
  * @swagger
- * /departments/{id}/update:
+ * /department/{id}/update:
  *   put:
  *     tags: [Department]
  *     parameters:
@@ -76,7 +76,7 @@
 
 /**
  * @swagger
- * /departments/{id}/delete:
+ * /department/{id}/delete:
  *   delete:
  *     tags: [Department]
  *     description: (در صورتی ک هیچ کاربری در این گروه آموزشی وجود نداشته باشد) حذف یک گروه آموزشی

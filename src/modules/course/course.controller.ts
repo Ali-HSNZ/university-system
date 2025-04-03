@@ -5,11 +5,10 @@ import courseService from './course.service'
 import { validationHandling } from '../../core/utils/validation-handling'
 import createCourseSchema from './course.validation'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import TCreateCourseType from './course.types'
 
-@Controller('/courses')
+@Controller('/course')
 class CourseController {
-    @Get()
+    @Get('/list')
     async getAll(req: Request, res: Response, next: NextFunction) {
         try {
             const courses = await courseService.getAll()

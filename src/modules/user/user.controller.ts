@@ -3,9 +3,9 @@ import { Controller, Delete, Get, Put } from '../../decorators/router.decorator'
 import userServices from './user.services'
 import httpStatus from 'http-status'
 
-@Controller('/users')
+@Controller('/user')
 class UserController {
-    @Get('/')
+    @Get('/list')
     async getAll(req: Request, res: Response) {
         const users = await userServices.getAll()
         res.status(httpStatus.OK).json({

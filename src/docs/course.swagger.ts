@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /courses:
+ * /course/list:
  *   get:
  *     tags: [Course]
  *     responses:
@@ -10,7 +10,7 @@
 
 /**
  * @swagger
- * /courses/{id}/info:
+ * /course/{id}/info:
  *   get:
  *     tags: [Course]
  *     parameters:
@@ -27,7 +27,7 @@
 
 /**
  * @swagger
- * /courses/create:
+ * /course/create:
  *   post:
  *     tags: [Course]
  *     requestBody:
@@ -57,7 +57,7 @@
 
 /**
  * @swagger
- * /courses/{id}/update:
+ * /course/{id}/update:
  *   put:
  *     tags: [Course]
  *     parameters:
@@ -94,7 +94,7 @@
 
 /**
  * @swagger
- * /courses/{id}/delete:
+ * /course/{id}/delete:
  *   delete:
  *     tags: [Course]
  *     parameters:

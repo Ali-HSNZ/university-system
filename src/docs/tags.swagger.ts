@@ -2,7 +2,6 @@
  * @swagger
  * tags:
  *   - name: Authentication
- *     description: عملیات مربوط به احراز هویت کاربر (ورود، ثبت نام، خروج)
  *   - name: User
  *     description: مدیریت کاربران، از جمله دانشجویان، استادها و مدیران
  *   - name: Student

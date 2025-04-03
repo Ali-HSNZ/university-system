@@ -1,6 +1,6 @@
 /**
  * @swagger
- * /degrees:
+ * /degree/list:
  *   get:
  *     tags: [Degree]
  *     responses:
@@ -10,7 +10,7 @@
 
 /**
  * @swagger
- * /degrees/{id}/info:
+ * /degree/{id}/info:
  *   get:
  *     tags: [Degree]
  *     parameters:
@@ -27,7 +27,7 @@
 
 /**
  * @swagger
- * /degrees/create:
+ * /degree/create:
  *   post:
  *     tags: [Degree]
  *     requestBody:
@@ -52,7 +52,7 @@
 
 /**
  * @swagger
- * /degrees/{id}/update:
+ * /degree/{id}/update:
  *   put:
  *     tags: [Degree]
  *     parameters:
@@ -82,7 +82,7 @@
 
 /**
  * @swagger
- * /degrees/{id}/delete:
+ * /degree/{id}/delete:
  *   delete:
  *     tags: [Degree]
  *     description:  (در صورتی ک هیچ کاربری در این مقطع تحصیلی وجود نداشته باشد) حذف یک مقطع تحصیلی
