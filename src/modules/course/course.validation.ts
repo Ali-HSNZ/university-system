@@ -1,6 +1,6 @@
 import * as yup from 'yup'
 
-const createCourseSchema = yup.object().shape({
+const courseSchema = yup.object().shape({
     name: yup
         .string()
         .required('نام درس الزامی است')
@@ -42,4 +42,4 @@ const createCourseSchema = yup.object().shape({
     corequisites: yup.array().of(yup.string()).optional()
 })
 
-export default createCourseSchema
+export default courseSchema

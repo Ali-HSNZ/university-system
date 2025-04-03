@@ -1,13 +1,12 @@
 import { Op } from 'sequelize'
 import { CourseModel } from '../../models/course.model'
-import TCreateCourseType from './course.types'
+import TCourseInferType from './course.types'
 
 const courseService = {
     getAll: async () => {
         const courses = await CourseModel.findAll()
         return courses
     },
-
     checkExistCode: async (code: string) => {
         const course = await CourseModel.findOne({ where: { code: code.trim() } })
         return course
@@ -25,11 +24,11 @@ const courseService = {
         const count = await CourseModel.count()
         return count
     },
-    create: async (courseDTO: TCreateCourseType & { code: string }) => {
+    create: async (courseDTO: TCourseInferType & { code: string }) => {
         const course = await CourseModel.create(courseDTO)
         return course
     },
-    update: async (courseDTO: TCreateCourseType, id: number) => {
+    update: async (id: number, courseDTO: TCourseInferType) => {
         const course = await CourseModel.update(courseDTO, { where: { id } })
         return course
     },
@@ -38,7 +37,6 @@ const courseService = {
         return course
     },
     checkExistNameInUpdate: async (name: string, id: string) => {
-        //  check name in other ids
         const course = await CourseModel.findOne({ where: { name: name.trim(), id: { [Op.ne]: id } } })
         return course
     }

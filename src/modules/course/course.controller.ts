@@ -3,7 +3,7 @@ import httpStatus from 'http-status'
 import { Controller, Delete, Get, Post, Put, UseMiddleware } from '../../decorators/router.decorator'
 import courseService from './course.service'
 import { validationHandling } from '../../core/utils/validation-handling'
-import createCourseSchema from './course.validation'
+import courseSchema from './course.validation'
 import { checkValidId } from '../../core/utils/check-valid-id'
 import departmentService from '../department/department.service'
 import { serializeArray } from '../../core/middleware/serialize-array'
@@ -53,12 +53,9 @@ class CourseController {
     @UseMiddleware(serializeArray('prerequisites', 'corequisites'))
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            await validationHandling(req.body, createCourseSchema)
+            await validationHandling(req.body, courseSchema)
 
-            const { name, department_id, theoretical_units, practical_units, type, prerequisites, corequisites } =
-                req.body
-
-            const existCourseName = await courseService.checkExistName(name)
+            const existCourseName = await courseService.checkExistName(req.body.name)
             if (existCourseName) {
                 return res.status(httpStatus.CONFLICT).json({
                     status: httpStatus.CONFLICT,
@@ -66,7 +63,7 @@ class CourseController {
                 })
             }
 
-            const departmentExists = await departmentService.checkExistId(department_id)
+            const departmentExists = await departmentService.checkExistId(req.body.department_id)
             if (!departmentExists) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
@@ -74,7 +71,7 @@ class CourseController {
                 })
             }
 
-            if (Number(theoretical_units) === 0 && Number(practical_units) === 0) {
+            if (Number(req.body.theoretical_units) === 0 && Number(req.body.practical_units) === 0) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
                     message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند.'
@@ -82,30 +79,24 @@ class CourseController {
             }
 
             // check exist course code
-            for (const prerequisite of prerequisites) {
+            for (const prerequisite of req.body.prerequisites) {
                 const existCourseCode = await courseService.checkExistCode(prerequisite)
                 if (!existCourseCode) {
-                    return res.status(httpStatus.BAD_REQUEST).json({
-                        status: httpStatus.BAD_REQUEST,
-                        message: 'کد درس پیش‌نیاز معتبر نیست'
-                    })
+                    throw new Error('کد درس پیش‌نیاز معتبر نیست')
                 }
             }
 
-            for (const corequisite of corequisites) {
+            for (const corequisite of req.body.corequisites) {
                 const existCourseCode = await courseService.checkExistCode(corequisite)
                 if (!existCourseCode) {
-                    return res.status(httpStatus.BAD_REQUEST).json({
-                        status: httpStatus.BAD_REQUEST,
-                        message: 'کد درس هم‌نیاز معتبر نیست'
-                    })
+                    throw new Error('کد درس هم‌نیاز معتبر نیست')
                 }
             }
 
             const courseCount = await courseService.count()
-            const course_code = `C${courseCount + 1}${Date.now().toString().slice(-5)}`
+            const course_code = `${courseCount + 1}${Date.now().toString().slice(-5)}`
 
-            const course = await courseService.create({
+            await courseService.create({
                 ...req.body,
                 code: course_code
             })
@@ -120,41 +111,57 @@ class CourseController {
     }
 
     @Put('/:id/update')
+    @UseMiddleware(serializeArray('prerequisites', 'corequisites'))
     async update(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
             checkValidId(id)
 
-            await validationHandling(req.body, createCourseSchema)
-
-            if (Number(req.body.theory_unit) === 0 && Number(req.body.practical_unit) === 0) {
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    status: httpStatus.BAD_REQUEST,
-                    message: 'واحد نظری و عملی نمی‌تواند صفر باشد'
-                })
-            }
+            await validationHandling(req.body, courseSchema)
 
             const existCourseName = await courseService.checkExistNameInUpdate(req.body.name, id)
             if (existCourseName) {
+                return res.status(httpStatus.CONFLICT).json({
+                    status: httpStatus.CONFLICT,
+                    message: 'درس با این نام قبلاً ایجاد شده است.'
+                })
+            }
+
+            const departmentExists = await departmentService.checkExistId(req.body.department_id)
+            if (!departmentExists) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
-                    message: 'درس با این نام قبلا ایجاد شده است'
+                    message: 'دپارتمان انتخاب شده معتبر نیست'
                 })
             }
 
-            const course = await courseService.update(req.body, Number(id))
-
-            if (course) {
-                return res.status(httpStatus.CREATED).json({
-                    status: httpStatus.CREATED,
-                    message: 'درس با موفقیت ویرایش شد',
-                    data: course
+            if (Number(req.body.theoretical_units) === 0 && Number(req.body.practical_units) === 0) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند.'
                 })
             }
 
-            return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'فرایند ایجاد درس با خطا مواجه شد'
+            // check exist course code
+            for (const prerequisite of req.body.prerequisites) {
+                const existCourseCode = await courseService.checkExistCode(prerequisite)
+                if (!existCourseCode) {
+                    throw new Error('کد درس پیش‌نیاز معتبر نیست')
+                }
+            }
+
+            for (const corequisite of req.body.corequisites) {
+                const existCourseCode = await courseService.checkExistCode(corequisite)
+                if (!existCourseCode) {
+                    throw new Error('کد درس هم‌نیاز معتبر نیست')
+                }
+            }
+
+            await courseService.update(Number(id), req.body)
+
+            return res.status(httpStatus.CREATED).json({
+                status: httpStatus.CREATED,
+                message: 'بروز رسانی درس با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)

@@ -30,11 +30,6 @@
  * /course/create:
  *   post:
  *     tags: [Course]
- *     summary: ایجاد یک درس جدید
- *     description: |
- *       **این متد برای ثبت یک درس جدید در سیستم استفاده می‌شود.**
- *       - نام، کد، تعداد واحدها و دپارتمان درس الزامی است.
- *       - پیش‌نیازها و همنیازهای درس به‌صورت آرایه‌ای از کد دروس ارسال می‌شود.
  *     requestBody:
  *       required: true
  *       content:
@@ -46,7 +41,7 @@
  *               - theoretical_units
  *               - practical_units
  *               - department_id
- *               - type  
+ *               - type
  *             properties:
  *               name:
  *                 type: string
@@ -105,25 +100,53 @@
  *             type: object
  *             required:
  *               - name
- *               - theory_unit
- *               - practical_unit
+ *               - theoretical_units
+ *               - practical_units
+ *               - department_id
+ *               - type
  *             properties:
  *               name:
  *                 type: string
- *                 default: ''
- *               theory_unit:
- *                 type: number
- *                 default: 0
- *               practical_unit:
- *                 type: number
- *                 default: 0
+ *                 description: نام درس
+ *               type:
+ *                 type: string
+ *                 enum: ["theory", "practical", "combined"]
+ *                 description: |
+ *                   نوع درس:
+ *                   - `theory`: نظری
+ *                   - `practical`: عملی
+ *                   - `combined`: ترکیبی
+ *               theoretical_units:
+ *                 description: تعداد واحد نظری
+ *                 type: integer
+ *                 example: 1
+ *               practical_units:
+ *                 type: integer
+ *                 description: تعداد واحد عملی
+ *                 example: 1
+ *               department_id:
+ *                 type: integer
+ *                 description: شناسه‌ی دپارتمان
+ *               prerequisites:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example: "123456"
+ *                 description: لیستی از کد دروس پیش‌نیاز
+ *               corequisites:
+ *                 type: array
+ *                 items:
+ *                   type: string
+ *                   example: "123456"
+ *                 description: لیستی از کد دروس همنیاز
  *     responses:
- *       200:
- *         description: A course updated successfully
- *       400:
- *         description: Bad Request
+ *       "201":
+ *         description: درس با موفقیت ایجاد شد.
+ *       "400":
+ *         description: اطلاعات ارسالی معتبر نیست.
+ *       "500":
+ *         description: خطای داخلی سرور.
  */
-
 /**
  * @swagger
  * /course/{id}/delete:

@@ -1,7 +1,6 @@
-type TCreateCourseType = {
-    name: string
-    theory_unit: string
-    practical_unit: string
-}
+import { InferType } from "yup"
+import courseSchema from "./course.validation"
 
-export default TCreateCourseType
+type TCourseInferType = InferType<typeof courseSchema>
+
+export default TCourseInferType
