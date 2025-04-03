@@ -119,8 +119,8 @@ class AuthController {
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                data: { token },
-                message: 'ثبت نام با موفقیت انجام شد'
+                message: 'ثبت نام با موفقیت انجام شد',
+                data: { token }
             })
         } catch (error) {
             next(error)
@@ -223,8 +223,8 @@ class AuthController {
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                data: { token },
-                message: 'ثبت نام با موفقیت انجام شد'
+                message: 'ثبت نام با موفقیت انجام شد',
+                data: { token }
             })
         } catch (error) {
             next(error)
@@ -287,7 +287,11 @@ class AuthController {
                 gender: data.gender,
                 birth_date: data.birth_date,
                 role: 'education_assistant',
-                password: hashedPassword
+                password: hashedPassword,
+                avatar: images?.avatar,
+                phone: data.phone || undefined,
+                email: data.email || undefined,
+                address: data.address || undefined
             })
 
             if (!user || !user?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
@@ -317,8 +321,8 @@ class AuthController {
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                data: { token },
-                message: 'ثبت نام با موفقیت انجام شد'
+                message: 'ثبت نام با موفقیت انجام شد',
+                data: { token }
             })
         } catch (error) {
             next(error)

@@ -135,12 +135,12 @@ class DepartmentController {
         if (users.length > 0) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
+                message: 'کاربرانی در این گروه آموزشی وجود دارند',
                 data: {
                     dependencies: {
                         users: users
                     }
                 },
-                message: 'کاربرانی در این گروه آموزشی وجود دارند'
             })
         }
         const isDeleted = await departmentServices.delete(id)

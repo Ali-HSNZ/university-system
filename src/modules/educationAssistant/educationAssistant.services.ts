@@ -1,11 +1,18 @@
-import { DegreeModel } from "../../models/degree.model"
-import { UserModel } from "../../models/user.model"
-import { DepartmentModel } from "../../models/department.model"
-import { EducationAssistantModel } from "../../models/educationAssistant.model"
+import { DegreeModel } from '../../models/degree.model'
+import { UserModel } from '../../models/user.model'
+import { DepartmentModel } from '../../models/department.model'
+import { EducationAssistantModel } from '../../models/educationAssistant.model'
+import { APP_ENV } from '../../core/config/dotenv.config'
+
+const protocol = APP_ENV.application.protocol
+const host = APP_ENV.application.host
+const port = APP_ENV.application.port
+
+const BASE_URL = `${protocol}://${host}:${port}`
 
 const educationAssistantServices = {
     list: async () => {
-        const educationAssistants = EducationAssistantModel.findAll({
+        const educationAssistants = await EducationAssistantModel.findAll({
             include: [
                 {
                     model: UserModel,
@@ -29,7 +36,13 @@ const educationAssistantServices = {
                 exclude: ['updatedAt', 'degree_id', 'department_id', 'user_id']
             }
         })
-        return educationAssistants
+
+        return educationAssistants.map((educationAssistant) => {
+            if (educationAssistant.dataValues.user && educationAssistant.dataValues.user.avatar) {
+                educationAssistant.dataValues.user.avatar = `${BASE_URL}${educationAssistant.dataValues.user.avatar}`
+            }
+            return educationAssistant
+        })
     }
 }
 

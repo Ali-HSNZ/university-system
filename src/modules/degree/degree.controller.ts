@@ -104,10 +104,10 @@ class DegreeController {
         if (users) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
+                message: 'مقطع تحصیلی دارای کاربر است',
                 data: {
                     dependencies: users
                 },
-                message: 'مقطع تحصیلی دارای کاربر است'
             })
         }
 

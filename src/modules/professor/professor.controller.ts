@@ -11,8 +11,8 @@ class ProfessorServices {
 
         return res.status(httpStatus.OK).json({
             status: httpStatus.OK,
-            data: professors,
-            message: 'عملیات با موفقیت انجام شد'
+            message: 'عملیات با موفقیت انجام شد',
+            data: professors
         })
     }
 }

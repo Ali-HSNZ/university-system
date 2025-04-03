@@ -11,11 +11,13 @@ class EducationAssistantController {
             const educationAssistants = await educationAssistantServices.list()
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
-                data: educationAssistants,
-                message: 'عملیات با موفقیت انجام شد'
+                message: 'عملیات با موفقیت انجام شد',
+                data: educationAssistants
             })
         } catch (error) {
             next(error)
         }
     }
 }
+
+export default EducationAssistantController

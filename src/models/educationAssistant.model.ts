@@ -3,6 +3,13 @@ import { sequelizeConfig } from '../core/config/database.config'
 import { UserModel } from './user.model'
 import { DepartmentModel } from './department.model'
 import { DegreeModel } from './degree.model'
+import { APP_ENV } from '../core/config/dotenv.config'
+
+const PROTOCOL = APP_ENV.application.protocol
+const HOST = APP_ENV.application.host
+const PORT = APP_ENV.application.port
+
+const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
 
 const EducationAssistantModel = sequelizeConfig.define(
     'education_assistants',
@@ -44,4 +51,30 @@ EducationAssistantModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 
 EducationAssistantModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 EducationAssistantModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' }) // <-- Add this
 
+EducationAssistantModel.addHook('afterFind', (result) => {
+    if (!result) return
+
+    const addBaseUrl = (educationAssistant: any) => {
+        if (!educationAssistant || !educationAssistant.dataValues) return
+
+        const fileFields = [
+            'national_card_image',
+            'birth_certificate_image',
+            'military_service_image',
+            'employment_contract_file'
+        ]
+
+        fileFields.forEach((field) => {
+            if (educationAssistant.dataValues[field]) {
+                educationAssistant.dataValues[field] = `${BASE_URL}${educationAssistant.dataValues[field]}`
+            }
+        })
+    }
+
+    if (Array.isArray(result)) {
+        result.forEach(addBaseUrl)
+    } else {
+        addBaseUrl(result)
+    }
+})
 export { EducationAssistantModel }
