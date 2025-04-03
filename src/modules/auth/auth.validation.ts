@@ -201,7 +201,65 @@ const registerEducationAssistantValidation = Yup.object({
         maxSize: 10 * 1024 * 1024,
         required: false
     })
-
 })
 
-export { registerStudentValidation, registerProfessorValidation, registerEducationAssistantValidation }
+const registerUniversityPresidentValidation = Yup.object({
+    first_name: Yup.string().required('نام الزامی است'),
+    last_name: Yup.string().required('نام خانوادگی الزامی است'),
+    national_code: Yup.string().required('کد ملی الزامی است'),
+    gender: Yup.string().oneOf(['male', 'female'], 'جنسیت معتبر نیست').required('جنسیت الزامی است'),
+    birth_date: Yup.string().required('تاریخ تولد الزامی است'),
+    phone: Yup.string().nullable(),
+    email: Yup.string().email('ایمیل معتبر نیست').nullable(),
+    president_code: Yup.string().nullable(),
+    address: Yup.string().nullable(),
+    work_experience_years: Yup.number().required('سابقه کاری الزامی است').positive('سابقه کاری معتبر نیست'),
+    office_phone: Yup.string().nullable(),
+    office_address: Yup.string().nullable(),
+    responsibilities: Yup.string().required('وظایف الزامی است'),
+    hire_date: Yup.string().required('تاریخ استخدام الزامی است'),
+    avatar: validateFile({
+        title: 'تصویر پروفایل',
+        uniqueTitle: 'check-auth-student-avatar',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    national_card_image: validateFile({
+        title: 'کارت ملی',
+        uniqueTitle: 'check-auth-university-president-national-card-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    birth_certificate_image: validateFile({
+        title: 'شناسنامه',
+        uniqueTitle: 'check-auth-university-president-birth-certificate-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    military_service_image: validateFile({
+        title: 'نظام وظیفه',
+        uniqueTitle: 'check-auth-university-president-military-service-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    employment_contract_file: validateFile({
+        title: 'قرارداد کاری',
+        uniqueTitle: 'check-auth-university-president-employment-contract-file',
+        validTypes: ['pdf'],
+        maxSize: 10 * 1024 * 1024
+    }),
+    phd_certificate_file: validateFile({
+        title: 'مدرک دکتری',
+        uniqueTitle: 'check-auth-university-president-phd-certificate-file',
+        validTypes: ['pdf'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
+    })
+})
+
+export {
+    registerStudentValidation,
+    registerProfessorValidation,
+    registerEducationAssistantValidation,
+    registerUniversityPresidentValidation
+}

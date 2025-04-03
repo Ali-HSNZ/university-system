@@ -6,6 +6,7 @@
  *   - name: Student
  *   - name: Professor
  *   - name: Education Assistant
+ *   - name: University President
  *   - name: Course
  *     description: مدیریت دروس
  *   - name: Class

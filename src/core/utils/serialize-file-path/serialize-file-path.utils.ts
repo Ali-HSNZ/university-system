@@ -1,5 +1,5 @@
-const serializeFilePath = (path?: string): string | null => {
-    if (!path) return null
+const serializeFilePath = (path?: string): string | undefined => {
+    if (!path) return
 
     const filePath = path.replace(/\\/g, '/')
     const index = filePath.indexOf('/uploads/')

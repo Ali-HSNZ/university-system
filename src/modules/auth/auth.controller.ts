@@ -3,7 +3,8 @@ import { Controller, Post, UseMiddleware } from '../../decorators/router.decorat
 import {
     registerEducationAssistantValidation,
     registerProfessorValidation,
-    registerStudentValidation
+    registerStudentValidation,
+    registerUniversityPresidentValidation
 } from './auth.validation'
 import httpStatus from 'http-status'
 import authServices from './auth.services'
@@ -14,7 +15,9 @@ import {
     TRegisterProfessorFilesType,
     TRegisterProfessorInferType,
     TRegisterStudentFilesType,
-    TRegisterStudentInferType
+    TRegisterStudentInferType,
+    TRegisterUniversityPresidentFilesType,
+    TRegisterUniversityPresidentInferType
 } from './auth.types'
 import userServices from '../user/user.services'
 import { validationHandling } from '../../core/utils/validation-handling'
@@ -61,10 +64,10 @@ class AuthController {
             const hashedPassword = hashString(data.national_code)
 
             const images = {
-                avatar: serializeFilePath(req.body.avatar?.path) || undefined,
-                national_card_image: serializeFilePath(req.body.national_card_image?.path) || undefined,
-                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path) || undefined,
-                military_service_image: serializeFilePath(req.body.military_service_image?.path) || undefined
+                avatar: serializeFilePath(req.body.avatar?.path),
+                national_card_image: serializeFilePath(req.body.national_card_image?.path),
+                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path),
+                military_service_image: serializeFilePath(req.body.military_service_image?.path)
             }
 
             const user = await authServices.registerUser({
@@ -170,13 +173,13 @@ class AuthController {
             const hashedPassword = hashString(data.national_code)
 
             const images = {
-                avatar: serializeFilePath(req.body.avatar?.path) || undefined,
-                national_card_file: serializeFilePath(req.body.national_card_file?.path) || undefined,
-                birth_certificate_file: serializeFilePath(req.body.birth_certificate_file?.path) || undefined,
-                military_service_file: serializeFilePath(req.body.military_service_file?.path) || undefined,
-                cv_file: serializeFilePath(req.body.cv_file?.path) || undefined,
-                phd_certificate_file: serializeFilePath(req.body.phd_certificate_file?.path) || undefined,
-                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path) || undefined
+                avatar: serializeFilePath(req.body.avatar?.path),
+                national_card_file: serializeFilePath(req.body.national_card_file?.path),
+                birth_certificate_file: serializeFilePath(req.body.birth_certificate_file?.path),
+                military_service_file: serializeFilePath(req.body.military_service_file?.path),
+                cv_file: serializeFilePath(req.body.cv_file?.path),
+                phd_certificate_file: serializeFilePath(req.body.phd_certificate_file?.path),
+                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path)
             }
 
             const user = await authServices.registerUser({
@@ -271,11 +274,11 @@ class AuthController {
             if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
 
             const images = {
-                avatar: serializeFilePath(req.body.avatar?.path) || undefined,
-                national_card_image: serializeFilePath(req.body.national_card_image?.path) || undefined,
-                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path) || undefined,
-                military_service_image: serializeFilePath(req.body.military_service_image?.path) || undefined,
-                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path) || undefined
+                avatar: serializeFilePath(req.body.avatar?.path),
+                national_card_image: serializeFilePath(req.body.national_card_image?.path),
+                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path),
+                military_service_image: serializeFilePath(req.body.military_service_image?.path),
+                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path)
             }
 
             const hashedPassword = hashString(data.national_code)
@@ -316,6 +319,100 @@ class AuthController {
             })
 
             if (!educationAssistant || !educationAssistant?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
+
+            const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
+
+            return res.status(httpStatus.CREATED).json({
+                status: httpStatus.CREATED,
+                message: 'ثبت نام با موفقیت انجام شد',
+                data: { token }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Post('/register/university-president')
+    @UseMiddleware(
+        fileUpload.fields([
+            { name: 'avatar', maxCount: 1 },
+            { name: 'national_card_image', maxCount: 1 },
+            { name: 'birth_certificate_image', maxCount: 1 },
+            { name: 'military_service_image', maxCount: 1 },
+            { name: 'employment_contract_file', maxCount: 1 },
+            { name: 'phd_certificate_file', maxCount: 1 }
+        ])
+    )
+    async registerUniversityPresident(req: Request, res: Response, next: NextFunction) {
+        try {
+            const files = req.files as TRegisterUniversityPresidentFilesType
+
+            req.body.avatar = files?.['avatar']?.[0]
+            req.body.national_card_image = files?.['national_card_image']?.[0]
+            req.body.birth_certificate_image = files?.['birth_certificate_image']?.[0]
+            req.body.military_service_image = files?.['military_service_image']?.[0]
+            req.body.employment_contract_file = files?.['employment_contract_file']?.[0]
+            req.body.phd_certificate_file = files?.['phd_certificate_file']?.[0]
+
+            const data = await validationHandling<TRegisterUniversityPresidentInferType>(
+                req.body,
+                registerUniversityPresidentValidation
+            )
+
+            const existUser = await userServices.findOne({
+                national_code: data.national_code,
+                phone: data.phone || undefined,
+                email: data.email || undefined
+            })
+
+            if (existUser) throw new Error('کاربر در سیستم وجود دارد')
+
+            const images = {
+                avatar: serializeFilePath(req.body.avatar?.path),
+                national_card_image: serializeFilePath(req.body.national_card_image?.path),
+                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path),
+                military_service_image: serializeFilePath(req.body.military_service_image?.path),
+                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path),
+                phd_certificate_file: serializeFilePath(req.body.phd_certificate_file?.path)
+            }
+
+            const hashedPassword = hashString(data.national_code)
+
+            const user = await authServices.registerUser({
+                first_name: data.first_name,
+                last_name: data.last_name,
+                national_code: data.national_code,
+                gender: data.gender,
+                birth_date: data.birth_date,
+                role: 'university_president',
+                password: hashedPassword,
+                avatar: images?.avatar,
+                phone: data.phone || undefined,
+                email: data.email || undefined,
+                address: data.address || undefined
+            })
+
+            if (!user || !user?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
+
+            const universityPresidentCode = `${data.national_code}${user.dataValues.id}`
+
+            const universityPresident = await authServices.registerUniversityPresident({
+                user_id: user.dataValues.id,
+                president_code: universityPresidentCode,
+                hire_date: data.hire_date,
+                work_experience_years: data.work_experience_years,
+                phd_certificate_file: images?.phd_certificate_file,
+                employment_contract_file: images?.employment_contract_file,
+                birth_certificate_image: images?.birth_certificate_image,
+                military_service_image: images?.military_service_image,
+                national_card_image: images?.national_card_image,
+                office_address: data.office_address,
+                office_phone: data.office_phone,
+                responsibilities: data.responsibilities
+            })
+
+            if (!universityPresident || !universityPresident?.dataValues?.id)
+                throw new Error('ثبت نام با مشکل مواجه شد')
 
             const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
 

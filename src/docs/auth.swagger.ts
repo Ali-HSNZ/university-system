@@ -387,3 +387,121 @@
  */
 
 
+/**
+ * @swagger
+ * /auth/register/university-president:
+ *   post:
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - first_name
+ *               - last_name
+ *               - email
+ *               - phone
+ *               - national_code
+ *               - birth_date
+ *               - gender
+ *               - avatar
+ *               - national_card_image
+ *               - birth_certificate_image
+ *               - military_service_image
+ *               - work_experience_years
+ *               - employment_contract_file
+ *               - phd_certificate_file
+ *               - office_phone
+ *               - office_address
+ *               - responsibilities
+ *               - hire_date
+ *             properties:
+ *               first_name:
+ *                 type: string
+ *                 description: "نام"
+ *                 example: "Ali"
+ *               last_name:
+ *                 type: string
+ *                 description: "نام خانوادگی"
+ *                 example: "Rezaei"
+ *               email:
+ *                 type: string
+ *                 description: "ایمیل"
+ *                 example: "ali.rezaei@example.com"
+ *               address:
+ *                 type: string
+ *                 description: "آدرس"
+ *                 example: "Tehran, Iran"
+ *               phone:
+ *                 type: string
+ *                 description: "شماره تماس"
+ *                 example: "09123456789"
+ *               national_code:
+ *                 type: string
+ *                 description: "کد ملی"
+ *                 example: "1234567890"
+ *               birth_date:
+ *                 type: string
+ *                 format: date
+ *                 description: "تاریخ تولد"
+ *                 example: "2000-01-01"
+ *               gender:
+ *                 type: enum
+ *                 enum: ["male", "female"]
+ *                 description: "جنسیت"
+ *                 example: "male"
+ *               work_experience_years:
+ *                 type: integer
+ *                 description: "سابقه کاری"
+ *                 example: 5
+ *               office_phone:
+ *                 type: string
+ *                 description: "تلفن دفتر"
+ *                 example: "09123456789"
+ *               office_address:
+ *                 type: string
+ *                 description: "آدرس دفتر"
+ *                 example: "Tehran, Iran"
+ *               responsibilities:
+ *                 type: string
+ *                 description: "وظایف"
+ *                 example: "Responsibilities"
+ *               hire_date:
+ *                 type: string
+ *                 format: date
+ *                 description: "تاریخ استخدام"
+ *                 example: "2025-03-22"
+ *               avatar:
+ *                 type: string
+ *                 format: binary
+ *                 description: "عکس پرسنلی"
+ *               national_card_image:
+ *                 type: string
+ *                 format: binary
+ *                 description: "تصویر کارت ملی"
+ *               birth_certificate_image:
+ *                 type: string
+ *                 format: binary
+ *                 description: "تصویر شناسنامه"
+ *               military_service_image:
+ *                 type: string
+ *                 format: binary
+ *                 description: "تصویر کارت پایان خدمت"
+ *               employment_contract_file:
+ *                 type: string
+ *                 format: binary
+ *                 description: "قرارداد کاری"
+ *               phd_certificate_file:
+ *                 type: string
+ *                 format: binary
+ *                 description: "مدرک دکتری"
+ *     responses:
+ *       201:
+ *         description: "رئیس دانشگاه با موفقیت ثبت شد"
+ *       400:
+ *         description: "درخواست نامعتبر (خطا در داده‌های ورودی)"
+ *       500:
+ *         description: "خطای داخلی سرور"
+ */
