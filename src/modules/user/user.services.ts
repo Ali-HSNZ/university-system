@@ -1,6 +1,7 @@
 import { UserModel } from '../../models/user.model'
 import { Op } from 'sequelize'
-import { TCheckExistUserType, TUpdateUserDataType } from './user.types'
+import { TFindOneUserType } from './user.types'
+import { TBaseUserDataType } from '../auth/auth.types'
 
 const userServices = {
     getAll: async () => {
@@ -13,7 +14,7 @@ const userServices = {
         const usersCount = await UserModel.count()
         return usersCount
     },
-    update: async (id: number, data: TUpdateUserDataType) => {
+    update: async (id: number, data: TBaseUserDataType) => {
         const user = await UserModel.update(data, { where: { id } })
         return user
     },
@@ -54,11 +55,11 @@ const userServices = {
         const user = await UserModel.findOne({ where: { national_code } })
         return user
     },
-    findOne: async (data: TCheckExistUserType) => {
+    findOne: async (data: TFindOneUserType) => {
         if (!data.national_code) return true
 
         const whereClause = ['national_code', 'phone', 'email'].reduce<Record<string, string>>((acc, key) => {
-            const value = data[key as keyof TCheckExistUserType]?.trim()
+            const value = data[key as keyof TFindOneUserType]?.trim()
             if (value) acc[key] = value
             return acc
         }, {})

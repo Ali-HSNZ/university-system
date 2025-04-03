@@ -5,6 +5,12 @@ import { HighSchoolDiplomaModel } from '../../models/highSchoolDiploma.model'
 import { StudentModel } from '../../models/student.model'
 import { UserModel } from '../../models/user.model'
 
+const protocol = APP_ENV.application.protocol
+const host = APP_ENV.application.host
+const port = APP_ENV.application.port
+
+const BASE_URL = `${protocol}://${host}:${port}`
+
 const studentService = {
     list: async () => {
         const students = await StudentModel.findAll({
@@ -37,19 +43,12 @@ const studentService = {
             }
         })
 
-        const protocol = APP_ENV.application.protocol
-        const host = APP_ENV.application.host
-        const port = APP_ENV.application.port
-
-        const BASE_URL = `${protocol}://${host}:${port}`
-
         return students.map((student) => {
             if (student.dataValues.user && student.dataValues.user.avatar) {
                 student.dataValues.user.avatar = `${BASE_URL}${student.dataValues.user.avatar}`
             }
             return student
         })
-        return students
     }
 }
 

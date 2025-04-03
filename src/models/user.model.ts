@@ -24,7 +24,7 @@ const UserModel = sequelizeConfig.define(
         },
         password: { type: DataTypes.STRING(255), allowNull: false },
         avatar: { type: DataTypes.STRING(255), allowNull: true },
-        is_deleted: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false },
+        is_deleted: { type: DataTypes.BOOLEAN, allowNull: true, defaultValue: false },
         deleted_by: {
             type: DataTypes.INTEGER,
             allowNull: true,
