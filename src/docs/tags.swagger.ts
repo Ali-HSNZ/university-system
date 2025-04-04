@@ -11,6 +11,10 @@
  *     description: مدیریت دروس
  *   - name: Class
  *     description: مدیریت کلاس ها
+ *   - name: Class Professor
+ *     description: مدیریت استادان در کلاس ها
+ *   - name: Class Schedule
+ *     description: مدیریت ساعات کلاس
  *   - name: Enrollment
  *     description: مدیریت دانشجویان در کلاس ها
  *   - name: Attendance

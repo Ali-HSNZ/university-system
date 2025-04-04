@@ -8,9 +8,10 @@ const EnrollmentModel = sequelizeConfig.define(
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         student_id: { type: DataTypes.INTEGER, allowNull: false },
-        class_id: { type: DataTypes.INTEGER, allowNull: false },
+        class_schedule_id: { type: DataTypes.INTEGER, allowNull: false },
         status: {
             type: DataTypes.ENUM('pending', 'approved', 'rejected'),
+            allowNull: false,
             defaultValue: 'pending'
         }
     },

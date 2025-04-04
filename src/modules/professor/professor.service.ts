@@ -43,6 +43,10 @@ const professorServices = {
             }
             return professor
         })
+    },
+    checkExist: async (id: number) => {
+        const professor = await ProfessorModel.findByPk(id)
+        return !!professor
     }
 }
 
