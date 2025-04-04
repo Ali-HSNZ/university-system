@@ -1,5 +1,6 @@
 import { InferType } from 'yup'
 import {
+    loginValidation,
     registerEducationAssistantValidation,
     registerProfessorValidation,
     registerStudentValidation,
@@ -7,6 +8,8 @@ import {
 } from './auth.validation'
 
 type TUserGenderType = 'male' | 'female'
+
+type TLoginInferType = InferType<typeof loginValidation>
 
 type TRegisterStudentInferType = InferType<typeof registerStudentValidation>
 
@@ -69,6 +72,7 @@ export type {
     TRegisterProfessorFilesType,
     TRegisterUniversityPresidentFilesType,
     TRegisterStudentInferType,
+    TLoginInferType,
     TRegisterProfessorInferType,
     TRegisterEducationAssistantInferType,
     TRegisterUniversityPresidentInferType,

@@ -10,7 +10,7 @@ const port = APP_ENV.application.port
 
 const BASE_URL = `${protocol}://${host}:${port}`
 
-const educationAssistantServices = {
+const educationAssistantService = {
     list: async () => {
         const educationAssistants = await EducationAssistantModel.findAll({
             include: [
@@ -43,7 +43,11 @@ const educationAssistantServices = {
             }
             return educationAssistant
         })
+    },
+    checkExistByUserId: async (user_id: number) => {
+        const educationAssistant = await EducationAssistantModel.findOne({ where: { user_id } })
+        return !!educationAssistant
     }
 }
 
-export default educationAssistantServices
+export default educationAssistantService

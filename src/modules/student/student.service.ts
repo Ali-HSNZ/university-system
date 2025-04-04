@@ -49,7 +49,12 @@ const studentService = {
             }
             return student
         })
+    },
+    checkExistByUserId: async (user_id: number) => {
+        const student = await StudentModel.findOne({ where: { user_id } })
+        return !!student
     }
+
 }
 
 export default studentService

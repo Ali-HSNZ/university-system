@@ -1,6 +1,11 @@
 import * as Yup from 'yup'
 import { validateFile } from '../../core/validations'
 
+const loginValidation = Yup.object({
+    username: Yup.string().required('نام کاربری الزامی است'),
+    password: Yup.string().required('رمز عبور الزامی است')
+})
+
 const registerStudentValidation = Yup.object({
     first_name: Yup.string().required('نام الزامی است'),
     last_name: Yup.string().required('نام خانوادگی الزامی است'),
@@ -258,6 +263,7 @@ const registerUniversityPresidentValidation = Yup.object({
 })
 
 export {
+    loginValidation,
     registerStudentValidation,
     registerProfessorValidation,
     registerEducationAssistantValidation,

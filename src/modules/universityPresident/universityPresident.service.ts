@@ -8,7 +8,7 @@ const port = APP_ENV.application.port
 
 const BASE_URL = `${protocol}://${host}:${port}`
 
-const universityPresidentServices = {
+const universityPresidentService = {
     list: async () => {
         const universityPresidents = await UniversityPresidentModel.findAll({
             include: [
@@ -38,7 +38,11 @@ const universityPresidentServices = {
             }
             return universityPresident
         })
+    },
+    checkExistByUserId: async (user_id: number) => {
+        const universityPresident = await UniversityPresidentModel.findOne({ where: { user_id } })
+        return !!universityPresident
     }
 }
 
-export default universityPresidentServices
+export default universityPresidentService

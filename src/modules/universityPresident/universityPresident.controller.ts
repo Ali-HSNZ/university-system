@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express'
 import { Controller, Get } from '../../decorators/router.decorator'
-import universityPresidentServices from './universityPresident.service'
+import universityPresidentService from './universityPresident.service'
 import httpStatus from 'http-status'
 
 @Controller('/university-president')
@@ -8,7 +8,7 @@ class UniversityPresidentController {
     @Get('/list')
     async getUniversityPresidents(req: Request, res: Response, next: NextFunction) {
         try {
-            const universityPresidents = await universityPresidentServices.list()
+            const universityPresidents = await universityPresidentService.list()
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',

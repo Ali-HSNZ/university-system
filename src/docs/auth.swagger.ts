@@ -1,5 +1,36 @@
 /**
  * @swagger
+ * /auth/login:
+ *   post:
+ *     tags: [Authentication]
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         application/x-www-form-urlencoded:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - username
+ *               - password
+ *             properties:
+ *               username:
+ *                 type: string
+ *                 example: ""
+ *               password:
+ *                 type: string
+ *                 example: ""
+ *     responses:
+ *       '200':
+ *         description: "Login successful"
+ *       '401':
+ *         description: "Invalid username or password"
+ *       '500':
+ *         description: "Internal server error"
+ */
+
+
+/**
+ * @swagger
  *   /auth/register/student:
  *     post:
  *       tags: [Authentication]

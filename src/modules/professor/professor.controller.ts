@@ -1,13 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
 import { Controller, Get } from '../../decorators/router.decorator'
-import professorServices from './professor.service'
+import professorService from './professor.service'
 import httpStatus from 'http-status'
 
 @Controller('/professor')
-class ProfessorServices {
+class ProfessorController {
     @Get('/list')
     async getProfessors(req: Request, res: Response, next: NextFunction) {
-        const professors = await professorServices.list()
+        const professors = await professorService.list()
 
         return res.status(httpStatus.OK).json({
             status: httpStatus.OK,
@@ -17,4 +17,4 @@ class ProfessorServices {
     }
 }
 
-export default ProfessorServices
+export default ProfessorController

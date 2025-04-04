@@ -1,6 +1,7 @@
 import { Request, Response, NextFunction } from 'express'
 import { Controller, Post, UseMiddleware } from '../../decorators/router.decorator'
 import {
+    loginValidation,
     registerEducationAssistantValidation,
     registerProfessorValidation,
     registerStudentValidation,
@@ -10,6 +11,7 @@ import httpStatus from 'http-status'
 import authServices from './auth.service'
 import { fileUpload } from '../../core/utils/file-upload'
 import {
+    TLoginInferType,
     TRegisterEducationAssistantFilesType,
     TRegisterEducationAssistantInferType,
     TRegisterProfessorFilesType,
@@ -23,7 +25,7 @@ import userServices from '../user/user.service'
 import { validationHandling } from '../../core/utils/validation-handling'
 import { tokenGenerator } from '../../core/utils/token-generator'
 import degreeServices from '../degree/degree.service'
-import { hashString } from '../../core/utils/hash-string'
+import { compareHash, hashString } from '../../core/utils/hash-string'
 import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
 import { serializeArray } from '../../core/middleware/serialize-array'
 import departmentServices from '../department/department.service'
@@ -31,6 +33,36 @@ import { serializeFilePath } from '../../core/utils/serialize-file-path'
 
 @Controller('/auth')
 class AuthController {
+    @Post('/login')
+    async login(req: Request, res: Response, next: NextFunction) {
+        try {
+            const data = await validationHandling<TLoginInferType>(req.body, loginValidation)
+
+            const user = await authServices.findOne(data.username)
+
+            if (!user) throw new Error('کاربری با این مشخصات یافت نشد')
+
+            const isPasswordValid = compareHash(data.password, user.dataValues.password)
+            if (!isPasswordValid) throw new Error('رمز عبور اشتباه است') 
+
+
+            await authServices.checkValidUser(user.dataValues.id, user.dataValues.role)
+
+            const token = tokenGenerator({
+                role: user.dataValues.role,
+                nationalCode: user.dataValues.national_code
+            })
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'ورود با موفقیت انجام شد',
+                data: { token, user: user.dataValues.first_name + ' ' + user.dataValues.last_name }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     @Post('/register/student')
     @UseMiddleware(
         fileUpload.fields([
@@ -118,12 +150,9 @@ class AuthController {
                 entry_semester: data.entry_semester
             })
 
-            const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
-
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'ثبت نام با موفقیت انجام شد',
-                data: { token }
+                message: 'ثبت نام با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
@@ -222,12 +251,9 @@ class AuthController {
 
             if (!professor || !professor?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
 
-            const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
-
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'ثبت نام با موفقیت انجام شد',
-                data: { token }
+                message: 'ثبت نام با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
@@ -320,12 +346,9 @@ class AuthController {
 
             if (!educationAssistant || !educationAssistant?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
 
-            const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
-
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'ثبت نام با موفقیت انجام شد',
-                data: { token }
+                message: 'ثبت نام با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
@@ -414,12 +437,9 @@ class AuthController {
             if (!universityPresident || !universityPresident?.dataValues?.id)
                 throw new Error('ثبت نام با مشکل مواجه شد')
 
-            const token = tokenGenerator({ nationalCode: user.dataValues.national_code })
-
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'ثبت نام با موفقیت انجام شد',
-                data: { token }
+                message: 'ثبت نام با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
