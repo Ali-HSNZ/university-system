@@ -1,23 +1,22 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
-import { SemesterModel } from './semester.model'
+import { DepartmentModel } from './department.model'
 
-const ImportantDatesModel = sequelizeConfig.define(
-    'important_date',
+const ImportantDateModel = sequelizeConfig.define(
+    'important_dates',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        semester_id: {
-            type: DataTypes.INTEGER,
-            allowNull: false,
-            references: { model: SemesterModel, key: 'id' },
-            onDelete: 'CASCADE'
+        type: {
+            type: DataTypes.ENUM('course_selection', 'add_drop'),
+            allowNull: false
         },
-        start_date: { type: DataTypes.DATEONLY, allowNull: false },
-        end_date: { type: DataTypes.DATEONLY, allowNull: false }
+        start_date: { type: DataTypes.DATE, allowNull: false },
+        end_date: { type: DataTypes.DATE, allowNull: false },
+        entry_year: { type: DataTypes.INTEGER, allowNull: false }
     },
     { timestamps: false, freezeTableName: true }
 )
 
-ImportantDatesModel.belongsTo(SemesterModel, { foreignKey: 'semester_id', onDelete: 'CASCADE' })
+ImportantDateModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 
-export { ImportantDatesModel }
+export { ImportantDateModel }
