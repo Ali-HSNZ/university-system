@@ -16,7 +16,7 @@
  *   - name: Class Schedule
  *     description: مدیریت ساعات کلاس
  *   - name: Enrollment
- *     description: مدیریت دانشجویان در کلاس ها
+ *     description: Enrollment management APIs
  *   - name: Attendance
  *     description: مدیریت حضور و غیاب دانشجویان
  *   - name: Grade

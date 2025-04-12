@@ -19,6 +19,6 @@ const EnrollmentModel = sequelizeConfig.define(
 )
 
 EnrollmentModel.belongsTo(UserModel, { foreignKey: 'student_id', onDelete: 'CASCADE' })
-EnrollmentModel.belongsTo(ClassModel, { foreignKey: 'class_id', onDelete: 'CASCADE' })
+EnrollmentModel.belongsTo(ClassModel, { foreignKey: 'class_schedule_id', onDelete: 'CASCADE' })
 
 export { EnrollmentModel }
