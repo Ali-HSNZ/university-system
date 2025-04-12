@@ -80,8 +80,6 @@ class EnrollmentController {
             const student = await studentService.getByUserId(Number(userId))
             if (!student) throw new Error('دانشجویی با این شناسه یافت نشد')
 
-            console.log('student: ', student)
-
             const enrollments = await enrollmentService.getStudentEnrollments(Number(student.dataValues.id))
 
             return res.status(httpStatus.OK).json({
@@ -99,12 +97,11 @@ class EnrollmentController {
         try {
             await validationHandling(req.body, createEnrollmentValidation)
 
-            const enrollment = await enrollmentService.createEnrollment(req.body)
+            await enrollmentService.createEnrollment(req.body)
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'Enrollment created successfully',
-                data: enrollment
+                message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
