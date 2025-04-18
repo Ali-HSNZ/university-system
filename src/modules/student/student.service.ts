@@ -9,6 +9,7 @@ import { CourseModel } from '../../models/course.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ClassScheduleModel } from '../../models/classSchedule.model'
 import { ProfessorModel } from '../../models/professor.model'
+import { EnrollmentModel } from '../../models/enrollment.model'
 import { Op } from 'sequelize'
 import { sequelizeConfig } from '../../core/config/database.config'
 
@@ -65,11 +66,29 @@ const studentService = {
         const student = await StudentModel.findOne({ where: { user_id } })
         return student
     },
-    getAvailableClasses: async (semester_id?: number) => {
+    getAvailableClasses: async (semester_id?: number, userId?: number) => {
         // Prepare the where clause for classes
+
+        const studentUser = await studentService.getByUserId(userId!)
+
+        const studentUserId = studentUser?.dataValues?.id
+
+        console.log('student user id : ', studentUserId)
+
+        if (!studentUserId) {
+            throw new Error('دانشجویی با این اطلاعات یافت نشد')
+        }
+
         const classWhereClause: any = {
             status: 'open',
-            [Op.or]: [{ enrolled_students: { [Op.lt]: sequelizeConfig.col('capacity') } }, { enrolled_students: null }]
+            [Op.or]: [
+                {
+                    enrolled_students: {
+                        [Op.lt]: sequelizeConfig.col('capacity')
+                    }
+                },
+                { enrolled_students: null }
+            ]
         }
 
         if (semester_id) {
@@ -81,6 +100,37 @@ const studentService = {
             is_deleted: false,
             status: {
                 [Op.ne]: 'completed'
+            }
+        }
+
+        // Get student information if userId is provided
+        let student = null
+        let takenCourseIds = [] as number[]
+
+        if (studentUserId) {
+            student = await StudentModel.findOne({ where: { id: studentUserId } })
+
+            if (student) {
+                // Get enrollments for this student
+                const enrollments = await EnrollmentModel.findAll({
+                    where: { student_id: studentUserId },
+                    include: [
+                        {
+                            model: ClassScheduleModel,
+                            include: [
+                                {
+                                    model: ClassModel,
+                                    include: [{ model: CourseModel }]
+                                }
+                            ]
+                        }
+                    ]
+                })
+
+                // Extract course IDs from enrollments
+                takenCourseIds = enrollments
+                    .filter((enrollment) => enrollment.dataValues.class_schedule?.class?.course)
+                    .map((enrollment) => enrollment.dataValues.class_schedule.class.course.id)
             }
         }
 
@@ -123,6 +173,11 @@ const studentService = {
             const classData = scheduleData.class
 
             if (!classData) return
+
+            // Skip if student has already taken this course
+            if (takenCourseIds.includes(classData.course?.id)) {
+                return
+            }
 
             // Format professor info
             if (scheduleData.professor && scheduleData.professor.user) {

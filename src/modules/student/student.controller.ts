@@ -3,6 +3,13 @@ import httpStatus from 'http-status'
 import studentService from './student.service'
 import { Controller, Get } from '../../decorators/router.decorator'
 
+// Add interface for Request with user property
+interface AuthenticatedRequest extends Request {
+    user?: {
+        id: number
+    }
+}
+
 @Controller('/student')
 class StudentController {
     @Get('/list')
@@ -21,12 +28,15 @@ class StudentController {
     }
 
     @Get('/available-classes')
-    async getAvailableClasses(req: Request, res: Response, next: NextFunction) {
+    async getAvailableClasses(req: AuthenticatedRequest, res: Response, next: NextFunction) {
         try {
             const { semester_id } = req.query
             const semesterId = semester_id ? Number(semester_id) : undefined
 
-            const classes = await studentService.getAvailableClasses(semesterId)
+            // Get current user ID
+            const userId = req.user?.id
+
+            const classes = await studentService.getAvailableClasses(semesterId, userId)
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
