@@ -19,6 +19,24 @@ class StudentController {
             next(error)
         }
     }
+
+    @Get('/available-classes')
+    async getAvailableClasses(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { semester_id } = req.query
+            const semesterId = semester_id ? Number(semester_id) : undefined
+
+            const classes = await studentService.getAvailableClasses(semesterId)
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: classes
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new StudentController()
