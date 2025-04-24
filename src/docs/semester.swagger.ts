@@ -60,7 +60,7 @@
  *                 type: enum
  *                 enum:
  *                   - upcoming
- *                   - ongoing
+ *                   - active
  *                   - completed
  *                 example: "upcoming"
  *     responses:
@@ -112,7 +112,7 @@
  *                 type: enum
  *                 enum:
  *                   - upcoming
- *                   - ongoing
+ *                   - active
  *                   - completed
  *                 example: "upcoming"
  *     responses:

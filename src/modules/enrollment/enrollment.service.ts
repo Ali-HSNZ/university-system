@@ -6,6 +6,7 @@ import { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType } from './
 import { StudentModel } from '../../models/student.model'
 import { SemesterModel } from '../../models/semester.model'
 import userServices from '../user/user.service'
+import { CourseModel } from '../../models/course.model'
 
 export class EnrollmentService {
     async list() {
@@ -24,6 +25,10 @@ export class EnrollmentService {
                                 {
                                     model: SemesterModel,
                                     attributes: ['start_date', 'end_date', 'academic_year', 'term_number', 'status']
+                                },
+                                {
+                                    model: CourseModel,
+                                    attributes: ['id', 'name', 'code']
                                 }
                             ]
                         }
@@ -42,8 +47,12 @@ export class EnrollmentService {
 
     async createEnrollment(enrollmentData: TEnrollmentRequestBodyType) {
         // Check if student exists
-        const student = await StudentModel.findOne({ where: { user_id: Number(enrollmentData.student_id) } })
+        const student = await StudentModel.findOne({ where: { id: Number(enrollmentData.student_id) } })
         if (!student) throw new Error('دانشجویی با این شناسه یافت نشد')
+
+        // Get the user_id associated with this student
+        const userId = student.dataValues.user_id
+        if (!userId) throw new Error('اطلاعات کاربری دانشجو یافت نشد')
 
         // Check if class schedule exists
         const classSchedule = await ClassScheduleModel.findOne({
@@ -72,7 +81,7 @@ export class EnrollmentService {
         // بررسی ثبت نام دانشجویی در این برنامه جلسه
         const existingEnrollment = await EnrollmentModel.findOne({
             where: {
-                student_id: Number(enrollmentData.student_id),
+                student_id: userId,
                 class_schedule_id: Number(enrollmentData.class_schedule_id)
             }
         })
@@ -81,7 +90,7 @@ export class EnrollmentService {
 
         // ثبت نام دانشجویی
         const enrollment = await EnrollmentModel.create({
-            student_id: enrollmentData.student_id,
+            student_id: userId,
             class_schedule_id: enrollmentData.class_schedule_id,
             status: 'pending'
         })
@@ -180,3 +189,4 @@ export class EnrollmentService {
         return { success: true, message: 'ثبت نام با موفقیت حذف شد' }
     }
 }
+

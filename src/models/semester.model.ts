@@ -14,9 +14,9 @@ const SemesterModel = sequelizeConfig.define(
         start_date: { type: DataTypes.DATEONLY, allowNull: false },
         // description: 'تاریخ پایان ترم'
         end_date: { type: DataTypes.DATEONLY, allowNull: false },
-        // description: 'وضعیت ترم: upcoming (در انتظار)، ongoing (در حال اجرا)، completed (پایان‌یافته)'
+        // description: 'وضعیت ترم: upcoming (در انتظار)، active (در حال اجرا)، completed (پایان‌یافته)'
         status: {
-            type: DataTypes.ENUM('upcoming', 'ongoing', 'completed'),
+            type: DataTypes.ENUM('upcoming', 'active', 'completed'),
             allowNull: false,
             defaultValue: 'upcoming'
         },
