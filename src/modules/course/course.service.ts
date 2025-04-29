@@ -11,6 +11,10 @@ const courseService = {
         const course = await CourseModel.findOne({ where: { code: code.trim() } })
         return course
     },
+    checkExistId: async (id: number) => {
+        const course = await CourseModel.findByPk(id)
+        return !!course
+    },
 
     getInfo: async (id: number) => {
         const course = await CourseModel.findByPk(id)

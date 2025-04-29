@@ -62,7 +62,7 @@ const studentService = {
         const student = await StudentModel.findOne({ where: { user_id } })
         return !!student
     },
-    getByUserId: async (user_id: number) => {
+    getByUserId: async (user_id: number | undefined) => {
         const student = await StudentModel.findOne({ where: { user_id } })
         return student
     },

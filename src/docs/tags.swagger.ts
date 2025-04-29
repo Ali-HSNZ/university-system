@@ -17,10 +17,6 @@
  *     description: مدیریت ساعات کلاس
  *   - name: Enrollment
  *     description: Enrollment management APIs
- *   - name: Attendance
- *     description: مدیریت حضور و غیاب دانشجویان
- *   - name: Grade
- *     description: مدیریت نمرات دانشجویان
  *   - name: Semester
  *     description: مدیریت ترم ها
  *   - name: Important Dates
@@ -31,6 +27,8 @@
  *     description: مدیریت مقاطع تحصیلی
  *   - name: Entry Year Course
  *     description: مدیریت دروس مناسب برای هر سال ورود
- *   - name: University Certificate
- *     description: مدیریت مدارک تحص
+ *   - name: Attendance
+ *     description: مدیریت حضور و غیاب دانشجویان
+ *   - name: Grade
+ *     description: مدیریت نمرات دانشجویان
  */

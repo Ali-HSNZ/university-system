@@ -2,13 +2,9 @@ import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
 import studentService from './student.service'
 import { Controller, Get } from '../../decorators/router.decorator'
+import TAuthenticatedRequestType from '../../core/types/auth/auth.types'
 
 // Add interface for Request with user property
-interface AuthenticatedRequest extends Request {
-    user?: {
-        id: number
-    }
-}
 
 @Controller('/student')
 class StudentController {
@@ -20,7 +16,7 @@ class StudentController {
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
-                data: students
+                data: (req as any).user
             })
         } catch (error) {
             next(error)
@@ -28,15 +24,20 @@ class StudentController {
     }
 
     @Get('/available-classes')
-    async getAvailableClasses(req: AuthenticatedRequest, res: Response, next: NextFunction) {
+    async getAvailableClasses(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
-            const { semester_id } = req.query
-            const semesterId = semester_id ? Number(semester_id) : undefined
+            //* 1. get student id from request
+            //? 2. list of all courses for current student
+            // 3. find all courses that current student is enrolled in
+            // 4. remove enrolled courses from list of all courses
+            // 5. return list of available classes
 
-            // Get current user ID
-            const userId = req.user?.id
+            const student = await studentService.getByUserId(req.user?.id)
+            if (!student) throw new Error('دانشجویی با این اطلاعات یافت نشد')
 
-            const classes = await studentService.getAvailableClasses(semesterId, userId)
+            const studentId = student.dataValues.id
+
+            const classes = await studentService.getAvailableClasses(studentId)
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
