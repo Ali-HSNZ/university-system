@@ -1,5 +1,6 @@
 import express from 'express'
 import http from 'http'
+import morgan from 'morgan'
 import './app.module'
 
 import ApplicationRoutes from './index.routes'
@@ -13,6 +14,9 @@ const server = http.createServer(app)
 
 // serve static files
 app.use('/', express.static(path.join(__dirname, '../public')))
+
+// configure morgan for logging
+app.use(morgan('dev'))
 
 // parse urlencoded and json body
 app.use(express.urlencoded({ extended: true }))
@@ -33,4 +37,3 @@ exceptionErrorMiddleware(app)
 server.listen(APP_ENV.application.port, () => {
     console.log(`Server is running on http://localhost:${APP_ENV.application.port}`)
 })
-

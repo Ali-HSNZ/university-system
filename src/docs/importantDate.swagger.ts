@@ -2,7 +2,7 @@
  * @swagger
  * /important-date/list:
  *   get:
- *     tags: [Important Date]
+ *     tags: [Important Dates]
  *     responses:
  *       200:
  *         description: A list of important dates
@@ -12,7 +12,7 @@
  * @swagger
  * /important-date/{id}/info:
  *   get:
- *     tags: [Important Date]
+ *     tags: [Important Dates]
  *     parameters:
  *       - name: id
  *         in: path
@@ -27,7 +27,7 @@
  * @swagger
  * /important-date/create:
  *   post:
- *     tags: [Important Date]
+ *     tags: [Important Dates]
  *     requestBody:
  *       required: true
  *       content:
@@ -70,7 +70,7 @@
  * @swagger
  * /important-date/{id}/update:
  *   put:
- *     tags: [Important Date]
+ *     tags: [Important Dates]
  *     parameters:
  *       - name: id
  *         in: path

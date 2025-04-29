@@ -1,9 +1,18 @@
+import { DepartmentModel } from '../../models/department.model'
 import { ImportantDateModel } from '../../models/importantDate.model'
 import TImportantDateInferType from './importantDate.types'
 
 const importantDateService = {
     list: async () => {
-        const importantDates = await ImportantDateModel.findAll()
+        const importantDates = await ImportantDateModel.findAll({
+            attributes: { exclude: ['department_id'] },
+            include: [
+                {
+                    model: DepartmentModel,
+                    attributes: ['id', 'name']
+                }
+            ]
+        })
         return importantDates
     },
     create: async (data: TImportantDateInferType) => {
