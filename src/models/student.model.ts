@@ -5,12 +5,15 @@ import { DegreeModel } from './degree.model'
 import { DepartmentModel } from './department.model'
 import { HighSchoolDiplomaModel } from './highSchoolDiploma.model'
 import { APP_ENV } from '../core/config/dotenv.config'
+import { StudyModel } from './study.model'
 
 const StudentModel = sequelizeConfig.define(
     'students',
     {
         student_code: { type: DataTypes.STRING(10), allowNull: false },
-        pre_degree_id: { type: DataTypes.INTEGER, allowNull: false },
+        pre_degree_id: { type: DataTypes.INTEGER, allowNull: true },
+        degree_id: { type: DataTypes.INTEGER, allowNull: true },
+        study_id: { type: DataTypes.INTEGER, allowNull: false },
         department_id: { type: DataTypes.INTEGER, allowNull: false },
         entry_year: { type: DataTypes.INTEGER, allowNull: false },
         entry_semester: { type: DataTypes.ENUM('1', '2'), allowNull: false },
@@ -46,8 +49,10 @@ const StudentModel = sequelizeConfig.define(
 
 StudentModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
 StudentModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
+StudentModel.belongsTo(StudyModel, { foreignKey: 'study_id', onDelete: 'CASCADE' })
 StudentModel.belongsTo(HighSchoolDiplomaModel, { foreignKey: 'high_school_diploma_id', onDelete: 'SET NULL' })
 StudentModel.belongsTo(DegreeModel, { foreignKey: 'pre_degree_id', onDelete: 'CASCADE' })
+StudentModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host

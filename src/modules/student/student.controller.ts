@@ -2,7 +2,8 @@ import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
 import studentService from './student.service'
 import { Controller, Get } from '../../decorators/router.decorator'
-import TAuthenticatedRequestType from '../../core/types/auth/auth.types'
+import { TAuthenticatedRequestType } from '../../core/types/auth'
+import { checkValidId } from '../../core/utils/check-valid-id'
 
 // Add interface for Request with user property
 
@@ -16,7 +17,42 @@ class StudentController {
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
-                data: (req as any).user
+                data: students
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/:id/info')
+    async findOne(req: Request, res: Response, next: NextFunction) {
+        try {
+            checkValidId(req.params.id)
+            const student = await studentService.getDetailById(Number(req.params.id))
+
+            if (!student) throw new Error('دانشجویی با این اطلاعات یافت نشد')
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: student
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/info')
+    async getByUserId(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const student = await studentService.getStudentDetailByUserId(req.user?.id)
+
+            if (!student) throw new Error('دانشجویی با این اطلاعات یافت نشد')
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: student
             })
         } catch (error) {
             next(error)

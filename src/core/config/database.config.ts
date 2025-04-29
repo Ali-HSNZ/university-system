@@ -16,12 +16,12 @@ const connectToDatabase = async () => {
         await sequelizeConfig.authenticate().then(() => {
             sequelizeConfig
                 .sync({ alter: true })
-                .then(() => console.log('Database Synced successfully'))
-                .catch((error) => console.error('Error Syncing Database', error))
+                .then(() => console.log('Database synced successfully'))
+                .catch((error) => console.error('Error syncing database', error))
         })
-        console.log('Connected to DB Successfully')
+        console.log('Connected to database successfully')
     } catch (error) {
-        console.error('\x1b[31mError connecting to DB')
+        console.error('\x1b[31mError connecting to database')
         process.exit(0)
     }
 }

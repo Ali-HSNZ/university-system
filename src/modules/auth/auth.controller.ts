@@ -30,6 +30,7 @@ import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.se
 import { serializeArray } from '../../core/middleware/serialize-array'
 import departmentServices from '../department/department.service'
 import { serializeFilePath } from '../../core/utils/serialize-file-path'
+import studyServices from '../study/study.service'
 
 @Controller('/auth')
 class AuthController {
@@ -43,8 +44,7 @@ class AuthController {
             if (!user) throw new Error('کاربری با این مشخصات یافت نشد')
 
             const isPasswordValid = compareHash(data.password, user.dataValues.password)
-            if (!isPasswordValid) throw new Error('رمز عبور اشتباه است') 
-
+            if (!isPasswordValid) throw new Error('رمز عبور اشتباه است')
 
             await authServices.checkValidUser(user.dataValues.id, user.dataValues.role)
 
@@ -90,9 +90,16 @@ class AuthController {
             })
 
             if (existUser) throw new Error('کاربر در سیستم وجود دارد')
-            const existDegree = await degreeServices.checkExist(data.pre_degree_id)
 
+            const existPreDegree = await degreeServices.checkExist(data.pre_degree_id)
+            if (!existPreDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
+
+            const existDegree = await degreeServices.checkExist(data.degree_id)
             if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
+
+            const existStudy = await studyServices.checkExist(String(data.study_id))
+            if (!existStudy) throw new Error('رشته تحصیلی موجود نمی باشد')
+
             const hashedPassword = hashString(data.national_code)
 
             const images = {
@@ -131,6 +138,8 @@ class AuthController {
                 user_id: user.dataValues.id,
                 pre_degree_id: data.pre_degree_id,
                 student_code: studentCode,
+                study_id: data.study_id,
+                degree_id: data.degree_id,
                 student_status: 'active',
                 total_passed_units: 0,
                 current_term_units: 0,

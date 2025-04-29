@@ -42,6 +42,8 @@
  *               required:
  *                 - first_name
  *                 - last_name
+ *                 - study_id
+ *                 - degree_id
  *                 - national_code
  *                 - gender
  *                 - birth_date
@@ -93,6 +95,14 @@
  *                   type: string
  *                   description: "آدرس"
  *                   example: "Tehran, Iran"
+ *                 study_id:
+ *                   type: integer
+ *                   description: "شناسه رشته تحصیلی"
+ *                   example: 1
+ *                 degree_id:
+ *                   type: integer
+ *                   description: "شناسه مقطع تحصیلی فعلی"
+ *                   example: 1
  *                 department_id:
  *                   type: integer
  *                   description: "شناسه گروه آموزشی"

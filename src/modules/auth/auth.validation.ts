@@ -35,7 +35,7 @@ const registerStudentValidation = Yup.object({
     phone: Yup.string().nullable(),
     email: Yup.string().email('ایمیل معتبر نیست').nullable(),
     pre_degree_id: Yup.number()
-        .optional()
+        .required('شناسه آخرین مدرک تحصیلی الزامی است')
         .positive('شناسه آخرین مدرک تحصیلی معتبر نیست')
         .integer('شناسه آخرین مدرک تحصیلی باید یک عدد صحیح باشد'),
     address: Yup.string().nullable(),
@@ -64,6 +64,8 @@ const registerStudentValidation = Yup.object({
         maxSize: 10 * 1024 * 1024
     }),
     department_id: Yup.number().required('شناسه گروه آموزشی الزامی است'),
+    study_id: Yup.number().required('شناسه رشته تحصیلی الزامی است'),
+    degree_id: Yup.number().required('شناسه مقطع تحصیلی الزامی است'),
     entry_year: Yup.number().required('سال ورود الزامی است'),
     entry_semester: Yup.string().oneOf(['1', '2'], 'نیمسال ورود معتبر نیست').required('نیمسال ورود الزامی است')
 })

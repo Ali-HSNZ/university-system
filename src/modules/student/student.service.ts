@@ -12,6 +12,7 @@ import { ProfessorModel } from '../../models/professor.model'
 import { EnrollmentModel } from '../../models/enrollment.model'
 import { Op } from 'sequelize'
 import { sequelizeConfig } from '../../core/config/database.config'
+import { StudyModel } from '../../models/study.model'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -64,6 +65,87 @@ const studentService = {
     },
     getByUserId: async (user_id: number | undefined) => {
         const student = await StudentModel.findOne({ where: { user_id } })
+        return student
+    },
+    getStudentDetailByUserId: async (user_id: number | undefined) => {
+        const student = await StudentModel.findOne({
+            where: { user_id },
+            include: [
+                {
+                    model: UserModel,
+                    attributes: {
+                        exclude: [
+                            'id',
+                            'createdAt',
+                            'updatedAt',
+                            'password',
+                            'is_deleted',
+                            'deleted_by',
+                            'deleted_at',
+                            'updated_at'
+                        ]
+                    }
+                },
+                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                {
+                    model: HighSchoolDiplomaModel,
+                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] },
+                    include: [{ model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }]
+                },
+                {
+                    model: StudyModel,
+                    attributes: ['name']
+                }
+            ],
+            attributes: {
+                exclude: [
+                    'updatedAt',
+                    'pre_degree_id',
+                    'department_id',
+                    'high_school_diploma_id',
+                    'user_id',
+                    'degree_id',
+                    'study_id'
+                ]
+            }
+        })
+        return student
+    },
+    getDetailById: async (id: number) => {
+        const student = await StudentModel.findByPk(id, {
+            include: [
+                {
+                    model: UserModel,
+                    attributes: {
+                        exclude: [
+                            'id',
+                            'createdAt',
+                            'updatedAt',
+                            'password',
+                            'is_deleted',
+                            'deleted_by',
+                            'deleted_at',
+                            'updated_at'
+                        ]
+                    }
+                },
+                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                {
+                    model: HighSchoolDiplomaModel,
+                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] },
+                    include: [{ model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }]
+                },
+                {
+                    model: StudyModel,
+                    attributes: ['name']
+                }
+            ],
+            attributes: {
+                exclude: ['updatedAt', 'pre_degree_id', 'department_id', 'high_school_diploma_id', 'user_id']
+            }
+        })
         return student
     },
     getAvailableClasses: async (semester_id?: number, userId?: number) => {

@@ -46,11 +46,11 @@ const AuthenticateMiddleware = (req: Request, res: Response, next: NextFunction)
 
                 return next()
             } catch (error) {
-                next(error)
+                return next(error)
             }
         })
     } catch (error) {
-        next(error)
+        return next(error)
     }
 }
 
