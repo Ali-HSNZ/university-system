@@ -24,7 +24,7 @@
  *   - name: Department
  *     description: مدیریت گروه های آموزشی
  *   - name: Degree
- *     description: مدیریت مقاطع تحصیلی
+ *     description: مدیریت مقاطع تحصیلی (کارشناسی، کارشناسی ارشد، دکترا)
  *   - name: Entry Year Course
  *     description: مدیریت دروس مناسب برای هر سال ورود
  *   - name: Attendance
