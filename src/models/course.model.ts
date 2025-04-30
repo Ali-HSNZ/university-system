@@ -1,8 +1,5 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
-import { DepartmentModel } from './department.model'
-import { EntryYearModel } from './entryYear.model'
-import { EntryYearCourseModel } from './entryYearCourse.model'
 
 const CourseModel = sequelizeConfig.define(
     'course',
@@ -18,15 +15,13 @@ const CourseModel = sequelizeConfig.define(
                 return Number(this.dataValues.theoretical_units) + Number(this.dataValues.practical_units)
             }
         },
-        department_id: { type: DataTypes.INTEGER, allowNull: false },
-        type: { type: DataTypes.ENUM('theory', 'practical', 'combined'), allowNull: false },
+        type: { type: DataTypes.ENUM('public', 'specialized', 'basic'), allowNull: false },
         prerequisites: { type: DataTypes.JSON, allowNull: true },
         corequisites: { type: DataTypes.JSON, allowNull: true }
     },
     { timestamps: false, freezeTableName: true }
 )
 
-CourseModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 
 CourseModel.addHook('afterFind', (result) => {
     if (!result) return

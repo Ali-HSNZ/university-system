@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
-import entryYearService from './entry-year.service'
-import { Controller, Get, Post, Put, Delete, UseMiddleware } from '../../decorators/router.decorator'
+import entryYearService from './entryYear.service'
+import { Controller, Get, Post, Put, Delete } from '../../decorators/router.decorator'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import entryYearValidation from './entry-year.validations'
+import entryYearValidation from './entryYear.validations'
 import degreeService from '../degree/degree.service'
 import departmentService from '../department/department.service'
-import TEntryYearBodyInferType from './entry-year.types'
+import TEntryYearBodyInferType from './entryYear.types'
 import { validationHandling } from '../../core/utils/validation-handling'
 
 @Controller('/entry-year')
@@ -53,6 +53,9 @@ class EntryYearController {
             // check valid department
             const department = await departmentService.checkExistId(req.body.department_id)
             if (!department) throw new Error('گروه آموزشی مورد نظر یافت نشد')
+
+            const checkExistEntryYear = await entryYearService.checkExistEntryYear(Number(data.year))
+            if (checkExistEntryYear) throw new Error('سال ورودی مورد نظر قبلاً ایجاد شده است')
 
             await entryYearService.create(data)
 

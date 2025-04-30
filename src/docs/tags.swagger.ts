@@ -27,6 +27,8 @@
  *     description: مدیریت مقاطع تحصیلی (کارشناسی، کارشناسی ارشد، دکترا)
  *   - name: Entry Year
  *     description: مدیریت سال های ورود
+ *   - name: Entry Year Course
+ *     description: مدیریت دروس سال های ورود
  *   - name: Study
  *     description: مدیریت رشته های تحصیلی
  *   - name: Attendance

@@ -9,11 +9,11 @@ const departmentServices = {
         return departments
     },
     create: async (name: string) => {
-        const department = await DepartmentModel.create({ name })
+        const department = await DepartmentModel.create({ name: name.trim() })
         return department
     },
     checkExistName: async (name: string) => {
-        const department = await DepartmentModel.findOne({ where: { name } })
+        const department = await DepartmentModel.findOne({ where: { name: name.trim() } })
         return !!department
     },
     checkExistId: async (id: string) => {
@@ -29,7 +29,7 @@ const departmentServices = {
         if (!department) {
             return false
         }
-        await department.update({ name })
+        await department.update({ name: name.trim() })
         return true
     },
     checkUsersInDepartment: async (id: string) => {

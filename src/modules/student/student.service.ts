@@ -155,8 +155,6 @@ const studentService = {
 
         const studentUserId = studentUser?.dataValues?.id
 
-        console.log('student user id : ', studentUserId)
-
         if (!studentUserId) {
             throw new Error('دانشجویی با این اطلاعات یافت نشد')
         }

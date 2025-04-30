@@ -40,7 +40,6 @@
  *               - name
  *               - theoretical_units
  *               - practical_units
- *               - department_id
  *               - type
  *             properties:
  *               name:
@@ -48,20 +47,17 @@
  *                 description: نام درس
  *               type:
  *                 type: string
- *                 enum: ["theory", "practical", "combined"]
+ *                 enum: ["public", "specialized", "basic"]
  *                 description: |
  *                   نوع درس:
- *                   - `theory`: نظری
- *                   - `practical`: عملی
- *                   - `combined`: ترکیبی
+ *                   - `public`: عمومی
+ *                   - `specialized`: تخصصی
+ *                   - `basic`: پایه
  *               theoretical_units:
  *                 description: تعداد واحد نظری
  *               practical_units:
  *                 type: integer
  *                 description: تعداد واحد عملی
- *               department_id:
- *                 type: integer
- *                 description: شناسه‌ی دپارتمان
  *               prerequisites:
  *                 type: array
  *                 items:
@@ -102,7 +98,6 @@
  *               - name
  *               - theoretical_units
  *               - practical_units
- *               - department_id
  *               - type
  *             properties:
  *               name:
@@ -110,12 +105,12 @@
  *                 description: نام درس
  *               type:
  *                 type: string
- *                 enum: ["theory", "practical", "combined"]
+ *                 enum: ["public", "specialized", "basic"]
  *                 description: |
  *                   نوع درس:
- *                   - `theory`: نظری
- *                   - `practical`: عملی
- *                   - `combined`: ترکیبی
+ *                   - `public`: عمومی
+ *                   - `specialized`: تخصصی
+ *                   - `basic`: پایه
  *               theoretical_units:
  *                 description: تعداد واحد نظری
  *                 type: integer
@@ -124,9 +119,6 @@
  *                 type: integer
  *                 description: تعداد واحد عملی
  *                 example: 1
- *               department_id:
- *                 type: integer
- *                 description: شناسه‌ی دپارتمان
  *               prerequisites:
  *                 type: array
  *                 items:

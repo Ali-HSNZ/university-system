@@ -10,13 +10,13 @@ const EntryYearCourseModel = sequelizeConfig.define(
         entry_year_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: EntryYearModel, key: 'id' },
+            references: { model: EntryYearModel },
             onDelete: 'CASCADE'
         },
         course_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
-            references: { model: CourseModel, key: 'id' },
+            references: { model: CourseModel },
             onDelete: 'CASCADE'
         }
     },

@@ -1,10 +1,8 @@
-import { CourseModel } from '../../models/course.model'
 import { DegreeModel } from '../../models/degree.model'
 import { DepartmentModel } from '../../models/department.model'
 import { EntryYearModel } from '../../models/entryYear.model'
 import { StudyModel } from '../../models/study.model'
-import courseService from '../course/course.service'
-import TEntryYearBodyInferType from './entry-year.types'
+import TEntryYearBodyInferType from './entryYear.types'
 
 const entryYearService = {
     async list() {
@@ -25,6 +23,10 @@ const entryYearService = {
                 }
             ]
         })
+    },
+    checkExistEntryYear: async (year: number) => {
+        const entryYear = await EntryYearModel.findOne({ where: { year } })
+        return !!entryYear
     },
     async getById(id: number) {
         const entryYear = await EntryYearModel.findByPk(id, {

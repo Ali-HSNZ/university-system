@@ -5,7 +5,6 @@ import courseService from './course.service'
 import { validationHandling } from '../../core/utils/validation-handling'
 import courseSchema from './course.validation'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import departmentService from '../department/department.service'
 import { serializeArray } from '../../core/middleware/serialize-array'
 
 @Controller('/course')
@@ -59,22 +58,14 @@ class CourseController {
             if (existCourseName) {
                 return res.status(httpStatus.CONFLICT).json({
                     status: httpStatus.CONFLICT,
-                    message: 'درس با این نام قبلاً ایجاد شده است.'
-                })
-            }
-
-            const departmentExists = await departmentService.checkExistId(req.body.department_id)
-            if (!departmentExists) {
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    status: httpStatus.BAD_REQUEST,
-                    message: 'دپارتمان انتخاب شده معتبر نیست'
+                    message: 'درس با این نام قبلاً ایجاد شده است'
                 })
             }
 
             if (Number(req.body.theoretical_units) === 0 && Number(req.body.practical_units) === 0) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
-                    message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند.'
+                    message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند'
                 })
             }
 
@@ -103,7 +94,7 @@ class CourseController {
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
-                message: 'درس با موفقیت ایجاد شد.'
+                message: 'درس با موفقیت ایجاد شد'
             })
         } catch (error) {
             next(error)
@@ -123,22 +114,14 @@ class CourseController {
             if (existCourseName) {
                 return res.status(httpStatus.CONFLICT).json({
                     status: httpStatus.CONFLICT,
-                    message: 'درس با این نام قبلاً ایجاد شده است.'
-                })
-            }
-
-            const departmentExists = await departmentService.checkExistId(req.body.department_id)
-            if (!departmentExists) {
-                return res.status(httpStatus.BAD_REQUEST).json({
-                    status: httpStatus.BAD_REQUEST,
-                    message: 'دپارتمان انتخاب شده معتبر نیست'
+                    message: 'درس با این نام قبلاً ایجاد شده است'
                 })
             }
 
             if (Number(req.body.theoretical_units) === 0 && Number(req.body.practical_units) === 0) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
-                    message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند.'
+                    message: 'واحد نظری و عملی نمی‌توانند هر دو صفر باشند'
                 })
             }
 
