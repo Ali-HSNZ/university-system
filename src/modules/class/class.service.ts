@@ -6,9 +6,24 @@ import TClassInferType from './class.types'
 const classService = {
     async list() {
         const classes = await ClassModel.findAll({
-            include: [{ model: CourseModel }, { model: SemesterModel }]
+            attributes: { exclude: ['course_id', 'semester_id'] },
+            include: [
+                {
+                    model: CourseModel,
+                    attributes: {
+                        exclude: ['prerequisites', 'corequisites', 'total_units']
+                    }
+                },
+                { model: SemesterModel, attributes: { exclude: ['is_deleted', 'deleted_at'] } }
+            ]
         })
         return classes
+    },
+    async existClass(classDTO: TClassInferType) {
+        const findClass = await ClassModel.findOne({
+            where: { course_id: classDTO.course_id, semester_id: classDTO.semester_id }
+        })
+        return !!findClass
     },
     async create(classDTO: TClassInferType) {
         const createdClass = await ClassModel.create(classDTO)
@@ -16,7 +31,16 @@ const classService = {
     },
     async findOne(id: number) {
         const findClass = await ClassModel.findByPk(id, {
-            include: [{ model: CourseModel }, { model: SemesterModel }]
+            attributes: { exclude: ['course_id', 'semester_id'] },
+            include: [
+                {
+                    model: CourseModel,
+                    attributes: {
+                        exclude: ['prerequisites', 'corequisites', 'total_units']
+                    }
+                },
+                { model: SemesterModel, attributes: { exclude: ['is_deleted', 'deleted_at'] } }
+            ]
         })
         return findClass
     },

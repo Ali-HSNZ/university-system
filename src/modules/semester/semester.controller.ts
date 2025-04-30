@@ -104,11 +104,19 @@ class SemesterController {
             const { id } = req.params
             checkValidId(id)
 
-            await semesterService.delete(Number(id))
+            const existSemester = await semesterService.checkExist(Number(id))
 
+            if (!existSemester) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'ترم یافت نشد'
+                })
+            }
+
+            await semesterService.delete(Number(id))
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
-                message: 'حذف با موفقیت انجام شد'
+                message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)

@@ -5,6 +5,7 @@ import classSchema from './class.validation'
 import classService from './class.service'
 import httpStatus from 'http-status'
 import { checkValidId } from '../../core/utils/check-valid-id'
+import TClassInferType from './class.types'
 
 @Controller('/class')
 class ClassController {
@@ -51,10 +52,21 @@ class ClassController {
     @Post('/create')
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            await validationHandling(req.body, classSchema)
+            const  data = await validationHandling<TClassInferType>(req.body, classSchema)
+
+            const existClass = await classService.existClass({
+                course_id: data.course_id,
+                semester_id: data.semester_id
+            })
+
+            if (existClass) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'کلاس با این درس و ترم قبلاً ایجاد شده است'
+                })
+            }
 
             await classService.create(req.body)
-
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
                 message: 'عملیات با موفقیت انجام شد'

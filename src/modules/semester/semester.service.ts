@@ -41,8 +41,12 @@ const semesterService = {
         const semester = await SemesterModel.update(data, { where: { id } })
         return semester
     },
+    async checkExist(id: number) {
+        const semester = await SemesterModel.findByPk(id)
+        return !!semester
+    },
     async delete(id: number) {
-        const semester = await SemesterModel.update({ is_deleted: true, deleted_at: new Date() }, { where: { id } })
+        const semester = await SemesterModel.destroy({ where: { id } })
         return semester
     }
 }
