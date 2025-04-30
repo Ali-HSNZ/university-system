@@ -4,13 +4,7 @@ import { Controller, Delete, Get, Post, Put } from '../../decorators/router.deco
 import { validationHandling } from '../../core/utils/validation-handling'
 import { checkValidId } from '../../core/utils/check-valid-id'
 import { EnrollmentService } from './enrollment.service'
-import {
-    createEnrollmentValidation,
-    enrollmentIdValidation,
-    updateEnrollmentValidation,
-    studentIdValidation,
-    classIdValidation
-} from './enrollment.validation'
+import { createEnrollmentValidation, updateEnrollmentValidation, classIdValidation } from './enrollment.validation'
 import studentService from '../student/student.service'
 
 const enrollmentService = new EnrollmentService()
@@ -37,13 +31,11 @@ class EnrollmentController {
             const { id } = req.params
             checkValidId(id)
 
-            await validationHandling({ id: Number(id) }, enrollmentIdValidation)
-
             const enrollment = await enrollmentService.getEnrollmentById(Number(id))
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
-                message: 'Enrollment retrieved successfully',
+                message: 'عملیات با موفقیت انجام شد',
                 data: enrollment
             })
         } catch (error) {
@@ -114,7 +106,6 @@ class EnrollmentController {
             const { id } = req.params
             checkValidId(id)
 
-            await validationHandling({ id: Number(id) }, enrollmentIdValidation)
             await validationHandling(req.body, updateEnrollmentValidation)
 
             const enrollment = await enrollmentService.updateEnrollmentStatus(Number(id), req.body)
@@ -135,14 +126,11 @@ class EnrollmentController {
             const { id } = req.params
             checkValidId(id)
 
-            await validationHandling({ id: Number(id) }, enrollmentIdValidation)
-
-            const result = await enrollmentService.deleteEnrollment(Number(id))
+            await enrollmentService.deleteEnrollment(Number(id))
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
-                message: 'Enrollment deleted successfully',
-                data: result
+                message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)

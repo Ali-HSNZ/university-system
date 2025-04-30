@@ -21,6 +21,7 @@
  *             type: object
  *             required:
  *               - class_id
+ *               - classroom_id
  *               - professor_id
  *               - day_of_week
  *               - start_time
@@ -30,6 +31,10 @@
  *               class_id:
  *                 type: integer
  *                 description: شناسه کلاس
+ *                 example: 1
+ *               classroom_id:
+ *                 type: integer
+ *                 description: شناسه سالن
  *                 example: 1
  *               professor_id:
  *                 type: integer

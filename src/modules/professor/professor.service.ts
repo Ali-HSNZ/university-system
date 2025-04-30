@@ -44,7 +44,9 @@ const professorService = {
             return professor
         })
     },
-    checkExist: async (id: number) => {
+    checkExist: async (id: string|number | undefined) => {
+        if (!id) return false
+
         const professor = await ProfessorModel.findByPk(id)
         return !!professor
     },

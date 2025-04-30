@@ -18,10 +18,6 @@ const updateEnrollmentValidation = yup.object<TEnrollmentUpdateRequestBodyType>(
     status: yup.string().oneOf(['pending', 'approved', 'rejected']).required()
 })
 
-const enrollmentIdValidation = yup.object().shape({
-    id: yup.number().integer().positive().required()
-})
-
 const studentIdValidation = yup.object().shape({
     userId: yup.number().integer().positive().required()
 })
@@ -30,10 +26,4 @@ const classIdValidation = yup.object().shape({
     classId: yup.number().integer().positive().required()
 })
 
-export {
-    createEnrollmentValidation,
-    updateEnrollmentValidation,
-    enrollmentIdValidation,
-    studentIdValidation,
-    classIdValidation
-}
+export { createEnrollmentValidation, updateEnrollmentValidation, studentIdValidation, classIdValidation }

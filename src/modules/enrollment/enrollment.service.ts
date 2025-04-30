@@ -13,7 +13,12 @@ export class EnrollmentService {
         const enrollments = await EnrollmentModel.findAll({
             attributes: { exclude: ['class_schedule_id', 'student_id'] },
             include: [
-                { model: UserModel, attributes: ['id', 'first_name', 'last_name', 'gender', 'national_code', 'phone'] },
+                // { model: UserModel, attributes: ['id', 'first_name', 'last_name', 'gender', 'national_code', 'phone'] },
+                {
+                    model: StudentModel,
+                    attributes: ['id', 'student_code'],
+                    include: [{ model: UserModel, attributes: ['first_name', 'last_name', 'gender', 'national_code'] }]
+                },
                 {
                     model: ClassScheduleModel,
                     attributes: ['day_of_week', 'start_time', 'end_time'],
@@ -51,8 +56,7 @@ export class EnrollmentService {
         if (!student) throw new Error('دانشجویی با این شناسه یافت نشد')
 
         // Get the user_id associated with this student
-        const userId = student.dataValues.user_id
-        if (!userId) throw new Error('اطلاعات کاربری دانشجو یافت نشد')
+        const studentId = student.dataValues.id
 
         // Check if class schedule exists
         const classSchedule = await ClassScheduleModel.findOne({
@@ -81,19 +85,23 @@ export class EnrollmentService {
         // بررسی ثبت نام دانشجویی در این برنامه جلسه
         const existingEnrollment = await EnrollmentModel.findOne({
             where: {
-                student_id: userId,
+                student_id: studentId,
                 class_schedule_id: Number(enrollmentData.class_schedule_id)
             }
         })
+
+        // check student is enrolled in this class or course
+        await this.checkEnrollmentOfClass(studentId, classId)
 
         if (existingEnrollment) throw new Error('دانشجو قبلا در این کلاس ثبت نام کرده است')
 
         // ثبت نام دانشجویی
         const enrollment = await EnrollmentModel.create({
-            student_id: userId,
+            student_id: studentId,
             class_schedule_id: enrollmentData.class_schedule_id,
             status: 'pending'
         })
+        console.log('student')
 
         // افزایش تعداد دانشجویان در کلاس
         await ClassModel.update(
@@ -102,6 +110,27 @@ export class EnrollmentService {
         )
 
         return enrollment
+    }
+    async checkEnrollmentOfClass(student_id: number, class_id: number) {
+        const allSchedulesOfThisClass = await ClassScheduleModel.findAll({
+            where: { class_id },
+            attributes: ['id']
+        })
+
+        // استخراج id برنامه‌ها
+        const allScheduleIds = allSchedulesOfThisClass.map((s) => s.dataValues.id)
+
+        // بررسی اینکه آیا دانشجو در یکی از این برنامه‌ها ثبت‌نام کرده
+        const existingEnrollment = await EnrollmentModel.findOne({
+            where: {
+                student_id,
+                class_schedule_id: allScheduleIds // بررسی با IN
+            }
+        })
+
+        if (existingEnrollment) {
+            throw new Error('دانشجو قبلاً در این کلاس ثبت‌نام کرده است')
+        }
     }
 
     async updateEnrollmentStatus(id: number, updateData: TEnrollmentUpdateRequestBodyType) {
@@ -186,7 +215,7 @@ export class EnrollmentService {
         }
 
         await enrollment.destroy()
-        return { success: true, message: 'ثبت نام با موفقیت حذف شد' }
+        return true
     }
 }
 

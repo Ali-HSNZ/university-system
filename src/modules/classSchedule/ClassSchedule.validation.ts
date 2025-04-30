@@ -4,13 +4,17 @@ const classScheduleSchema = yup.object().shape({
     class_id: yup.string().test('class_id', 'شناسه کلاس الزامی است', function (value) {
         if (!value) return this.createError({ message: 'شناسه کلاس الزامی است' })
         if (isNaN(Number(value))) return this.createError({ message: 'شناسه کلاس بایستی عددی باشد' })
-        if (Number(value) <= 0) return this.createError({ message: 'شناسه کلاس بایستی بزرگتر از صفر باشد' })
         return true
     }),
+    classroom_id: yup.string().test('classroom_id', 'شناسه سالن لزامی است', function (value) {
+        if (!value) return this.createError({ message: 'شناسه سالن الزامی است' })
+        if (isNaN(Number(value))) return this.createError({ message: 'شناسه سالن بایستی عددی باشد' })
+        return true
+    }),
+
     professor_id: yup.string().test('professor_id', 'شناسه استاد الزامی است', function (value) {
         if (!value) return this.createError({ message: 'شناسه استاد الزامی است' })
         if (isNaN(Number(value))) return this.createError({ message: 'شناسه استاد بایستی عددی باشد' })
-        if (Number(value) <= 0) return this.createError({ message: 'شناسه استاد بایستی بزرگتر از صفر باشد' })
         return true
     }),
     day_of_week: yup

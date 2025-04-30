@@ -10,6 +10,7 @@ import { StudyModel } from './study.model'
 const StudentModel = sequelizeConfig.define(
     'students',
     {
+        id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         student_code: { type: DataTypes.STRING(10), allowNull: false },
         pre_degree_id: { type: DataTypes.INTEGER, allowNull: true },
         degree_id: { type: DataTypes.INTEGER, allowNull: true },

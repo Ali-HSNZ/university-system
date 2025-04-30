@@ -44,7 +44,9 @@ const classService = {
         })
         return findClass
     },
-    async checkExist(id: number) {
+    async checkExist(id: string | number | undefined) {
+        if (!id) return false
+
         const findClass = await ClassModel.findByPk(id)
         return !!findClass
     },
