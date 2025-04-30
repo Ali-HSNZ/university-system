@@ -1,24 +1,24 @@
 import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
-import entryYearCourseService from './entry-year-course.service'
-import { Controller, Get, Post, Put, Delete } from '../../decorators/router.decorator'
+import entryYearService from './entry-year.service'
+import { Controller, Get, Post, Put, Delete, UseMiddleware } from '../../decorators/router.decorator'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import { validationHandling } from '../../core/utils/validation-handling'
-import entryYearCourseValidation from './entry-year-course.validations'
-import courseService from '../course/course.service'
+import entryYearValidation from './entry-year.validations'
 import degreeService from '../degree/degree.service'
 import departmentService from '../department/department.service'
+import TEntryYearBodyInferType from './entry-year.types'
+import { validationHandling } from '../../core/utils/validation-handling'
 
-@Controller('/entry-year-course')
-class EntryYearCourseController {
+@Controller('/entry-year')
+class EntryYearController {
     @Get('/list')
     async list(req: Request, res: Response, next: NextFunction) {
         try {
-            const entryYearCourses = await entryYearCourseService.list()
+            const entryYears = await entryYearService.list()
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
-                data: entryYearCourses
+                data: entryYears
             })
         } catch (error) {
             next(error)
@@ -30,11 +30,11 @@ class EntryYearCourseController {
         try {
             const id = req.params.id
             checkValidId(id)
-            const entryYearCourse = await entryYearCourseService.getById(Number(id))
+            const entryYear = await entryYearService.getById(Number(id))
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
-                data: entryYearCourse
+                data: entryYear
             })
         } catch (error) {
             next(error)
@@ -44,11 +44,7 @@ class EntryYearCourseController {
     @Post('/create')
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            await entryYearCourseValidation.validate(req.body, { abortEarly: false })
-
-            // check valid course
-            const course = await courseService.checkExistId(req.body.course_id)
-            if (!course) throw new Error('درس مورد نظر یافت نشد')
+            const data = await validationHandling<TEntryYearBodyInferType>(req.body, entryYearValidation)
 
             // check valid degree
             const degree = await degreeService.checkExistId(req.body.degree_id)
@@ -58,7 +54,7 @@ class EntryYearCourseController {
             const department = await departmentService.checkExistId(req.body.department_id)
             if (!department) throw new Error('گروه آموزشی مورد نظر یافت نشد')
 
-            await entryYearCourseService.create(req.body)
+            await entryYearService.create(data)
 
             res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
@@ -69,14 +65,13 @@ class EntryYearCourseController {
         }
     }
 
-    @Put('/:id')
+    @Put('/:id/update')
     async update(req: Request, res: Response, next: NextFunction) {
         try {
-            const entryYearCourse = await entryYearCourseService.update(Number(req.params.id), req.body)
-            res.status(httpStatus.OK).json({
+            await entryYearService.update(Number(req.params.id), req.body)
+            return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
-                message: 'عملیات با موفقیت انجام شد',
-                data: entryYearCourse
+                message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)
@@ -86,7 +81,7 @@ class EntryYearCourseController {
     @Delete('/:id')
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
-            await entryYearCourseService.delete(Number(req.params.id))
+            await entryYearService.delete(Number(req.params.id))
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'
@@ -97,4 +92,4 @@ class EntryYearCourseController {
     }
 }
 
-export default new EntryYearCourseController()
+export default new EntryYearController()

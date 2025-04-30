@@ -1,6 +1,8 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
 import { DepartmentModel } from './department.model'
+import { EntryYearModel } from './entryYear.model'
+import { EntryYearCourseModel } from './entryYearCourse.model'
 
 const CourseModel = sequelizeConfig.define(
     'course',

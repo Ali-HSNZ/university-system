@@ -1,12 +1,12 @@
 /**
  * @swagger
- *  /entry-year-course/list:
+ *  /entry-year/list:
  *    get:
- *      tags: [Entry Year Course]
- *      description: Returns a list of all entry year courses with their associated degree, course, and department information
+ *      tags: [Entry Year]
+ *      description: Returns a list of all entry years with their associated degree, course, and department information
  *      responses:
  *       200:
- *         description: Successfully retrieved entry year courses
+ *         description: Successfully retrieved entry years
  *       400:
  *         description: Bad request
  *       500:
@@ -15,34 +15,34 @@
 
 /**
  * @swagger
- * /entry-year-course/{id}/info:
+ * /entry-year/{id}/info:
  *   get:
- *     tags: [Entry Year Course]
- *     summary: Get entry year course by ID
- *     description: Returns detailed information about a specific entry year course
+ *     tags: [Entry Year]
+ *     summary: Get entry year by ID
+ *     description: Returns detailed information about a specific entry year
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the entry year course
+ *         description: ID of the entry year
  *     responses:
  *       200:
- *         description: Successfully retrieved entry year course
+ *         description: Successfully retrieved entry year
  *       404:
- *         description: Entry year course not found
+ *         description: Entry year not found
  *       500:
  *         description: Server error
  */
 
 /**
  * @swagger
- * /entry-year-course/create:
+ * /entry-year/create:
  *   post:
- *     tags: [Entry Year Course]
- *     summary: Create new entry year course
- *     description: Creates a new entry year course
+ *     tags: [Entry Year]
+ *     summary: Create new entry year
+ *     description: Creates a new entry year
  *     requestBody:
  *       required: true
  *       content:
@@ -51,29 +51,29 @@
  *             type: object
  *             required:
  *               - year
- *               - course_id
+ *               - study_id
  *               - degree_id
  *               - department_id
  *             properties:
  *               year:
  *                 type: string
- *                 description: The year of entry student
+ *                 description: سال ورود دانشجو
  *                 example: "1402"
- *               course_id:
+ *               study_id:
  *                 type: integer
- *                 description: The course id
+ *                 description: شناسه رشته تحصیلی
  *                 example: 1
  *               degree_id:
  *                 type: integer
- *                 description: The degree id
+ *                 description: شناسه مقطع تحصیلی
  *                 example: 1
  *               department_id:
  *                 type: integer
- *                 description: The department id
+ *                 description: شناسه گروه آموزشی
  *                 example: 1
  *     responses:
  *       201:
- *         description: Successfully created entry year course
+ *         description: created successfully
  *       400:
  *         description: Bad request
  *       500:
@@ -82,18 +82,18 @@
 
 /**
  * @swagger
- * /entry-year-course/{id}/update:
+ * /entry-year/{id}/update:
  *   put:
- *     tags: [Entry Year Course]
- *     summary: Update entry year course
- *     description: Updates an existing entry year course
+ *     tags: [Entry Year]
+ *     summary: Update entry year
+ *     description: Updates an existing entry year
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the entry year course
+ *         description: ID of the entry year
  *     requestBody:
  *       required: true
  *       content:
@@ -102,53 +102,53 @@
  *             type: object
  *             required:
  *               - year
- *               - course_id
+ *               - study_id
  *               - degree_id
  *               - department_id
  *             properties:
  *               year:
  *                 type: string
- *                 description: The year of entry student
- *                 example: "1402"
- *               course_id:
+ *                 description: سال ورود دانشجو
+ *                 example: "1402" 
+ *               study_id:
  *                 type: integer
- *                 description: The course id
+ *                 description: شناسه رشته تحصیلی
  *                 example: 1
  *               degree_id:
  *                 type: integer
- *                 description: The degree id
+ *                 description: شناسه مقطع تحصیلی
  *                 example: 1
  *               department_id:
  *                 type: integer
- *                 description: The department id
+ *                 description: شناسه گروه آموزشی
  *                 example: 1
  *     responses:
  *       200:
- *         description: Successfully updated entry year course
+ *         description: updated successfully
  *       404:
- *         description: Entry year course not found
+ *         description: Entry year not found
  *       500:
  *         description: Server error
  */
 
 /**
  * @swagger
- * /entry-year-course/{id}/delete:
+ * /entry-year/{id}/delete:
  *   delete:
- *     tags: [Entry Year Course]
- *     summary: Delete entry year course
- *     description: Deletes an existing entry year course
+ *     tags: [Entry Year]
+ *     summary: Delete entry year
+ *     description: Deletes an existing entry year
  *     parameters:
  *       - in: path
  *         name: id
  *         required: true
  *         schema:
  *           type: integer
- *         description: ID of the entry year course
+ *         description: ID of the entry year
  *     responses:
  *       200:
- *         description: Successfully deleted entry year course
+ *         description: Successfully deleted entry year
  *       404:
- *         description: Entry year course not found
+ *         description: Entry year not found
  *       500:
  */

@@ -1,20 +1,30 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
-import { DegreeModel } from './degree.model'
 import { CourseModel } from './course.model'
-import { DepartmentModel } from './department.model'
+import { EntryYearModel } from './entryYear.model'
 
 const EntryYearCourseModel = sequelizeConfig.define(
     'entry_year_course',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        year: { type: DataTypes.STRING, allowNull: false }
+        entry_year_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: EntryYearModel, key: 'id' },
+            onDelete: 'CASCADE'
+        },
+        course_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: { model: CourseModel, key: 'id' },
+            onDelete: 'CASCADE'
+        }
     },
     { timestamps: false, freezeTableName: true }
 )
 
-EntryYearCourseModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
-EntryYearCourseModel.belongsTo(CourseModel, { foreignKey: 'course_id', onDelete: 'CASCADE' })
-EntryYearCourseModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
+// Set up the associations
+EntryYearCourseModel.belongsTo(EntryYearModel, { foreignKey: 'entry_year_id' })
+EntryYearCourseModel.belongsTo(CourseModel, { foreignKey: 'course_id' })
 
 export { EntryYearCourseModel }
