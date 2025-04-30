@@ -244,6 +244,7 @@ class AuthController {
                 academic_rank: data.academic_rank,
                 hire_date: data.hire_date,
                 degree_id: data.degree_id,
+                study_id: data.study_id,
                 department_id: data.department_id,
                 research_interests: data.research_interests,
                 work_experience_years: data.work_experience_years,

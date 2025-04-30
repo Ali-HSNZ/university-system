@@ -51,6 +51,10 @@ const professorService = {
     checkExistByUserId: async (user_id: number) => {
         const professor = await ProfessorModel.findOne({ where: { user_id } })
         return !!professor
+    },
+    delete: async (id: number) => {
+        const professor = await ProfessorModel.destroy({ where: { id } })
+        return professor
     }
 }
 

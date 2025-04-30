@@ -199,6 +199,7 @@
  *               - phone
  *               - employment_contract_file
  *               - department_id
+ *               - study_id
  *               - degree_id
  *               - academic_rank
  *             properties:
@@ -239,6 +240,10 @@
  *               degree_id:
  *                 type: integer
  *                 description: "شناسه مقطع تحصیلی"
+ *                 example: 1
+ *               study_id:
+ *                 type: integer
+ *                 description: "شناسه رشته تحصیلی"
  *                 example: 1
  *               academic_rank:
  *                 type: string

@@ -74,6 +74,7 @@ const registerProfessorValidation = Yup.object({
     first_name: Yup.string().required('نام الزامی است'),
     last_name: Yup.string().required('نام خانوادگی الزامی است'),
     professor_code: Yup.string().nullable(),
+    study_id: Yup.number().required('شناسه رشته تحصیلی الزامی است'),
     national_code: Yup.string()
         .length(10, 'کد ملی باید 10 رقم باشد')
         .matches(/^\d+$/, 'کد ملی فقط میتواند شامل اعداد باشد')
@@ -137,7 +138,8 @@ const registerProfessorValidation = Yup.object({
         title: 'مدرک دکتری',
         uniqueTitle: 'check-auth-professor-phd-certificate-file',
         validTypes: ['pdf'],
-        maxSize: 10 * 1024 * 1024
+        maxSize: 10 * 1024 * 1024,
+        required: false
     }),
     national_card_file: validateFile({
         title: 'کارت ملی',
