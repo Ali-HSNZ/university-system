@@ -39,7 +39,7 @@ class ClassScheduleController {
                 req.body.class_id,
                 req.body.professor_id
             )
-            if (checkExistClassSchedule) throw new Error('ساعت کلاس قبلاً ایجاد شده است')
+            if (checkExistClassSchedule) throw new Error('کلاس قبلاً ایجاد شده است')
 
             await classScheduleService.create(req.body)
 

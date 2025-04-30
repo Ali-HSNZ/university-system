@@ -8,28 +8,51 @@ import TClassScheduleInferType from './ClassSchedule.types'
 
 const classScheduleService = {
     list: async () => {
-        const classSchedule = await ClassScheduleModel.findAll({
-            attributes: {
-                exclude: ['class_id', 'professor_id']
+    const classSchedule = await ClassScheduleModel.findAll({
+        attributes: {
+            exclude: ['class_id', 'professor_id']
+        },
+        include: [
+            {
+                model: ClassModel,
+                attributes: ['id'],
+                include: [
+                    { model: CourseModel, attributes: ['name'] },
+                    { model: SemesterModel, attributes: ['academic_year', 'term_number'] }
+                ]
             },
-            include: [
-                {
-                    model: ClassModel,
-                    attributes: ['id'],
-                    include: [
-                        { model: CourseModel, attributes: ['name'] },
-                        { model: SemesterModel, attributes: ['academic_year', 'term_number'] }
-                    ]
-                },
-                {
-                    model: ProfessorModel,
-                    attributes: ['id'],
-                    include: [{ model: UserModel, attributes: ['id', 'first_name', 'last_name'] }]
-                }
-            ]
-        })
-        return classSchedule
+            {
+                model: ProfessorModel,
+                attributes: ['id'],
+                include: [{ model: UserModel, attributes: ['id', 'first_name', 'last_name'] }]
+            }
+        ]
+    });
+
+    // Group by class id
+    const grouped: Record<string, any> = {};
+    for (const item of classSchedule) {
+        const classId = (item as any).class.id;
+        if (!grouped[classId]) {
+            grouped[classId] = {
+                class: (item as any).class,
+                sessions: []
+            };
+        }
+
+        grouped[classId].sessions.push({
+            id: (item as any).id,
+            day_of_week: (item as any).day_of_week,
+            start_time: (item as any).start_time,
+            end_time: (item as any).end_time,
+            session_count: (item as any).session_count,
+            professor: (item as any).professor
+            })
+        }
+
+        return Object.values(grouped)
     },
+
     checkExist: async (class_id: number, professor_id: number) => {
         const classSchedule = await ClassScheduleModel.findOne({ where: { class_id, professor_id } })
         return !!classSchedule
