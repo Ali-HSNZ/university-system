@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Controller, Get, Post } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post } from '../../decorators/router.decorator'
 import { validationHandling } from '../../core/utils/validation-handling'
 import classSchema from './class.validation'
 import classService from './class.service'
@@ -57,6 +57,32 @@ class ClassController {
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
+                message: 'عملیات با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Delete('/:id/delete')
+    async delete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params
+            checkValidId(id)
+
+            const existClass = await classService.checkExist(Number(id))
+
+            if (!existClass) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'کلاس یافت نشد'
+                })
+            }
+
+            await classService.delete(Number(id))
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {

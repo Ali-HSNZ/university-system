@@ -23,6 +23,10 @@ const classService = {
     async checkExist(id: number) {
         const findClass = await ClassModel.findByPk(id)
         return !!findClass
+    },
+    async delete(id: number) {
+        const deletedClass = await ClassModel.destroy({ where: { id } })
+        return deletedClass
     }
 }
 
