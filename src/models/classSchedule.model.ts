@@ -2,7 +2,7 @@ import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
 import { ProfessorModel } from './professor.model'
 import { ClassModel } from './class.model'
-import { ClassroomModel } from './Classroom.model'
+import { ClassroomModel } from './classroom.model'
 
 const ClassScheduleModel = sequelizeConfig.define(
     'class_schedule',

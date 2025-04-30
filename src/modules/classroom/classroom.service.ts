@@ -1,5 +1,5 @@
 import { Op } from 'sequelize'
-import { ClassroomModel } from '../../models/Classroom.model'
+import { ClassroomModel } from '../../models/classroom.model'
 import TClassroomInferType from './classroom.types'
 
 const classroomService = {

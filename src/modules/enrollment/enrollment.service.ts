@@ -5,7 +5,6 @@ import { UserModel } from '../../models/user.model'
 import { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType } from './enrollment.types'
 import { StudentModel } from '../../models/student.model'
 import { SemesterModel } from '../../models/semester.model'
-import userServices from '../user/user.service'
 import { CourseModel } from '../../models/course.model'
 
 export class EnrollmentService {
@@ -13,7 +12,6 @@ export class EnrollmentService {
         const enrollments = await EnrollmentModel.findAll({
             attributes: { exclude: ['class_schedule_id', 'student_id'] },
             include: [
-                // { model: UserModel, attributes: ['id', 'first_name', 'last_name', 'gender', 'national_code', 'phone'] },
                 {
                     model: StudentModel,
                     attributes: ['id', 'student_code'],
@@ -39,11 +37,6 @@ export class EnrollmentService {
                         }
                     ]
                 }
-                // {
-                //     model: ClassModel,
-                //     attributes: ['capacity', 'status', 'enrolled_students', 'capacity'],
-                //     include: [{ model: SemesterModel }]
-                // }
             ]
         })
 
@@ -218,4 +211,3 @@ export class EnrollmentService {
         return true
     }
 }
-

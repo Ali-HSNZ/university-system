@@ -1,5 +1,5 @@
 import { ClassModel } from '../../models/class.model'
-import { ClassroomModel } from '../../models/Classroom.model'
+import { ClassroomModel } from '../../models/classroom.model'
 import { ClassScheduleModel } from '../../models/classSchedule.model'
 import { CourseModel } from '../../models/course.model'
 import { ProfessorModel } from '../../models/professor.model'
