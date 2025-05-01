@@ -93,8 +93,7 @@ export class EnrollmentService {
             student_id: studentId,
             class_schedule_id: enrollmentData.class_schedule_id,
             status: 'pending'
-        })
-        console.log('student')
+        }) 
 
         // افزایش تعداد دانشجویان در کلاس
         await ClassModel.update(

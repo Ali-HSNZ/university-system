@@ -36,9 +36,6 @@ const classScheduleService = {
             ]
         })
 
-        console.log('classSchedule:', classSchedule)
-
-
         // Group by class id
         const grouped: Record<string, any> = {}
         for (const item of classSchedule) {

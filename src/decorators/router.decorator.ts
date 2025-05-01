@@ -44,7 +44,7 @@ const Controller = (basePath: string = '') => {
 
             const isWhitelisted = whitelist.some((route) => route.path === fullPath && route.method === method)
 
-            const finalMiddlewares: RequestHandler[] = isWhitelisted
+            const finalMiddlewares: any[] = isWhitelisted
                 ? [...localMiddleware, boundHandler]
                 : [AuthenticateMiddleware, ...localMiddleware, boundHandler]
 

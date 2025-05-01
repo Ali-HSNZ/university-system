@@ -4,22 +4,25 @@ import jwt from 'jsonwebtoken'
 import { APP_ENV } from '../../config/dotenv.config'
 import httpStatus from 'http-status'
 
-const getToken = (headers: any, res: Response) => {
+const getToken = (headers: any) => {
     const [bearer, token] = headers?.authorization?.split(' ') || []
 
     if (token && bearer.toLowerCase() === 'bearer') {
         return token
     }
-
-    return res.status(httpStatus.UNAUTHORIZED).json({
-        status: httpStatus.UNAUTHORIZED,
-        message: 'حساب کاربری شناسایی نشد. وارد حساب کاربری خود شوید'
-    })
 }
 
 const AuthenticateMiddleware = (req: Request, res: Response, next: NextFunction) => {
     try {
-        const token = getToken(req.headers, res)
+        const token = getToken(req.headers)
+
+        if (!token) {
+            return res.status(httpStatus.UNAUTHORIZED).json({
+                status: httpStatus.UNAUTHORIZED,
+                message: 'حساب کاربری شناسایی نشد. وارد حساب کاربری خود شوید'
+            })
+        }
+
         const secretKey = APP_ENV.token.secretKey
         jwt.verify(token, secretKey, async (err: any, payload: any) => {
             try {
