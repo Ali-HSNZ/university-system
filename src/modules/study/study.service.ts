@@ -8,6 +8,10 @@ const studyServices = {
         })
         return studies
     },
+    getStudyNameById: async (id: number) => {
+        const study = await StudyModel.findByPk(id, { attributes: ['name'] })
+        return study
+    },
 
     create: async (data: { name: string; description?: string }) => {
         const study = await StudyModel.create(data)

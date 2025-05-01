@@ -18,3 +18,5 @@ import './modules/entryYear/entryYear.controller'
 import './modules/entryYearCourse/entryYearCourse.controller'
 import './modules/study/study.controller'
 import './modules/classroom/classroom.controller'
+// panel
+import './modules/student-panel/student-panel.controller'

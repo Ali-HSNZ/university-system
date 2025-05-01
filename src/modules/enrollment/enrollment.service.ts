@@ -7,7 +7,7 @@ import { StudentModel } from '../../models/student.model'
 import { SemesterModel } from '../../models/semester.model'
 import { CourseModel } from '../../models/course.model'
 
-export class EnrollmentService {
+const enrollmentService = {
     async list() {
         const enrollments = await EnrollmentModel.findAll({
             attributes: { exclude: ['class_schedule_id', 'student_id'] },
@@ -41,7 +41,7 @@ export class EnrollmentService {
         })
 
         return enrollments
-    }
+    },
 
     async createEnrollment(enrollmentData: TEnrollmentRequestBodyType) {
         // Check if student exists
@@ -93,7 +93,7 @@ export class EnrollmentService {
             student_id: studentId,
             class_schedule_id: enrollmentData.class_schedule_id,
             status: 'pending'
-        }) 
+        })
 
         // افزایش تعداد دانشجویان در کلاس
         await ClassModel.update(
@@ -102,7 +102,7 @@ export class EnrollmentService {
         )
 
         return enrollment
-    }
+    },
     async checkEnrollmentOfClass(student_id: number, class_id: number) {
         const allSchedulesOfThisClass = await ClassScheduleModel.findAll({
             where: { class_id },
@@ -123,7 +123,7 @@ export class EnrollmentService {
         if (existingEnrollment) {
             throw new Error('دانشجو قبلاً در این کلاس ثبت‌نام کرده است')
         }
-    }
+    },
 
     async updateEnrollmentStatus(id: number, updateData: TEnrollmentUpdateRequestBodyType) {
         const enrollment = await EnrollmentModel.findByPk(id)
@@ -131,7 +131,7 @@ export class EnrollmentService {
 
         const updated = await enrollment.update(updateData)
         return updated
-    }
+    },
 
     async getEnrollmentById(id: number) {
         const enrollment = await EnrollmentModel.findByPk(id, {
@@ -152,7 +152,7 @@ export class EnrollmentService {
         }
 
         return result
-    }
+    },
 
     async getStudentEnrollments(student_id: number) {
         const student = await StudentModel.findOne({ where: { id: student_id } })
@@ -164,7 +164,7 @@ export class EnrollmentService {
         })
 
         return enrollments
-    }
+    },
 
     async getClassEnrollments(classId: number) {
         // First find the class schedules for this class
@@ -182,7 +182,7 @@ export class EnrollmentService {
         })
 
         return enrollments
-    }
+    },
 
     async deleteEnrollment(id: number) {
         const enrollment = await EnrollmentModel.findByPk(id)
@@ -208,5 +208,47 @@ export class EnrollmentService {
 
         await enrollment.destroy()
         return true
+    },
+
+    async getCurrentSemesterForStudent(studentId: number) {
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentId },
+            include: [
+                {
+                    model: ClassScheduleModel,
+                    as: 'class_schedule',
+                    include: [
+                        {
+                            model: ClassModel,
+                            as: 'class',
+                            include: [
+                                { model: SemesterModel, as: 'semester' },
+                                { model: CourseModel, as: 'course' }
+                            ]
+                        }
+                    ]
+                },
+                { model: StudentModel, as: 'student', include: [{ model: UserModel, as: 'user' }] }
+            ]
+        })
+
+        const activeSemesters = enrollments
+            .map((e) => {
+                const semester = e.dataValues.class_schedule?.class?.semester
+                return {
+                    id: semester.id,
+                    year: semester.academic_year,
+                    term: semester.term_number === '1' ? 'نوبت اول' : 'نوبت دوم',
+                    start_date: semester.start_date,
+                    end_date: semester.end_date
+                }
+            })
+            .filter(Boolean)
+
+        const uniqueSemesters = Array.from(new Map(activeSemesters.map((s) => [s.id, s])).values())
+
+        return uniqueSemesters
     }
 }
+
+export default enrollmentService

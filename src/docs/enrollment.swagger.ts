@@ -16,7 +16,6 @@
  *   get:
  *     tags: [Enrollment]
  *     summary: دریافت ثبت نام های یک دانشجو
- *     description: دریافت همه ثبت نام های یک دانشجو
  *     parameters:
  *       - name: userId
  *         in: path
@@ -26,55 +25,13 @@
  *         description: شناسه دانشجو
  *     responses:
  *       "200":
- *         description: ثبت نام های دانشجو با موفقیت دریافت شد
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: "Student enrollments retrieved successfully"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       student_id:
- *                         type: integer
- *                         example: 1
- *                       class_schedule_id:
- *                         type: integer
- *                         example: 1
- *                       status:
- *                         type: string
- *                         example: "pending"
- *                       Class:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             example: 1
- *                           course_id:
- *                             type: integer
- *                             example: 5
- *                           capacity:
- *                             type: integer
- *                             example: 30
- *                           enrolled_students:
- *                             type: integer
- *                             example: 15
- *                           status:
- *                             type: string
- *                             example: "open"
+ *         description:  get student enrollments successfully
  *       "400":
- *         description: Bad request - Invalid student ID
+ *         description: invalid input data or student not found
+ *       "404":
+ *         description: student not found
+ *       "500":
+ *         description: internal server error
  */
 
 /**
@@ -94,48 +51,12 @@
  *     responses:
  *       "200":
  *         description: Class enrollments retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: "Class enrollments retrieved successfully"
- *                 data:
- *                   type: array
- *                   items:
- *                     type: object
- *                     properties:
- *                       id:
- *                         type: integer
- *                         example: 1
- *                       student_id:
- *                         type: integer
- *                         example: 1
- *                       class_schedule_id:
- *                         type: integer
- *                         example: 1
- *                       status:
- *                         type: string
- *                         example: "pending"
- *                       User:
- *                         type: object
- *                         properties:
- *                           id:
- *                             type: integer
- *                             example: 1
- *                           name:
- *                             type: string
- *                             example: "John Doe"
- *                           email:
- *                             type: string
- *                             example: "john@example.com"
  *       "400":
  *         description: Bad request - Invalid class ID
+ *       "404":
+ *         description: Class not found
+ *       "500":
+ *         description: internal server error
  */
 
 /**
@@ -155,64 +76,12 @@
  *     responses:
  *       "200":
  *         description: Enrollment retrieved successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: "Enrollment retrieved successfully"
- *                 data:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: integer
- *                       example: 1
- *                     student_id:
- *                       type: integer
- *                       example: 1
- *                     class_schedule_id:
- *                       type: integer
- *                       example: 1
- *                     status:
- *                       type: string
- *                       example: "pending"
- *                     User:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 1
- *                         name:
- *                           type: string
- *                           example: "John Doe"
- *                         email:
- *                           type: string
- *                           example: "john@example.com"
- *                     Class:
- *                       type: object
- *                       properties:
- *                         id:
- *                           type: integer
- *                           example: 1
- *                         course_id:
- *                           type: integer
- *                           example: 5
- *                         capacity:
- *                           type: integer
- *                           example: 30
- *                         enrolled_students:
- *                           type: integer
- *                           example: 15
- *                         status:
- *                           type: string
- *                           example: "open"
+ *       "400":
+ *         description: Bad request - Invalid input data
  *       "404":
  *         description: Enrollment not found
+ *       "500":
+ *         description: internal server error
  */
 
 
@@ -222,7 +91,13 @@
  *   post:
  *     tags: [Enrollment]
  *     summary: Create a new enrollment
- *     description: Registers a student for a class
+ *     description: |
+ *       - student_id: شناسه دانشجو
+ *       - class_schedule_id: شناسه برنامه جلسه
+ *       - status: وضعیت ثبت نام
+ *          - pending: درحال بررسی
+ *          - approved: تایید شده
+ *          - rejected: رد شده
  *     requestBody:
  *       required: true
  *       content:

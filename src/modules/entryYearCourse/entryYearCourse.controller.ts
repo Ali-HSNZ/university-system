@@ -15,6 +15,7 @@ class EntryYearCourseController {
     async list(req: Request, res: Response, next: NextFunction) {
         try {
             const entryYearCourses = await entryYearCourseService.list()
+
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
@@ -25,12 +26,29 @@ class EntryYearCourseController {
         }
     }
 
-    @Get('/:id')
+    @Get('/groupe-by-entry-year')
+    async groupeByEntryYear(req: Request, res: Response, next: NextFunction) {
+        try {
+            const entryYearCourses = await entryYearCourseService.groupeByEntryYear()
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: entryYearCourses
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/:id/info')
     async getById(req: Request, res: Response, next: NextFunction) {
         try {
             const id = req.params.id
             checkValidId(id)
+
             const entryYearCourse = await entryYearCourseService.getById(Number(id))
+
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
@@ -46,11 +64,11 @@ class EntryYearCourseController {
         try {
             const data = await validationHandling<TEntryYearCourseBodyInferType>(req.body, entryYearCourseValidation)
 
-            // check valid degree
+            // check valid course
             const course = await courseService.checkExistId(req.body.course_id)
             if (!course) throw new Error('درس مورد نظر یافت نشد')
 
-            // check valid department
+            // check valid entry year
             const entryYear = await entryYearService.getById(req.body.entry_year_id)
             if (!entryYear) throw new Error('سال ورود مورد نظر یافت نشد')
 
@@ -84,10 +102,17 @@ class EntryYearCourseController {
         }
     }
 
-    @Delete('/:id')
+    @Delete('/:id/delete')
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
-            await entryYearCourseService.delete(Number(req.params.id))
+            const id = req.params.id?.trim()
+            checkValidId(id)
+
+            // const existEntryYearCourse = await entryYearCourseService.checkExist(Number(id))
+            // if (!existEntryYearCourse) throw new Error('درس مورد نظر یافت نشد')
+
+            await entryYearCourseService.delete(Number(id))
+
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'

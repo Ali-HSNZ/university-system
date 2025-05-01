@@ -8,6 +8,10 @@ const degreeServices = {
         })
         return degrees
     },
+    getDegreeNameById: async (id: number) => {
+        const degree = await DegreeModel.findByPk(id, { attributes: ['name'] })
+        return degree
+    },
     checkExist: async (degree_id?: string | number) => {
         if (!degree_id) return false
 

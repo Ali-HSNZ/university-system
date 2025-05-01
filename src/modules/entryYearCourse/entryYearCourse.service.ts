@@ -6,6 +6,7 @@ import { EntryYearCourseModel } from '../../models/entryYearCourse.model'
 import { StudyModel } from '../../models/study.model'
 import { TEntryYearCourseBodyInferType, TEntryYearCourseGroupedType } from './entryYearCourse.types'
 import courseService from '../course/course.service'
+
 const entryYearCourseService = {
     checkExistEntryYearCourse: async (entryYearId: string, courseId: string) => {
         const entryYearCourse = await EntryYearCourseModel.findOne({
@@ -31,8 +32,12 @@ const entryYearCourseService = {
             nest: true
         })
 
-        // همه دروس موجود در سیستم را برای جست‌وجو استفاده می‌کنیم
-        const allCourses = await courseService.getAll() // شامل کد و مشخصات همه دروس
+        return rawResult
+    },
+
+    async groupeByEntryYear() {
+        const rawResult = await this.list()
+        const allCourses = await courseService.getAll()
 
         const grouped: TEntryYearCourseGroupedType[] = Object.values(
             rawResult.reduce((acc, item) => {
@@ -102,18 +107,27 @@ const entryYearCourseService = {
         return entryYearCourse
     },
 
+    async checkExist(id: number) {
+        const entryYearCourse = await EntryYearCourseModel.findOne({
+            where: { id: id.toString().trim() }
+        })
+        return !!entryYearCourse
+    },
+
     async create(data: TEntryYearCourseBodyInferType) {
         return await EntryYearCourseModel.create(data)
     },
 
     async update(id: number, data: any) {
-        const entryYear = await this.getById(id)
-        return await entryYear.update(data)
+        const entryYearCourse = await EntryYearCourseModel.findOne({
+            where: { id: id.toString().trim() }
+        })
+        return await entryYearCourse?.update(data)
     },
 
     async delete(id: number) {
-        const entryYear = await this.getById(id)
-        await entryYear.destroy()
+        const course = await EntryYearCourseModel.destroy({ where: { id } })
+        return course
     }
 }
 

@@ -36,6 +36,21 @@
 
 /**
  * @swagger
+ *  /entry-year-course/groupe-by-entry-year:
+ *    get:
+ *      tags: [Entry Year Course]
+ *      description:  group by entry year
+ *      responses:
+ *       200:
+ *         description: Successfully retrieved entry years
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
  * /entry-year-course/create:
  *   post:
  *     tags: [Entry Year Course]

@@ -6,15 +6,10 @@ const SemesterModel = sequelizeConfig.define(
     'semester',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
-        // description: "سال تحصیلی به صورت 'YYYY-YYYY' (مثال: '2024-2025')"
         academic_year: { type: DataTypes.STRING(9), allowNull: false },
-        // description: 'شماره نیمسال: 1 (ترم اول) یا 2 (ترم دوم)'
         term_number: { type: DataTypes.ENUM('1', '2'), allowNull: false },
-        // description: 'تاریخ شروع ترم'
         start_date: { type: DataTypes.DATEONLY, allowNull: false },
-        // description: 'تاریخ پایان ترم'
         end_date: { type: DataTypes.DATEONLY, allowNull: false },
-        // description: 'وضعیت ترم: upcoming (در انتظار)، active (در حال اجرا)، completed (پایان‌یافته)'
         status: {
             type: DataTypes.ENUM('upcoming', 'active', 'completed'),
             allowNull: false,

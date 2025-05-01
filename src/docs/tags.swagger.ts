@@ -7,6 +7,7 @@
  *   - name: Professor
  *   - name: Education Assistant
  *   - name: University President
+ *   - name: Student Panel
  *   - name: Course
  *     description: مدیریت دروس
  *   - name: Class

@@ -8,6 +8,10 @@ const departmentServices = {
         })
         return departments
     },
+    getDepartmentNameById: async (id: number) => {
+        const department = await DepartmentModel.findByPk(id, { attributes: ['name'] })
+        return department
+    },
     create: async (name: string) => {
         const department = await DepartmentModel.create({ name: name.trim() })
         return department

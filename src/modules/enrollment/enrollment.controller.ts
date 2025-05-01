@@ -3,11 +3,9 @@ import httpStatus from 'http-status'
 import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import { validationHandling } from '../../core/utils/validation-handling'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import { EnrollmentService } from './enrollment.service'
+import enrollmentService from './enrollment.service'
 import { createEnrollmentValidation, updateEnrollmentValidation, classIdValidation } from './enrollment.validation'
 import studentService from '../student/student.service'
-
-const enrollmentService = new EnrollmentService()
 
 @Controller('/enrollment')
 class EnrollmentController {

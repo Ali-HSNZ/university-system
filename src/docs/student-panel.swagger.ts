@@ -1,0 +1,30 @@
+
+/**
+ * @swagger
+ * /student-panel/profile:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get student profile
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved student profile
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
+ * /student-panel/education-information:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get student education information
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved student education information
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
