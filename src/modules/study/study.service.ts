@@ -28,7 +28,7 @@ const studyServices = {
         return !!study
     },
 
-    checkExist: async (id: string) => {
+    checkExistId: async (id: string | number) => {
         const study = await StudyModel.findByPk(id)
         return !!study
     },

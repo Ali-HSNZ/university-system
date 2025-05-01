@@ -28,7 +28,7 @@ class StudyController {
             const studyId = req.params.id
             checkValidId(studyId)
 
-            const study = await studyServices.checkExist(studyId)
+            const study = await studyServices.checkExistId(studyId)
             if (!study) {
                 throw new Error('رشته تحصیلی یافت نشد')
             }
@@ -117,7 +117,7 @@ class StudyController {
         const { id } = req.params
         checkValidId(id)
 
-        const study = await studyServices.checkExist(id)
+        const study = await studyServices.checkExistId(id)
         if (!study) {
             return res.status(httpStatus.NOT_FOUND).json({
                 status: httpStatus.NOT_FOUND,

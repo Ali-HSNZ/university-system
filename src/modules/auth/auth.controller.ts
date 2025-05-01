@@ -97,7 +97,7 @@ class AuthController {
             const existDegree = await degreeServices.checkExist(data.degree_id)
             if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
 
-            const existStudy = await studyServices.checkExist(String(data.study_id))
+            const existStudy = await studyServices.checkExistId(String(data.study_id))
             if (!existStudy) throw new Error('رشته تحصیلی موجود نمی باشد')
 
             const hashedPassword = hashString(data.national_code)

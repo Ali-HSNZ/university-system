@@ -40,25 +40,39 @@
  *               - end_date
  *               - entry_year
  *               - department_id
+ *               - degree_id
+ *               - study_id
  *             properties:
  *               type:
  *                 type: string
  *                 description: نوع
  *                 enum:
- *                   - course_selection
+ *                   - enrollment
  *                   - add_drop
  *               start_date:
  *                 type: string
  *                 description: تاریخ شروع
+ *                 example: 1404-01-01
  *               end_date:
  *                 type: string
  *                 description: تاریخ پایان
+ *                 example: 1405-01-01
  *               entry_year:
  *                 type: number
  *                 description: سال ورود
+ *                 example: 1404
  *               department_id:
  *                 type: number
  *                 description: شناسه گروه آموزشی
+ *                 example: 1
+ *               degree_id:
+ *                 type: number
+ *                 description: شناسه مقطع تحصیلی
+ *                 example: 1
+ *               study_id:
+ *                 type: number
+ *                 description: شناسه رشته تحصیلی
+ *                 example: 1
  *     responses:
  *       201:
  *         description: Important date created successfully
@@ -88,6 +102,8 @@
  *               - end_date
  *               - entry_year
  *               - department_id
+ *               - degree_id
+ *               - study_id
  *             properties:
  *               type:
  *                 type: string
@@ -98,16 +114,46 @@
  *               start_date:
  *                 type: string
  *                 description: تاریخ شروع
+ *                 example: 1404-01-01T12:00
  *               end_date:
  *                 type: string
  *                 description: تاریخ پایان
+ *                 example: 1405-01-01T16:00
  *               entry_year:
  *                 type: number
  *                 description: سال ورود
+ *                 example: 1404
  *               department_id:
  *                 type: number
  *                 description: شناسه گروه آموزشی
+ *                 example: 1
+ *               degree_id:
+ *                 type: number
+ *                 description: شناسه مقطع تحصیلی
+ *                 example: 1
+ *               study_id:
+ *                 type: number
+ *                 description: شناسه رشته تحصیلی
  *     responses:
  *       200:
  *         description: Important date updated successfully
+ */
+
+/**
+ * @swagger
+ * /important-date/{id}/delete:
+ *   delete:
+ *     tags: [Important Dates]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: number
+ *     responses:
+ *       200:
+ *         description: Important date deleted successfully
+ *       404:
+ *         description: Important date not found
+ *       500:
+ *         description: Internal server error
  */
