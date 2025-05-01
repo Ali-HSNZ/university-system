@@ -60,7 +60,7 @@ const studentPanelService = {
                     include: [
                         {
                             model: ClassModel,
-                            include: [{ model: CourseModel }, { model: SemesterModel }]
+                            include: [{ model: CourseModel }]
                         }
                     ]
                 }

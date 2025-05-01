@@ -6,6 +6,8 @@ import { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType } from './
 import { StudentModel } from '../../models/student.model'
 import { SemesterModel } from '../../models/semester.model'
 import { CourseModel } from '../../models/course.model'
+import { ClassroomModel } from '../../models/classroom.model'
+import { ProfessorModel } from '../../models/professor.model'
 
 const enrollmentService = {
     async list() {
@@ -19,21 +21,30 @@ const enrollmentService = {
                 },
                 {
                     model: ClassScheduleModel,
-                    attributes: ['day_of_week', 'start_time', 'end_time'],
+                    attributes: { exclude: ['class_id', 'professor_id', 'classroom_id', 'semester_id'] },
                     include: [
                         {
                             model: ClassModel,
                             attributes: ['id', 'capacity', 'status', 'enrolled_students'],
                             include: [
                                 {
-                                    model: SemesterModel,
-                                    attributes: ['start_date', 'end_date', 'academic_year', 'term_number', 'status']
-                                },
-                                {
                                     model: CourseModel,
                                     attributes: ['id', 'name', 'code']
                                 }
                             ]
+                        },
+                        {
+                            model: SemesterModel,
+                            attributes: ['academic_year', 'term_number', 'start_date', 'end_date', 'status']
+                        },
+                        {
+                            model: ClassroomModel,
+                            attributes: ['name', 'building_name', 'floor_number']
+                        },
+                        {
+                            model: ProfessorModel,
+                            attributes: ['id'],
+                            include: [{ model: UserModel, attributes: ['first_name', 'last_name'] }]
                         }
                     ]
                 }
