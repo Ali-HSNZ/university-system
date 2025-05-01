@@ -19,6 +19,5 @@ const ClassModel = sequelizeConfig.define(
 )
 
 ClassModel.belongsTo(CourseModel, { foreignKey: 'course_id', onDelete: 'CASCADE' })
-ClassModel.belongsTo(SemesterModel, { foreignKey: 'semester_id', onDelete: 'CASCADE' })
 
 export { ClassModel }

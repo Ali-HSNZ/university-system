@@ -10,6 +10,10 @@ const semesterService = {
         const semester = await SemesterModel.findOne({ where: { id } })
         return semester
     },
+    async getActiveSemester() {
+        const semester = await SemesterModel.findOne({ where: { status: 'active' } })
+        return semester
+    },
     async create(data: any) {
         const semester = await SemesterModel.create(data)
         return semester

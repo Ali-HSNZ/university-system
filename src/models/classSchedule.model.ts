@@ -3,6 +3,7 @@ import { sequelizeConfig } from '../core/config/database.config'
 import { ProfessorModel } from './professor.model'
 import { ClassModel } from './class.model'
 import { ClassroomModel } from './classroom.model'
+import { SemesterModel } from './semester.model'
 
 const ClassScheduleModel = sequelizeConfig.define(
     'class_schedule',
@@ -22,6 +23,7 @@ const ClassScheduleModel = sequelizeConfig.define(
 ClassScheduleModel.belongsTo(ClassModel, { foreignKey: 'class_id', onDelete: 'CASCADE' })
 ClassScheduleModel.belongsTo(ProfessorModel, { foreignKey: 'professor_id', onDelete: 'CASCADE' })
 ClassScheduleModel.belongsTo(ClassroomModel, { foreignKey: 'classroom_id', onDelete: 'SET NULL' })
+ClassScheduleModel.belongsTo(SemesterModel, { foreignKey: 'semester_id', onDelete: 'CASCADE' })
 ClassroomModel.hasMany(ClassScheduleModel, { foreignKey: 'classroom_id' })
 
 export { ClassScheduleModel }

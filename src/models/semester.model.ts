@@ -11,9 +11,9 @@ const SemesterModel = sequelizeConfig.define(
         start_date: { type: DataTypes.DATEONLY, allowNull: false },
         end_date: { type: DataTypes.DATEONLY, allowNull: false },
         status: {
-            type: DataTypes.ENUM('upcoming', 'active', 'completed'),
+            type: DataTypes.ENUM('active', 'de-active'),
             allowNull: false,
-            defaultValue: 'upcoming'
+            defaultValue: 'de-active'
         },
         deleted_at: { type: DataTypes.DATE, allowNull: true },
         is_deleted: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: false }

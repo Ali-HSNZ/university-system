@@ -28,3 +28,18 @@
  *       500:
  *         description: Server error
  */
+
+/**
+ * @swagger
+ * /student-panel/current-semester-courses:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get student current semester courses
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved student current semester courses
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */

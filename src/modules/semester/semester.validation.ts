@@ -35,7 +35,7 @@ const semesterSchema = yup.object().shape({
     }),
     status: yup.string().test('status', 'status is required', function (value) {
         if (!value) return this.createError({ message: 'وضعیت ترم الزامی است' })
-        const validStatuses = ['upcoming', 'active', 'completed']
+        const validStatuses = ['active', 'de-active']
         if (!validStatuses.includes(value)) {
             return this.createError({ message: `وضعیت باید ${validStatuses.join(', ')} باشد` })
         }

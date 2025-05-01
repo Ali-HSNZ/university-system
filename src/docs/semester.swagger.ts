@@ -59,10 +59,9 @@
  *               status:
  *                 type: enum
  *                 enum:
- *                   - upcoming
  *                   - active
- *                   - completed
- *                 example: "upcoming"
+ *                   - de-active
+ *                 example: "active"
  *     responses:
  *       200:
  *         description: A list of semesters
@@ -111,10 +110,9 @@
  *               status:
  *                 type: enum
  *                 enum:
- *                   - upcoming
  *                   - active
- *                   - completed
- *                 example: "upcoming"
+ *                   - de-active
+ *                 example: "active"
  *     responses:
  *       200:
  *         description: A list of semesters

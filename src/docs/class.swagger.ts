@@ -31,7 +31,6 @@
  *       این API برای ایجاد یک کلاس جدید در سیستم استفاده می‌شود.
  *       - **نکات مهم**:
  *         - `course_id` باید یک درس معتبر باشد.
- *         - `semester_id` باید به یک ترم تحصیلی معتبر اشاره کند.
  *         - مقدار `capacity` نشان‌دهنده تعداد دانشجویانی است که می‌توانند در کلاس ثبت‌نام کنند.
  *         - `status` وضعیت کلاس را مشخص می‌کند:
  *           - `open`: کلاس در حال ثبت‌نام است.
@@ -46,7 +45,6 @@
  *             type: object
  *             required:
  *               - course_id
- *               - semester_id
  *               - capacity
  *               - status
  *             properties:
@@ -54,10 +52,6 @@
  *                 type: integer
  *                 example: 5
  *                 description: شناسه درس مرتبط با این کلاس
- *               semester_id:
- *                 type: integer
- *                 example: 2
- *                 description: شناسه ترم تحصیلی که کلاس در آن برگزار می‌شود
  *               capacity:
  *                 type: integer
  *                 example: 30
@@ -72,31 +66,7 @@
  *                   - `canceled`: کلاس لغو شده است.
  *     responses:
  *       201:
- *         description: کلاس با موفقیت ایجاد شد
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 id:
- *                   type: integer
- *                   example: 12
- *                   description: شناسه کلاس ایجاد‌شده
- *                 course_id:
- *                   type: integer
- *                   example: 5
- *                 semester_id:
- *                   type: integer
- *                   example: 2
- *                 capacity:
- *                   type: integer
- *                   example: 30
- *                 enrolled_students:
- *                   type: integer
- *                   example: 0
- *                 status:
- *                   type: string
- *                   example: "open"
+ *         description: کلاس با موفقیت ایجاد شد 
  *       400:
  *         description: خطای درخواست (پارامترهای نامعتبر)
  *       500:

@@ -5,29 +5,21 @@ import { CourseModel } from '../../models/course.model'
 import { ProfessorModel } from '../../models/professor.model'
 import { SemesterModel } from '../../models/semester.model'
 import { UserModel } from '../../models/user.model'
-import TClassScheduleInferType from './ClassSchedule.types'
+import { TClassScheduleInferType, TClassScheduleListType } from './ClassSchedule.types'
 
 const classScheduleService = {
     list: async () => {
         const classSchedule = await ClassScheduleModel.findAll({
             attributes: {
-                exclude: ['class_id', 'professor_id']
+                exclude: ['class_id', 'professor_id', 'classroom_id', 'semester_id']
             },
             include: [
                 {
                     model: ClassModel,
-                    attributes: ['id'],
-                    include: [
-                        { model: CourseModel, attributes: ['name'] },
-                        { model: SemesterModel, attributes: ['academic_year', 'term_number'] }
-                    ]
+                    include: [{ model: CourseModel, attributes: ['name'] }]
                 },
-                {
-                    model: ClassroomModel,
-                    attributes: {
-                        exclude: ['description', 'id']
-                    }
-                },
+                { model: SemesterModel, attributes: { exclude: ['is_deleted', 'deleted_at', 'id'] } },
+                { model: ClassroomModel, attributes: { exclude: ['description', 'id'] } },
                 {
                     model: ProfessorModel,
                     attributes: ['id'],
@@ -36,25 +28,34 @@ const classScheduleService = {
             ]
         })
 
-        // Group by class id
+        return classSchedule as unknown as TClassScheduleListType[]
+    },
+
+    groupByClass: async () => {
+        const classSchedule = await classScheduleService.list()
+
         const grouped: Record<string, any> = {}
+
         for (const item of classSchedule) {
-            const classId = (item as any).class.id
+            const classId = item.class.id
+
             if (!grouped[classId]) {
                 grouped[classId] = {
-                    class: (item as any).class,
+                    class: item.class,
                     sessions: []
                 }
             }
 
             grouped[classId].sessions.push({
-                class_schedule_id: (item as any).id,
-                day_of_week: (item as any).day_of_week,
-                start_time: (item as any).start_time,
-                end_time: (item as any).end_time,
-                session_count: (item as any).session_count,
-                professor: (item as any).professor,
-                classroom: (item as any).classroom
+                class_schedule_id: item.id,
+                register_available: item.class.capacity - item.class.enrolled_students,
+                day_of_week: item.day_of_week,
+                start_time: item.start_time,
+                end_time: item.end_time,
+                session_count: item.session_count,
+                professor: item.professor,
+                semester: item.semester,
+                classroom: item.classroom
             })
         }
 
@@ -67,9 +68,17 @@ const classScheduleService = {
         const classSchedule = await ClassScheduleModel.findOne({ where: { class_id, professor_id } })
         return !!classSchedule
     },
-    create: async (classSchedule: TClassScheduleInferType) => {
+    checkExistById: async (id: string) => {
+        const classSchedule = await ClassScheduleModel.findByPk(id)
+        return !!classSchedule
+    },
+    create: async (classSchedule: TClassScheduleInferType & { semester_id: number }) => {
         const newClassSchedule = await ClassScheduleModel.create(classSchedule)
         return newClassSchedule
+    },
+    delete: async (id: string) => {
+        await ClassScheduleModel.destroy({ where: { id } })
+        return true
     }
 }
 

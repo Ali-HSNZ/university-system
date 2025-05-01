@@ -13,15 +13,14 @@ const classService = {
                     attributes: {
                         exclude: ['prerequisites', 'corequisites', 'total_units']
                     }
-                },
-                { model: SemesterModel, attributes: { exclude: ['is_deleted', 'deleted_at'] } }
+                }
             ]
         })
         return classes
     },
-    async existClass(classDTO: TClassInferType) {
+    async existClass(course_id: number) {
         const findClass = await ClassModel.findOne({
-            where: { course_id: classDTO.course_id, semester_id: classDTO.semester_id }
+            where: { course_id }
         })
         return !!findClass
     },

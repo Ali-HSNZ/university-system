@@ -10,9 +10,28 @@
 
 /**
  * @swagger
+ * /class-schedule/group-by-class:
+ *   get:
+ *     tags: [Class Schedule]
+ *     responses:
+ *       200:
+ *         description: ساعات کلاس
+ *       400:
+ *         description: خطایی رخ داده است
+ *       500:
+ *         description: خطایی رخ داده است
+ */
+
+
+/**
+ * @swagger
  * /class-schedule/create:
  *   post:
  *     tags: [Class Schedule]
+ *     description: |
+ *      - در این مسیر ساعت های کلاس و چه استادی آن کلاس را تدریس میکند توسط رئیس دانشگاه مشخص میشود
+ *      - این به صورت خودکار ترم فعال را پیدا میکند و ساعات را برای آن ترم مشخص ایجاد میکند
+ *
  *     requestBody:
  *       required: true
  *       content:
@@ -26,7 +45,6 @@
  *               - day_of_week
  *               - start_time
  *               - end_time
- *               - session_count
  *             properties:
  *               class_id:
  *                 type: integer
@@ -68,13 +86,31 @@
  *                 type: string
  *                 description: ساعت پایان
  *                 example: "11:00"
- *               session_count:
- *                 type: integer
- *                 description: تعداد جلسات
- *                 example: 18
  *     responses:
  *       201:
  *         description: ساعات کلاس ایجاد شد
  *       400:
  *         description: اطلاعات وارد شده معتبر نمی‌باشد
  */
+
+// delete
+
+/**
+ * @swagger
+ * /class-schedule/{id}/delete:
+ *   delete:
+ *     tags: [Class Schedule]
+ *     parameters:
+ *       - name: id
+ *         in: path
+ *         required: true
+ *         type: integer
+ *     responses:
+ *       200:
+ *         description: ساعات کلاس حذف شد
+ *       400:
+ *         description: ساعات کلاس یافت نشد
+ *       500:
+ *         description: خطایی رخ داده است
+ */
+

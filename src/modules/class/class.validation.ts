@@ -8,13 +8,6 @@ const classSchema = yup.object().shape({
 
         return true
     }),
-    semester_id: yup.string().test('is-valid-semester-id', 'شناسه ترم الزامی است', function (value) {
-        if (!value) return this.createError({ path: this.path, message: 'شناسه ترم الزامی است' })
-
-        if (Number.isNaN(Number(value))) return this.createError({ path: this.path, message: 'شناسه ترم معتبر نیست' })
-
-        return true
-    }),
     capacity: yup.string().test('is-valid-capacity', 'ظرفیت الزامی است', function (value) {
         if (!value) return this.createError({ path: this.path, message: 'ظرفیت الزامی است' })
 
@@ -28,8 +21,7 @@ const classSchema = yup.object().shape({
         if (!value) return this.createError({ path: this.path, message: 'وضعیت الزامی است' })
 
         const validStatuses = ['open', 'closed', 'cancelled']
-        if (!validStatuses.includes(value))
-            return this.createError({ path: this.path, message: 'وضعیت معتبر نیست' })
+        if (!validStatuses.includes(value)) return this.createError({ path: this.path, message: 'وضعیت معتبر نیست' })
 
         return true
     })

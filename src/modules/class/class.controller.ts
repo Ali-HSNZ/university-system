@@ -52,17 +52,14 @@ class ClassController {
     @Post('/create')
     async create(req: Request, res: Response, next: NextFunction) {
         try {
-            const  data = await validationHandling<TClassInferType>(req.body, classSchema)
+            const data = await validationHandling<TClassInferType>(req.body, classSchema)
 
-            const existClass = await classService.existClass({
-                course_id: data.course_id,
-                semester_id: data.semester_id
-            })
+            const existClass = await classService.existClass(Number(data.course_id))
 
             if (existClass) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
-                    message: 'کلاس با این درس و ترم قبلاً ایجاد شده است'
+                    message: 'کلاس با این درس قبلاً ایجاد شده است'
                 })
             }
 
