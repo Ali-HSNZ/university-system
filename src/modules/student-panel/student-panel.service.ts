@@ -9,8 +9,9 @@ import { EnrollmentModel } from '../../models/enrollment.model'
 import { ClassScheduleModel } from '../../models/classSchedule.model'
 import { ClassModel } from '../../models/class.model'
 import { CourseModel } from '../../models/course.model'
-import { SemesterModel } from '../../models/semester.model'
-import { GradeModel } from '../../models/grade.model'
+import { ProfessorModel } from '../../models/professor.model'
+import { UserModel } from '../../models/user.model'
+import { ClassroomModel } from '../../models/classroom.model'
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
@@ -51,46 +52,85 @@ const studentPanelService = {
         }
     },
 
-    async currentSemesterCourses(studentDTO: TStudentType) {
+    async currentSemesterCourses(semester_id: number, studentDTO: TStudentType) {
         const enrollments = await EnrollmentModel.findAll({
             where: { student_id: studentDTO.id },
             include: [
                 {
                     model: ClassScheduleModel,
+                    attributes: ['day_of_week', 'start_time', 'end_time'],
+                    where: {
+                        semester_id
+                    },
                     include: [
                         {
                             model: ClassModel,
                             include: [{ model: CourseModel }]
+                        },
+                        {
+                            model: ClassroomModel,
+                            attributes: ['name', 'building_name', 'floor_number']
+                        },
+                        {
+                            model: ProfessorModel,
+                            attributes: ['id'],
+                            include: [
+                                {
+                                    model: UserModel,
+                                    attributes: ['first_name', 'last_name']
+                                }
+                            ]
                         }
                     ]
                 }
             ]
         })
 
-        const currentSemester = await enrollmentService.getCurrentSemesterForStudent(studentDTO.id)
-        const currentSemesterId = currentSemester[0]?.id
-
-        const courses = enrollments
-            .filter((enrollment: any) => enrollment.class_schedule?.class?.semester?.id === currentSemesterId)
-            .map((enrollment: any) => ({
-                course: {
-                    id: enrollment.class_schedule?.class?.course?.id,
-                    name: enrollment.class_schedule?.class?.course?.name,
-                    code: enrollment.class_schedule?.class?.course?.code,
-                    theoretical_units: enrollment.class_schedule?.class?.course?.theoretical_units,
-                    practical_units: enrollment.class_schedule?.class?.course?.practical_units
-                },
-                grade: {
-                    midterm_score: enrollment.grade?.midterm_score,
-                    final_score: enrollment.grade?.final_score,
-                    total_score: enrollment.grade?.total_score
-                }
-            }))
-
-        return {
-            semester: currentSemester[0],
-            courses
+        const convertTime = (time: string) => {
+            return time.split(':').slice(0, 2).join(':')
         }
+
+        const dayOfWeekDictionary: Record<string, string> = {
+            '0': 'شنبه',
+            '1': 'یکشنبه',
+            '2': 'دوشنبه',
+            '3': 'سه شنبه',
+            '4': 'چهارشنبه',
+            '5': 'پنج شنبه',
+            '6': 'جمعه'
+        }
+
+        const handleFloorNumber = (floor_number: string) => {
+            if (floor_number?.toString() === '0') return 'همکف'
+            return 'طبقه ' + floor_number
+        }
+
+        const courses = enrollments.map((enrollment: any) => {
+            const classSchedule = enrollment.class_schedule
+            const course = classSchedule?.class?.course
+            const user = classSchedule?.professor?.user
+            const classroom = classSchedule?.classroom
+
+            return {
+                name: course?.name,
+                code: course?.code,
+                theoretical_units: course?.theoretical_units,
+                practical_units: course?.practical_units,
+                day_of_week: dayOfWeekDictionary[classSchedule?.day_of_week],
+                start_time: convertTime(classSchedule?.start_time),
+                end_time: convertTime(classSchedule?.end_time),
+                professor: {
+                    name: user?.first_name + ' ' + user?.last_name
+                },
+                classroom: {
+                    name: classroom?.name,
+                    building_name: classroom?.building_name,
+                    floor_number: handleFloorNumber(classroom?.floor_number)
+                }
+            }
+        })
+
+        return courses
     }
 }
 

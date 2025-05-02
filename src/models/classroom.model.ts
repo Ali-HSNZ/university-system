@@ -7,7 +7,7 @@ const ClassroomModel = sequelizeConfig.define(
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         name: { type: DataTypes.STRING, allowNull: false }, // نام - مثل "سالن 101"
         building_name: { type: DataTypes.STRING, allowNull: false }, // نام ساختمان - مثل "ساختمان 1"
-        floor_number: { type: DataTypes.INTEGER, allowNull: false }, // طبقه - مثل "1"
+        floor_number: { type: DataTypes.STRING, allowNull: false }, // طبقه - مثل "1"
         capacity: { type: DataTypes.INTEGER, allowNull: false }, // ظرفیت - مثل "30"
         description: { type: DataTypes.TEXT, allowNull: true } // توضیحات - مثل "سالن کوچک با ظرفیت 30 نفر"
     },

@@ -6,6 +6,7 @@ import httpStatus from 'http-status'
 import studentService from '../student/student.service'
 import { TStudentType } from '../../core/types/student'
 import { TUserType } from '../../core/types/user'
+import semesterService from '../semester/semester.service'
 
 @Controller('/student-panel')
 class StudentPanelController {
@@ -72,7 +73,19 @@ class StudentPanelController {
                 })
             }
 
-            const data = await studentPanelService.currentSemesterCourses(student as unknown as TStudentType)
+            const activeSemester = await semesterService.getActiveSemester()
+
+            if (!activeSemester) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'ترم فعالی یافت نشد'
+                })
+            }
+
+                const data = await studentPanelService.currentSemesterCourses(
+                    activeSemester?.dataValues?.id,
+                    student as unknown as TStudentType
+                )
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,

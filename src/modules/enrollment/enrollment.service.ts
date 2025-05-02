@@ -237,10 +237,7 @@ const enrollmentService = {
                         {
                             model: ClassModel,
                             as: 'class',
-                            include: [
-                                { model: SemesterModel, as: 'semester' },
-                                { model: CourseModel, as: 'course' }
-                            ]
+                            include: [{ model: CourseModel, as: 'course' }]
                         }
                     ]
                 },
@@ -248,22 +245,7 @@ const enrollmentService = {
             ]
         })
 
-        const activeSemesters = enrollments
-            .map((e) => {
-                const semester = e.dataValues.class_schedule?.class?.semester
-                return {
-                    id: semester.id,
-                    year: semester.academic_year,
-                    term: semester.term_number === '1' ? 'نوبت اول' : 'نوبت دوم',
-                    start_date: semester.start_date,
-                    end_date: semester.end_date
-                }
-            })
-            .filter(Boolean)
-
-        const uniqueSemesters = Array.from(new Map(activeSemesters.map((s) => [s.id, s])).values())
-
-        return uniqueSemesters
+        return enrollments
     },
 
     async handleImportantTimeStatus({
