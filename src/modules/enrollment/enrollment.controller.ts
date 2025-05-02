@@ -6,6 +6,7 @@ import { checkValidId } from '../../core/utils/check-valid-id'
 import enrollmentService from './enrollment.service'
 import { createEnrollmentValidation, updateEnrollmentValidation, classIdValidation } from './enrollment.validation'
 import studentService from '../student/student.service'
+import { TAuthenticatedRequestType } from '../../core/types/auth'
 
 @Controller('/enrollment')
 class EnrollmentController {
@@ -83,9 +84,26 @@ class EnrollmentController {
     }
 
     @Post('/create')
-    async createEnrollment(req: Request, res: Response, next: NextFunction) {
+    async createEnrollment(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
             await validationHandling(req.body, createEnrollmentValidation)
+
+            const student = await studentService.getByUserId(req.user?.id)
+            if (!student) throw new Error('دانشجویی با این شناسه یافت نشد')
+
+            const handleEnrollmentTimeStatus = await enrollmentService.handleImportantTimeStatus({
+                entry_year: student.dataValues.entry_year,
+                department_id: student.dataValues.department_id,
+                degree_id: student.dataValues.degree_id,
+                study_id: student.dataValues.study_id
+            })
+
+            if (!handleEnrollmentTimeStatus.status) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: handleEnrollmentTimeStatus.message
+                })
+            }
 
             await enrollmentService.createEnrollment(req.body)
 

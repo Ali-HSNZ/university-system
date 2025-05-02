@@ -1,10 +1,17 @@
- type TEnrollmentRequestBodyType = {
-  student_id: number;
-  class_schedule_id: number;
+type TEnrollmentRequestBodyType = {
+    student_id: number
+    class_schedule_id: number
 }
 
 type TEnrollmentUpdateRequestBodyType = {
-  status: 'pending' | 'approved' | 'rejected';
+    status: 'pending' | 'approved' | 'rejected'
 }
 
-export type { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType }
+type THandleImportantTimeStatusType = {
+    entry_year: number
+    department_id: number
+    degree_id: number
+    study_id: number
+}
+
+export type { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType, THandleImportantTimeStatusType }

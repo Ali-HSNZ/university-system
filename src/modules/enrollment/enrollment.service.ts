@@ -2,12 +2,17 @@ import { EnrollmentModel } from '../../models/enrollment.model'
 import { ClassModel } from '../../models/class.model'
 import { ClassScheduleModel } from '../../models/classSchedule.model'
 import { UserModel } from '../../models/user.model'
-import { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType } from './enrollment.types'
+import {
+    TEnrollmentRequestBodyType,
+    TEnrollmentUpdateRequestBodyType,
+    THandleImportantTimeStatusType
+} from './enrollment.types'
 import { StudentModel } from '../../models/student.model'
 import { SemesterModel } from '../../models/semester.model'
 import { CourseModel } from '../../models/course.model'
 import { ClassroomModel } from '../../models/classroom.model'
 import { ProfessorModel } from '../../models/professor.model'
+import importantDateService from '../importantDate/importantDate.service'
 
 const enrollmentService = {
     async list() {
@@ -259,6 +264,46 @@ const enrollmentService = {
         const uniqueSemesters = Array.from(new Map(activeSemesters.map((s) => [s.id, s])).values())
 
         return uniqueSemesters
+    },
+
+    async handleImportantTimeStatus({
+        entry_year,
+        department_id,
+        degree_id,
+        study_id
+    }: THandleImportantTimeStatusType) {
+        const checkImportantTime = await importantDateService.checkEnrollmentTime(
+            entry_year,
+            department_id,
+            degree_id,
+            study_id
+        )
+
+        switch (checkImportantTime) {
+            case 'not-started': {
+                return {
+                    status: false,
+                    message: 'زمان ثبت نام فرا نرسیده است'
+                }
+            }
+            case 'ended': {
+                return {
+                    status: false,
+                    message: 'زمان ثبت نام به اتمام رسیده است'
+                }
+            }
+            case 'no-enrollment': {
+                return {
+                    status: false,
+                    message: 'زمان ثبت نام وجود ندارد'
+                }
+            }
+        }
+
+        return {
+            status: true,
+            message: 'زمان ثبت نام صحیح است'
+        }
     }
 }
 

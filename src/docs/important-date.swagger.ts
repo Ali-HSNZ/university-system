@@ -52,13 +52,12 @@
  *               start_date:
  *                 type: string
  *                 description: تاریخ شروع
- *                 example: 1404-01-01
+ *                 example: 1404-01-01T12:00
  *               end_date:
  *                 type: string
  *                 description: تاریخ پایان
- *                 example: 1405-01-01
+ *                 example: 1405-01-01T16:00
  *               entry_year:
- *                 type: number
  *                 description: سال ورود
  *                 example: 1404
  *               department_id:
@@ -109,7 +108,7 @@
  *                 type: string
  *                 description: نوع
  *                 enum:
- *                   - course_selection
+ *                   - enrollment
  *                   - add_drop
  *               start_date:
  *                 type: string
