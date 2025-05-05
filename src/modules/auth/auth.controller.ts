@@ -41,10 +41,16 @@ class AuthController {
 
             const user = await authServices.findOne(data.username)
 
-            if (!user) throw new Error('کاربری با این مشخصات یافت نشد')
+            if (!user) return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                message: 'کاربری با این مشخصات یافت نشد'
+            })
 
             const isPasswordValid = compareHash(data.password, user.dataValues.password)
-            if (!isPasswordValid) throw new Error('رمز عبور اشتباه است')
+            if (!isPasswordValid) return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                message: 'رمز عبور اشتباه است'
+            })
 
             await authServices.checkValidUser(user.dataValues.id, user.dataValues.role)
 
@@ -56,7 +62,7 @@ class AuthController {
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'ورود با موفقیت انجام شد',
-                data: { token, user: user.dataValues.first_name + ' ' + user.dataValues.last_name }
+                data: { token, role: user.dataValues.role }
             })
         } catch (error) {
             next(error)

@@ -2,6 +2,7 @@ import express from 'express'
 import http from 'http'
 import morgan from 'morgan'
 import './app.module'
+import cors from 'cors'
 
 import ApplicationRoutes from './index.routes'
 import { APP_ENV } from './core/config/dotenv.config'
@@ -21,6 +22,9 @@ app.use(morgan('dev'))
 // parse urlencoded and json body
 app.use(express.urlencoded({ extended: true }))
 app.use(express.json())
+
+// handle cors
+app.use(cors())
 
 // handle routes
 app.use(ApplicationRoutes)
