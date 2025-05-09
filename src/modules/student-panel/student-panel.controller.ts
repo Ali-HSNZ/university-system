@@ -82,11 +82,32 @@ class StudentPanelController {
                 })
             }
 
-                const data = await studentPanelService.currentSemesterCourses(
-                    activeSemester?.dataValues?.id,
-                    student as unknown as TStudentType
-                )
+            const data = await studentPanelService.currentSemesterCourses(
+                activeSemester?.dataValues?.id,
+                student as unknown as TStudentType
+            )
 
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/semesters-status')
+    async allSemesters(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const student = await studentService.getByUserId(req.user?.id)
+            if (!student) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'داده ای یافت نشد'
+                })
+            }
+            const data = await studentPanelService.allSemestersWithDetails(student as unknown as TStudentType)
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
@@ -99,3 +120,4 @@ class StudentPanelController {
 }
 
 export default StudentPanelController
+

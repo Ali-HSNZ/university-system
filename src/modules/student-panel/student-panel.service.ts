@@ -131,6 +131,58 @@ const studentPanelService = {
         })
 
         return courses
+    },
+
+    async allSemestersWithDetails(studentDTO: TStudentType) {
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentDTO.id },
+            include: [
+                {
+                    model: ClassScheduleModel,
+                    include: [
+                        {
+                            model: require('../../models/semester.model').SemesterModel,
+                            attributes: ['id', 'academic_year', 'term_number', 'start_date', 'end_date', 'status']
+                        },
+                        {
+                            model: ClassModel,
+                            include: [{ model: CourseModel }]
+                        }
+                    ]
+                }
+            ]
+        })
+
+        const semesters: any = {}
+        enrollments.forEach((enrollment: any) => {
+            const schedule = enrollment.class_schedule
+            const semester = schedule?.semester
+            const course = schedule?.class?.course
+            if (!semester) return
+            if (!semesters[semester.id]) {
+                semesters[semester.id] = {
+                    id: semester.id,
+                    academic_year: semester.academic_year,
+                    year: semester.academic_year.split('-')[0],
+                    term_number: semester.term_number,
+                    start_date: semester.start_date,
+                    end_date: semester.end_date,
+                    status: semester.status,
+                    courses: []
+                }
+            }
+            if (course) {
+                semesters[semester.id].courses.push({
+                    id: course.id,
+                    name: course.name,
+                    code: course.code,
+                    theoretical_units: course.theoretical_units,
+                    practical_units: course.practical_units
+                })
+            }
+        })
+
+        return Object.values(semesters)
     }
 }
 

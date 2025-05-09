@@ -1,4 +1,3 @@
-
 /**
  * @swagger
  * /student-panel/profile:
@@ -38,6 +37,21 @@
  *     responses:
  *       200:
  *         description: Successfully retrieved student current semester courses
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
+
+/**
+ * @swagger
+ * /student-panel/semesters-status:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get all semesters (enrollments) for the current student with details and courses
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved semesters
  *       400:
  *         description: Bad request
  *       500:
