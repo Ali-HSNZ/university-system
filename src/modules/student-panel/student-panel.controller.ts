@@ -117,6 +117,37 @@ class StudentPanelController {
             next(error)
         }
     }
+
+    @Get('/current-semester-details')
+    async getCurrentSemesterDetails(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const student = await studentService.getByUserId(req.user?.id)
+
+            if (!student) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'داده ای یافت نشد'
+                })
+            }
+
+            const data = await studentPanelService.getCurrentSemesterDetails(student as unknown as TStudentType)
+
+            if (!data) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'هیچ ترمی برای دانشجو یافت نشد'
+                })
+            }
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default StudentPanelController

@@ -12,6 +12,7 @@ import { CourseModel } from '../../models/course.model'
 import { ProfessorModel } from '../../models/professor.model'
 import { UserModel } from '../../models/user.model'
 import { ClassroomModel } from '../../models/classroom.model'
+import { SemesterModel } from '../../models/semester.model'
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
@@ -183,7 +184,156 @@ const studentPanelService = {
         })
 
         return Object.values(semesters)
+    },
+
+    async getCurrentSemesterDetails(studentDTO: TStudentType) {
+        // First try to get active semester
+        const activeSemester = await SemesterModel.findOne({
+            where: { status: 'active' },
+            attributes: ['id', 'academic_year', 'term_number', 'start_date', 'end_date', 'status']
+        })
+
+        // Check if student has enrollments in the active semester
+        let hasActiveEnrollments = false
+        let semester = activeSemester
+        let isActiveSemester = true
+        let enrollments: any[] = []
+
+        if (activeSemester) {
+            // Get enrollments for active semester
+            enrollments = await EnrollmentModel.findAll({
+                where: { student_id: studentDTO.id },
+                include: [
+                    {
+                        model: ClassScheduleModel,
+                        where: { semester_id: activeSemester.dataValues.id },
+                        include: [
+                            {
+                                model: ClassModel,
+                                include: [{ model: CourseModel }]
+                            },
+                            {
+                                model: SemesterModel,
+                                attributes: ['id', 'academic_year', 'term_number', 'start_date', 'end_date', 'status']
+                            }
+                        ]
+                    }
+                ]
+            })
+
+            hasActiveEnrollments = enrollments.length > 0
+        }
+
+        // If no active semester enrollments, find the last enrollment
+        if (!hasActiveEnrollments) {
+            isActiveSemester = false
+
+            // Get all enrollments for this student, ordered by creation date
+            const lastEnrollment: any = await EnrollmentModel.findOne({
+                where: { student_id: studentDTO.id },
+                include: [
+                    {
+                        model: ClassScheduleModel,
+                        include: [
+                            {
+                                model: ClassModel,
+                                include: [{ model: CourseModel }]
+                            },
+                            {
+                                model: SemesterModel,
+                                attributes: ['id', 'academic_year', 'term_number', 'start_date', 'end_date', 'status']
+                            }
+                        ]
+                    }
+                ],
+                order: [['createdAt', 'DESC']]
+            })
+
+            if (lastEnrollment) {
+                // Get the semester from the last enrollment
+                const lastSemester = lastEnrollment.class_schedule?.semester
+                if (lastSemester) {
+                    semester = lastSemester
+
+                    // Get all enrollments for this semester
+                    enrollments = await EnrollmentModel.findAll({
+                        where: { student_id: studentDTO.id },
+                        include: [
+                            {
+                                model: ClassScheduleModel,
+                                where: { semester_id: lastSemester.id },
+                                include: [
+                                    {
+                                        model: ClassModel,
+                                        include: [{ model: CourseModel }]
+                                    }
+                                ]
+                            }
+                        ]
+                    })
+                }
+            }
+        }
+
+        // If no semester or enrollments found, return null
+        if (!semester || enrollments.length === 0) {
+            return null
+        }
+
+        // Count registered classes
+        const registeredClassesCount = enrollments.length
+
+        // Calculate total units
+        let totalUnits = 0
+        enrollments.forEach((enrollment: any) => {
+            const course = enrollment.class_schedule?.class?.course
+            if (course) {
+                totalUnits += (course.theoretical_units || 0) + (course.practical_units || 0)
+            }
+        })
+
+        // Determine registration status
+        let registrationStatus = 'ثبت‌نام نشده'
+
+        if (registeredClassesCount > 0) {
+            // بررسی وضعیت تایید ثبت‌نام‌ها
+            const pendingCount = enrollments.filter(
+                (enrollment: any) => enrollment.dataValues.status === 'pending'
+            ).length
+
+            const approvedCount = enrollments.filter(
+                (enrollment: any) => enrollment.dataValues.status === 'approved'
+            ).length
+
+            const rejectedCount = enrollments.filter(
+                (enrollment: any) => enrollment.dataValues.status === 'rejected'
+            ).length
+
+            if (pendingCount > 0) {
+                registrationStatus = 'در انتظار تأیید معاون آموزشی'
+            } else if (approvedCount === enrollments.length) {
+                registrationStatus = 'تأیید شده'
+            } else if (rejectedCount > 0) {
+                registrationStatus = 'رد شده'
+            }
+        }
+
+        return {
+            // semester: {
+            //     id: semester.dataValues.id,
+            //     academic_year: semester.dataValues.academic_year,
+            //     term_number: semester.dataValues.term_number,
+            //     start_date: semester.dataValues.start_date.replaceAll('-', '/'),
+            //     end_date: semester.dataValues.end_date.replaceAll('-', '/'),
+            //     status: semester.dataValues.status,
+            //     is_current: isActiveSemester
+            // },
+            registration_status: registrationStatus,
+            registered_classes_count: registeredClassesCount,
+            total_units: totalUnits
+        }
     }
 }
 
 export default studentPanelService
+
