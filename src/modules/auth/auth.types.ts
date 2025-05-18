@@ -1,6 +1,7 @@
 import { InferType } from 'yup'
 import {
     loginValidation,
+    registerDepartmentHeadValidation,
     registerEducationAssistantValidation,
     registerProfessorValidation,
     registerStudentValidation,
@@ -17,6 +18,8 @@ type TRegisterProfessorInferType = InferType<typeof registerProfessorValidation>
 
 type TRegisterEducationAssistantInferType = InferType<typeof registerEducationAssistantValidation>
 
+type TRegisterDepartmentHeadInferType = InferType<typeof registerDepartmentHeadValidation>
+
 type TRegisterUniversityPresidentInferType = InferType<typeof registerUniversityPresidentValidation>
 
 type TBaseUserDataType = {
@@ -28,7 +31,7 @@ type TBaseUserDataType = {
     phone?: string
     email?: string
     address?: string
-    role: 'student' | 'professor' | 'education_assistant' | 'university_president'
+    role: 'student' | 'professor' | 'education_assistant' | 'university_president' | 'department_head'
     password: string
     avatar?: string
 }
@@ -77,5 +80,6 @@ export type {
     TRegisterEducationAssistantInferType,
     TRegisterUniversityPresidentInferType,
     TUserGenderType,
-    TBaseUserDataType
+    TBaseUserDataType,
+    TRegisterDepartmentHeadInferType
 }

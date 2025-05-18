@@ -19,7 +19,13 @@ const UserModel = sequelizeConfig.define(
         email: { type: DataTypes.STRING(100), allowNull: true },
         address: { type: DataTypes.STRING(255), allowNull: true },
         role: {
-            type: DataTypes.ENUM('student', 'professor', 'education_assistant', 'university_president'),
+            type: DataTypes.ENUM(
+                'student', // دانشجو
+                'professor', // استاد
+                'education_assistant', // معاون آموزشی
+                'department_head', // مدیر گروه
+                'university_president' // رئیس دانشگاه
+            ),
             allowNull: false
         },
         password: { type: DataTypes.STRING(255), allowNull: false },

@@ -41,16 +41,18 @@ class AuthController {
 
             const user = await authServices.findOne(data.username)
 
-            if (!user) return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'کاربری با این مشخصات یافت نشد'
-            })
+            if (!user)
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'کاربری با این مشخصات یافت نشد'
+                })
 
             const isPasswordValid = compareHash(data.password, user.dataValues.password)
-            if (!isPasswordValid) return res.status(httpStatus.BAD_REQUEST).json({
-                status: httpStatus.BAD_REQUEST,
-                message: 'رمز عبور اشتباه است'
-            })
+            if (!isPasswordValid)
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'رمز عبور اشتباه است'
+                })
 
             await authServices.checkValidUser(user.dataValues.id, user.dataValues.role)
 
@@ -361,6 +363,101 @@ class AuthController {
             })
 
             if (!educationAssistant || !educationAssistant?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
+
+            return res.status(httpStatus.CREATED).json({
+                status: httpStatus.CREATED,
+                message: 'ثبت نام با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Post('/register/department-head')
+    @UseMiddleware(
+        fileUpload.fields([
+            { name: 'avatar', maxCount: 1 },
+            { name: 'national_card_image', maxCount: 1 },
+            { name: 'birth_certificate_image', maxCount: 1 },
+            { name: 'military_service_image', maxCount: 1 },
+            { name: 'employment_contract_file', maxCount: 1 }
+        ])
+    )
+    async registerDepartmentHead(req: Request, res: Response, next: NextFunction) {
+        try {
+            const files = req.files as TRegisterEducationAssistantFilesType
+
+            req.body.avatar = files?.['avatar']?.[0]
+            req.body.national_card_image = files?.['national_card_image']?.[0]
+            req.body.birth_certificate_image = files?.['birth_certificate_image']?.[0]
+            req.body.military_service_image = files?.['military_service_image']?.[0]
+            req.body.employment_contract_file = files?.['employment_contract_file']?.[0]
+
+            const data = await validationHandling<TRegisterEducationAssistantInferType>(
+                req.body,
+                registerEducationAssistantValidation
+            )
+
+            const existUser = await userServices.findOne({
+                national_code: data.national_code,
+                phone: data.phone || undefined,
+                email: data.email || undefined
+            })
+
+            if (existUser) throw new Error('کاربر در سیستم وجود دارد')
+
+            const existDepartment = await departmentServices.checkExist(data.department_id)
+            if (!existDepartment) throw new Error('گروه آموزشی موجود نمی باشد')
+
+            const existDegree = await degreeServices.checkExist(Number(data.degree_id))
+            if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
+
+            const images = {
+                avatar: serializeFilePath(req.body.avatar?.path),
+                national_card_image: serializeFilePath(req.body.national_card_image?.path),
+                birth_certificate_image: serializeFilePath(req.body.birth_certificate_image?.path),
+                military_service_image: serializeFilePath(req.body.military_service_image?.path),
+                employment_contract_file: serializeFilePath(req.body.employment_contract_file?.path)
+            }
+
+            const hashedPassword = hashString(data.national_code)
+
+            const user = await authServices.registerUser({
+                first_name: data.first_name,
+                last_name: data.last_name,
+                national_code: data.national_code,
+                gender: data.gender,
+                birth_date: data.birth_date,
+                role: 'department_head',
+                password: hashedPassword,
+                avatar: images?.avatar,
+                phone: data.phone || undefined,
+                email: data.email || undefined,
+                address: data.address || undefined
+            })
+
+            if (!user || !user?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
+
+            const departmentHeadCode = `${data.national_code}${user.dataValues.id}`
+
+            const departmentHead = await authServices.registerDepartmentHead({
+                user_id: user.dataValues.id,
+                department_head_code: departmentHeadCode,
+                department_id: data.department_id,
+                degree_id: data.degree_id,
+                national_card_image: images?.national_card_image,
+                work_experience_years: data.work_experience_years,
+                hire_date: data.hire_date,
+                responsibilities: data.responsibilities,
+                employment_contract_file: images?.employment_contract_file,
+                birth_certificate_image: images?.birth_certificate_image,
+                military_service_image: images?.military_service_image,
+                office_address: data.office_address,
+                office_phone: data.office_phone,
+                status: 'inactive'
+            })
+
+            if (!departmentHead || !departmentHead?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,

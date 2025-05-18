@@ -34,6 +34,7 @@
  *   /auth/register/student:
  *     post:
  *       tags: [Authentication]
+ *       summary: "ثبت نام دانشجو"
  *       requestBody:
  *         content:
  *           multipart/form-data:
@@ -179,6 +180,7 @@
  * /auth/register/professor:
  *   post:
  *     tags: [Authentication]
+ *     summary: "ثبت نام استاد"
  *     requestBody:
  *       required: true
  *       content:
@@ -321,6 +323,7 @@
  * /auth/register/education-assistant:
  *   post:
  *     tags: [Authentication]
+ *     summary: "ثبت نام معاون آموزشی"
  *     requestBody:
  *       required: true
  *       content:
@@ -433,11 +436,134 @@
  */
 
 
+
+/**
+ * @swagger
+ * /auth/register/department-head:
+ *   post:
+ *     tags: [Authentication]
+ *     summary: "ثبت نام مدیر گروه"
+ *     requestBody:
+ *       required: true
+ *       content:
+ *         multipart/form-data:
+ *           schema:
+ *             type: object
+ *             required:
+ *               - first_name
+ *               - last_name
+ *               - email
+ *               - phone
+ *               - national_code
+ *               - birth_date
+ *               - gender
+ *               - avatar
+ *               - department_id
+ *               - degree_id
+ *               - work_experience_years
+ *               - hire_date
+ *               - national_card_image
+ *               - birth_certificate_image
+ *               - military_service_image
+ *             properties:
+ *                first_name:
+ *                  type: string
+ *                  description: "نام"
+ *                  example: "Ali"
+ *                last_name:
+ *                  type: string
+ *                  description: "نام خانوادگی"
+ *                  example: "Rezaei"
+ *                email:
+ *                  type: string
+ *                  description: "ایمیل"
+ *                  example: "ali.rezaei@example.com"
+ *                phone:
+ *                  type: string
+ *                  description: "شماره تماس"
+ *                  example: "09123456789"
+ *                national_code:
+ *                  type: string
+ *                  description: "کد ملی"
+ *                  example: "1234567890"
+ *                birth_date:
+ *                  type: string
+ *                  format: date
+ *                  description: "تاریخ تولد"
+ *                  example: "2000-01-01"
+ *                gender:
+ *                  type: enum
+ *                  enum: ["male", "female"]
+ *                  description: "جنسیت"
+ *                  example: "male"
+ *                department_id:
+ *                  type: integer
+ *                  description: "شناسه گروه آموزشی"
+ *                  example: 1
+ *                degree_id:
+ *                  type: integer
+ *                  description: "شناسه مقطع تحصیلی"
+ *                  example: 1
+ *                work_experience_years:
+ *                  type: integer
+ *                  description: "سابقه کاری"
+ *                  example: 5
+ *                office_phone:
+ *                  type: string
+ *                  description: "تلفن دفتر"
+ *                  example: "09123456789"
+ *                office_address:
+ *                  type: string
+ *                  description: "آدرس دفتر"
+ *                  example: "Tehran, Iran"
+ *                hire_date:
+ *                  type: string
+ *                  format: date
+ *                  description: "تاریخ استخدام"
+ *                  example: "2025-03-22"
+ *                responsibilities:
+ *                  type: string
+ *                  description: "وظایف"
+ *                  example: "Responsibilities"
+ *                avatar:
+ *                  type: string
+ *                  format: binary
+ *                  description: "عکس پرسنلی"
+ *                national_card_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر کارت ملی"
+ *                birth_certificate_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر شناسنامه"
+ *                military_service_image:
+ *                  type: string
+ *                  format: binary
+ *                  description: "تصویر کارت پایان خدمت"
+ *                employment_contract_file:
+ *                  type: string
+ *                  format: binary
+ *                  description: "قرارداد کاری"
+ *     responses:
+ *       201:
+ *         description: "معاون آموزشی با موفقیت ثبت شد"
+ *       400:
+ *         description: "درخواست نامعتبر (خطا در داده‌های ورودی)"
+ *       500:
+ *         description: "خطای داخلی سرور"
+ */
+
+
+
+
+
 /**
  * @swagger
  * /auth/register/university-president:
  *   post:
  *     tags: [Authentication]
+ *     summary: "ثبت نام رئیس دانشگاه"
  *     requestBody:
  *       required: true
  *       content:

@@ -6,6 +6,7 @@
  *   - name: Student
  *   - name: Professor
  *   - name: Education Assistant
+ *   - name: Department Head
  *   - name: University President
  *   - name: Student Panel
  *   - name: Course

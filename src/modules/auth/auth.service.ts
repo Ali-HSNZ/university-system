@@ -1,3 +1,4 @@
+import { DepartmentHeadModel } from '../../models/departmentHead.model'
 import { EducationAssistantModel } from '../../models/educationAssistant.model'
 import { ProfessorModel } from '../../models/professor.model'
 import { StudentModel } from '../../models/student.model'
@@ -12,7 +13,8 @@ import {
     TRegisterStudentInferType,
     TBaseUserDataType,
     TRegisterEducationAssistantInferType,
-    TRegisterUniversityPresidentInferType
+    TRegisterUniversityPresidentInferType,
+    TRegisterDepartmentHeadInferType
 } from './auth.types'
 
 const authServices = {
@@ -43,6 +45,13 @@ const authServices = {
     ) => {
         const educationAssistant = await EducationAssistantModel.create(data)
         return educationAssistant
+    },
+
+    registerDepartmentHead: async (
+        data: Omit<TRegisterDepartmentHeadInferType, keyof TBaseUserDataType> & { user_id: number }
+    ) => {
+        const departmentHead = await DepartmentHeadModel.create(data)
+        return departmentHead
     },
 
     registerUniversityPresident: async (
