@@ -24,13 +24,38 @@ const EnrollmentModel = sequelizeConfig.define(
             }
         },
         status: {
-            type: DataTypes.ENUM('pending', 'approved', 'rejected'),
-            allowNull: false,
-            defaultValue: 'pending'
+            type: DataTypes.ENUM(
+                'pending_department_head', // در انتظار تایید مدیر گروه
+                'pending_education_assistant', // در انتظار تایید معاون آموزشی
+                'approved_by_department_head', // تایید شده توسط مدیر گروه
+                'approved_by_education_assistant', // تایید شده توسط معاون آموزشی
+                'rejected_by_department_head', // رد شده توسط مدیر گروه
+                'rejected_by_education_assistant', // رد شده توسط معاون آموزشی
+                'final_approved', // تایید نهایی
+                'final_rejected' // رد نهایی
+            ),
+            allowNull: true,
+            defaultValue: 'pending_department_head'
+        },
+        department_head_id: { type: DataTypes.INTEGER, allowNull: true, comment: 'شناسه مدیر گروه' },
+        education_assistant_id: { type: DataTypes.INTEGER, allowNull: true, comment: 'شناسه معاون آموزشی' },
+
+        department_head_comment: { type: DataTypes.TEXT, allowNull: true, comment: 'توضیحات مدیر گروه' },
+        education_assistant_comment: { type: DataTypes.TEXT, allowNull: true, comment: 'توضیحات معاون آموزشی' },
+
+        department_head_approval_date: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            comment: 'تاریخ تایید/رد توسط مدیر گروه'
+        },
+        education_assistant_approval_date: {
+            type: DataTypes.TEXT,
+            allowNull: true,
+            comment: 'تاریخ تایید/رد توسط معاون آموزشی'
         }
     },
     {
-        timestamps: false,
+        timestamps: true,
         freezeTableName: true
     }
 )

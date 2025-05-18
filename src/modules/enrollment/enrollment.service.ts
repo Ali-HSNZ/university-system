@@ -107,8 +107,7 @@ const enrollmentService = {
         // ثبت نام دانشجویی
         const enrollment = await EnrollmentModel.create({
             student_id: studentId,
-            class_schedule_id: enrollmentData.class_schedule_id,
-            status: 'pending'
+            class_schedule_id: enrollmentData.class_schedule_id
         })
 
         // افزایش تعداد دانشجویان در کلاس
