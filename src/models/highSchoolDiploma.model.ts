@@ -1,7 +1,7 @@
 import { DataTypes } from 'sequelize'
 import { sequelizeConfig } from '../core/config/database.config'
 import { UserModel } from './user.model'
-import { DegreeModel } from './degree.model'
+import { StudyModel } from './study.model'
 
 const HighSchoolDiplomaModel = sequelizeConfig.define(
     'high_school_diplomas',
@@ -14,11 +14,12 @@ const HighSchoolDiplomaModel = sequelizeConfig.define(
         },
         school_name: { type: DataTypes.STRING(255), allowNull: false },
         diploma_date: { type: DataTypes.DATE, allowNull: false },
-        pre_degree_id: {
+        grade: { type: DataTypes.FLOAT, allowNull: false },
+        pre_study_id: {
             type: DataTypes.INTEGER,
             allowNull: false,
             references: {
-                model: 'degree',
+                model: 'study',
                 key: 'id'
             }
         }
@@ -26,7 +27,7 @@ const HighSchoolDiplomaModel = sequelizeConfig.define(
     { timestamps: true, freezeTableName: true }
 )
 
-HighSchoolDiplomaModel.belongsTo(DegreeModel, { foreignKey: 'pre_degree_id', onDelete: 'CASCADE' })
+HighSchoolDiplomaModel.belongsTo(StudyModel, { foreignKey: 'pre_study_id', onDelete: 'CASCADE' })
 HighSchoolDiplomaModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
 
 export { HighSchoolDiplomaModel }

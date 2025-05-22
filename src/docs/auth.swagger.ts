@@ -53,7 +53,8 @@
  *                 - entry_semester
  *                 - school_name
  *                 - diploma_date
- *                 - pre_degree_id
+ *                 - pre_study_id
+ *                 - pre_grade
  *                 - national_card_image
  *                 - birth_certificate_image
  *                 - military_service_image
@@ -134,10 +135,14 @@
  *                   format: date
  *                   description: "تاریخ آخرین اخذ مدرک"
  *                   example: "2025-03-22"
- *                 pre_degree_id:
+ *                 pre_study_id:
  *                   type: integer
- *                   description: "شناسه آخرین مدرک دانشگاهی"
+ *                   description: "شناسه آخرین رشته تحصیلی"
  *                   example: 1
+ *                 pre_grade:
+ *                   type: number
+ *                   description: "نمره آخرین رشته تحصیلی"
+ *                   example: 19.5
  *                 avatar:
  *                   type: string
  *                   format: binary

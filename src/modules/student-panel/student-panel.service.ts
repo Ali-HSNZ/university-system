@@ -14,19 +14,62 @@ import { UserModel } from '../../models/user.model'
 import { ClassroomModel } from '../../models/classroom.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ImportantDateModel } from '../../models/importantDate.model'
+import { HighSchoolDiplomaModel } from '../../models/highSchoolDiploma.model'
+import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
+        const militaryStatusDictionary: Record<string, string> = {
+            active: 'فعال',
+            completed: 'تکمیل شده',
+            exempted: 'اجازه‌ی صدور',
+            postponed: 'معافیت'
+        }
+
+        const studentStatusDictionary: Record<string, string> = {
+            active: 'فعال',
+            deActive: 'غیرفعال',
+            studying: 'در حال تحصیل',
+            graduate: 'فارغ‌التحصیل'
+        }
+
+        const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
+        const study = await studyServices.getStudyNameById(studentDTO.study_id)
+        const department = await departmentServices.getDepartmentNameById(studentDTO.department_id)
+
+
+
+        const highSchoolDiploma = await highSchoolDiplomaServices.getHighSchoolDiplomaById(
+            studentDTO.high_school_diploma_id
+        )
+        const preStudy = await studyServices.getStudyNameById(highSchoolDiploma?.dataValues?.pre_study_id)
+
         return {
-            name: `${userDTO.first_name} ${userDTO.last_name}`,
-            student_code: studentDTO.student_code,
-            national_code: userDTO.national_code,
-            gender: userDTO.gender === 'male' ? 'آقا' : 'خانم',
-            birth_date: moment(userDTO.birth_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD'),
-            phone: userDTO.phone,
-            email: userDTO.email,
-            address: userDTO.address,
-            avatar: userDTO.avatar
+            personal_information: {
+                avatar: userDTO.avatar,
+                name: userDTO.first_name + ' ' + userDTO.last_name,
+                national_code: userDTO.national_code,
+                birth_date: moment(userDTO.birth_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD'),
+                gender: userDTO.gender === 'male' ? 'مرد' : 'زن',
+                phone: userDTO.phone,
+                email: userDTO.email,
+                military_status: militaryStatusDictionary[studentDTO.military_status],
+                address: userDTO.address
+            },
+            education_information: {
+                student_code: studentDTO.student_code,
+                entry_year: studentDTO.entry_year.toString(),
+                degree: degree?.dataValues?.name,
+                study: study?.dataValues?.name,
+                department: department?.dataValues?.name,
+                status: studentStatusDictionary[studentDTO.student_status]
+            },
+            diploma_information: {
+                name: highSchoolDiploma?.dataValues?.school_name,
+                diploma_date: moment(highSchoolDiploma?.dataValues?.diploma_date).format('jYYYY/jMM/jDD'),
+                study: preStudy?.dataValues?.name,
+                grade: highSchoolDiploma?.dataValues.grade
+            }
         }
     },
 

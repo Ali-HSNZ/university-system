@@ -34,10 +34,14 @@ const registerStudentValidation = Yup.object({
         .required('تاریخ تولد الزامی است'),
     phone: Yup.string().nullable(),
     email: Yup.string().email('ایمیل معتبر نیست').nullable(),
-    pre_degree_id: Yup.number()
-        .required('شناسه آخرین مدرک تحصیلی الزامی است')
-        .positive('شناسه آخرین مدرک تحصیلی معتبر نیست')
-        .integer('شناسه آخرین مدرک تحصیلی باید یک عدد صحیح باشد'),
+    pre_study_id: Yup.number()
+        .required('شناسه آخرین رشته تحصیلی الزامی است')
+        .positive('شناسه آخرین رشته تحصیلی معتبر نیست')
+        .integer('شناسه آخرین رشته تحصیلی باید یک عدد صحیح باشد'),
+    pre_grade: Yup.number()
+        .required('نمره آخرین رشته تحصیلی الزامی است')
+        .positive('نمره آخرین رشته تحصیلی معتبر نیست')
+        .min(0, 'نمره آخرین رشته تحصیلی باید بیشتر از 0 باشد'),
     address: Yup.string().nullable(),
     avatar: validateFile({
         title: 'تصویر پروفایل',

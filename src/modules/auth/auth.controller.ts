@@ -99,8 +99,8 @@ class AuthController {
 
             if (existUser) throw new Error('کاربر در سیستم وجود دارد')
 
-            const existPreDegree = await degreeServices.checkExist(data.pre_degree_id)
-            if (!existPreDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
+            const existPreStudy = await studyServices.checkExistId(data.pre_study_id)
+            if (!existPreStudy) throw new Error('رشته تحصیلی موجود نمی باشد')
 
             const existDegree = await degreeServices.checkExist(data.degree_id)
             if (!existDegree) throw new Error('مقطع تحصیلی موجود نمی باشد')
@@ -137,14 +137,16 @@ class AuthController {
                 user_id: user.dataValues.id,
                 school_name: data.school_name,
                 diploma_date: data.diploma_date,
-                pre_degree_id: data.pre_degree_id
+                pre_study_id: data.pre_study_id,
+                pre_grade: data.pre_grade
             })
 
             const studentCode = `${data.national_code}${user.dataValues.id}`
 
             await authServices.registerStudent({
                 user_id: user.dataValues.id,
-                pre_degree_id: data.pre_degree_id,
+                pre_study_id: data.pre_study_id,
+                pre_grade: data.pre_grade,
                 student_code: studentCode,
                 study_id: data.study_id,
                 degree_id: data.degree_id,

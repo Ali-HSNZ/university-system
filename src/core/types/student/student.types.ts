@@ -1,7 +1,8 @@
 type TStudentType = {
     id: number
     student_code: string
-    pre_degree_id: number
+    pre_study_id: number
+    pre_grade: number
     degree_id: number
     study_id: number
     department_id: number
