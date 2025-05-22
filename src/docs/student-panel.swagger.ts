@@ -88,3 +88,17 @@
  *         description: Server error
  */
 
+/**
+ * @swagger
+ * /student-panel/weekly-schedule:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get student weekly schedule
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved student weekly schedule
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */

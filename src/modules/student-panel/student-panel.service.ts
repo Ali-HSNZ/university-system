@@ -30,6 +30,54 @@ const studentPanelService = {
         }
     },
 
+    async weeklySchedule(studentDTO: TStudentType) {
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentDTO.id },
+            include: [
+                {
+                    model: ClassScheduleModel,
+
+                    include: [
+                        { model: SemesterModel, where: { status: 'active' } },
+                        { model: ClassroomModel },
+                        { model: ClassModel, include: [{ model: CourseModel }] },
+                        {
+                            model: ProfessorModel,
+                            attributes: ['id'],
+                            include: [{ model: UserModel, attributes: ['first_name', 'last_name'] }]
+                        }
+                    ]
+                }
+            ]
+        })
+
+        const dayOfWeekDictionary: Record<string, string> = {
+            '0': 'شنبه',
+            '1': 'یکشنبه',
+            '2': 'دوشنبه',
+            '3': 'سه شنبه',
+            '4': 'چهارشنبه',
+            '5': 'پنج شنبه',
+            '6': 'جمعه'
+        }
+
+        const serializedEnrollments = enrollments.map((enrollment: any) => {
+            const classSchedule = enrollment.dataValues.class_schedule
+
+            return {
+                id: enrollment.dataValues.id,
+                day: dayOfWeekDictionary[classSchedule.day_of_week],
+                start_time: classSchedule.start_time.substring(0, 5),
+                end_time: classSchedule.end_time.substring(0, 5),
+                course_name: classSchedule.class.course.name,
+                professor: classSchedule.professor.user.first_name + ' ' + classSchedule.professor.user.last_name,
+                address: `${classSchedule.classroom.building_name} - طبقه ${classSchedule.classroom.floor_number} - کلاس ${classSchedule.classroom.name}`
+            }
+        })
+
+        return serializedEnrollments
+    },
+
     async educationInformation(studentDTO: TStudentType) {
         const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
         const study = await studyServices.getStudyNameById(studentDTO.study_id)

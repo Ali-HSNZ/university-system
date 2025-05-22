@@ -177,6 +177,30 @@ class StudentPanelController {
             next(error)
         }
     }
+
+    @Get('/weekly-schedule')
+    async weeklySchedule(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const student = await studentService.getByUserId(req.user?.id)
+
+            if (!student) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'داده ای یافت نشد'
+                })
+            }
+
+            const data = await studentPanelService.weeklySchedule(student as unknown as TStudentType)
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default StudentPanelController
