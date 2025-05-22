@@ -8,15 +8,15 @@ const classSchema = yup.object().shape({
 
         return true
     }),
-    capacity: yup.string().test('is-valid-capacity', 'ظرفیت الزامی است', function (value) {
-        if (!value) return this.createError({ path: this.path, message: 'ظرفیت الزامی است' })
+    // capacity: yup.string().test('is-valid-capacity', 'ظرفیت الزامی است', function (value) {
+    //     if (!value) return this.createError({ path: this.path, message: 'ظرفیت الزامی است' })
 
-        if (Number.isNaN(Number(value))) return this.createError({ path: this.path, message: 'ظرفیت معتبر نیست' })
+    //     if (Number.isNaN(Number(value))) return this.createError({ path: this.path, message: 'ظرفیت معتبر نیست' })
 
-        if (Number(value) <= 0) return this.createError({ path: this.path, message: 'ظرفیت باید بیشتر از 0 باشد' })
+    //     if (Number(value) <= 0) return this.createError({ path: this.path, message: 'ظرفیت باید بیشتر از 0 باشد' })
 
-        return true
-    }),
+    //     return true
+    // }),
     status: yup.string().test('is-valid-status', 'وضعیت الزامی است', function (value) {
         if (!value) return this.createError({ path: this.path, message: 'وضعیت الزامی است' })
 
