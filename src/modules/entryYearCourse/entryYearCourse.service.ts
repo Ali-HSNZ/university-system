@@ -14,6 +14,15 @@ const entryYearCourseService = {
         })
         return !!entryYearCourse
     },
+
+    checkExistEntryYearCourseWithDetail: async (entryYearId: string, courseId: string) => {
+        const entryYearCourse = await EntryYearCourseModel.findOne({
+            include: [{ model: EntryYearModel, where: { year: Number(entryYearId) } }],
+            where: { course_id: Number(courseId) }
+        })
+
+        return !!entryYearCourse
+    },
     async list() {
         const rawResult = await EntryYearCourseModel.findAll({
             include: [

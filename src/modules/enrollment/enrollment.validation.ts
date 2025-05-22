@@ -7,11 +7,16 @@ const createEnrollmentValidation = yup.object<TEnrollmentRequestBodyType>().shap
         .integer('شناسه دانشجو بایستی یک عدد صحیح باشد')
         .positive('شناسه دانشجو بایستی یک عدد صحیح مثبت باشد')
         .required('شناسه دانشجو الزامی است'),
-    class_schedule_id: yup
-        .number()
-        .integer('شناسه برنامه جلسه بایستی یک عدد صحیح باشد')
-        .positive('شناسه برنامه جلسه بایستی یک عدد صحیح مثبت باشد')
-        .required('شناسه برنامه جلسه الزامی است')
+    class_schedule_ids: yup
+        .array()
+        .of(
+            yup
+                .number()
+                .integer('شناسه برنامه جلسه بایستی یک عدد صحیح باشد')
+                .positive('شناسه برنامه جلسه بایستی یک عدد صحیح مثبت باشد')
+        )
+        .min(1, 'حداقل یک برنامه جلسه باید انتخاب شود')
+        .required('شناسه‌های برنامه جلسه الزامی است')
 })
 
 const updateEnrollmentValidation = yup.object<TEnrollmentUpdateRequestBodyType>().shape({

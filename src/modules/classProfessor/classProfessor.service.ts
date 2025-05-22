@@ -14,7 +14,6 @@ const classProfessorService = {
             include: [
                 {
                     model: ClassModel,
-                    attributes: ['capacity'],
                     include: [
                         { model: CourseModel, attributes: ['name'] },
                         { model: SemesterModel, attributes: ['academic_year', 'term_number'] }

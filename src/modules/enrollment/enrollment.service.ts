@@ -13,6 +13,7 @@ import { CourseModel } from '../../models/course.model'
 import { ClassroomModel } from '../../models/classroom.model'
 import { ProfessorModel } from '../../models/professor.model'
 import importantDateService from '../importantDate/importantDate.service'
+import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
 
 const enrollmentService = {
     async list() {
@@ -30,13 +31,8 @@ const enrollmentService = {
                     include: [
                         {
                             model: ClassModel,
-                            attributes: ['id', 'capacity', 'status', 'enrolled_students'],
-                            include: [
-                                {
-                                    model: CourseModel,
-                                    attributes: ['id', 'name', 'code']
-                                }
-                            ]
+                            attributes: ['id', 'status', 'enrolled_students'],
+                            include: [{ model: CourseModel, attributes: ['id', 'name', 'code'] }]
                         },
                         {
                             model: SemesterModel,
@@ -44,7 +40,7 @@ const enrollmentService = {
                         },
                         {
                             model: ClassroomModel,
-                            attributes: ['name', 'building_name', 'floor_number']
+                            attributes: ['name', 'building_name', 'floor_number', 'capacity']
                         },
                         {
                             model: ProfessorModel,
@@ -67,56 +63,77 @@ const enrollmentService = {
         // Get the user_id associated with this student
         const studentId = student.dataValues.id
 
-        // Check if class schedule exists
-        const classSchedule = await ClassScheduleModel.findOne({
-            where: { id: Number(enrollmentData.class_schedule_id) },
-            include: [{ model: ClassModel }]
-        })
+        // Process each class schedule ID
+        const enrollments = []
+        for (const classScheduleId of enrollmentData.class_schedule_ids) {
+            // Check if class schedule exists
+            const classSchedule = await ClassScheduleModel.findOne({
+                where: { id: Number(classScheduleId) },
+                include: [{ model: ClassModel }]
+            })
 
-        if (!classSchedule) throw new Error('برنامه جلسه با این شناسه یافت نشد')
+            if (!classSchedule) throw new Error(`برنامه جلسه با شناسه ${classScheduleId} یافت نشد`)
 
-        // Get the class_id from the schedule and find the class directly
-        const classId = classSchedule.dataValues.class_id
-        const classData = await ClassModel.findByPk(classId)
+            // Get the class_id from the schedule and find the class directly
+            const classId = classSchedule.dataValues.class_id
+            const classData = await ClassModel.findByPk(classId, {
+                include: [{ model: CourseModel, attributes: ['id', 'name', 'code'] }]
+            })
 
-        if (!classData) throw new Error('کلاس مرتبط با این برنامه یافت نشد')
+            if (!classData) throw new Error(`کلاس مرتبط با برنامه ${classScheduleId} یافت نشد`)
 
-        // بررسی وضعیت کلاس
-        if (classData.dataValues.status !== 'open') {
-            throw new Error('کلاس برای ثبت نام باز نیست')
-        }
+            // Check if course belongs to student's entry year
+            const isCourseAllowed = await entryYearCourseService.checkExistEntryYearCourseWithDetail(
+                student.dataValues.entry_year.toString(),
+                classData.dataValues.course_id.toString()
+            )
 
-        // بررسی ظرفیت کلاس
-        if (classData.dataValues.enrolled_students >= classData.dataValues.capacity) {
-            throw new Error('کلاس به حداکثر ظرفیت خود رسیده است')
-        }
-
-        // بررسی ثبت نام دانشجویی در این برنامه جلسه
-        const existingEnrollment = await EnrollmentModel.findOne({
-            where: {
-                student_id: studentId,
-                class_schedule_id: Number(enrollmentData.class_schedule_id)
+            if (!isCourseAllowed) {
+                const courseName = classData.dataValues.course?.name
+                const entryYear = student.dataValues.entry_year
+                
+                throw new Error(`${courseName} برای سال ورود ${entryYear} مجاز نیست`)
             }
-        })
 
-        // check student is enrolled in this class or course
-        await this.checkEnrollmentOfClass(studentId, classId)
+            // بررسی وضعیت کلاس
+            if (classData.dataValues.status !== 'open') {
+                throw new Error(`کلاس ${classId} برای ثبت نام باز نیست`)
+            }
 
-        if (existingEnrollment) throw new Error('دانشجو قبلا در این کلاس ثبت نام کرده است')
+            // بررسی ظرفیت کلاس
+            if (classData.dataValues.enrolled_students >= classData.dataValues.capacity) {
+                throw new Error(`کلاس ${classId} به حداکثر ظرفیت خود رسیده است`)
+            }
 
-        // ثبت نام دانشجویی
-        const enrollment = await EnrollmentModel.create({
-            student_id: studentId,
-            class_schedule_id: enrollmentData.class_schedule_id
-        })
+            // بررسی ثبت نام دانشجویی در این برنامه جلسه
+            const existingEnrollment = await EnrollmentModel.findOne({
+                where: {
+                    student_id: studentId,
+                    class_schedule_id: Number(classScheduleId)
+                }
+            })
 
-        // افزایش تعداد دانشجویان در کلاس
-        await ClassModel.update(
-            { enrolled_students: classData.dataValues.enrolled_students + 1 },
-            { where: { id: classId } }
-        )
+            // check student is enrolled in this class or course
+            await this.checkEnrollmentOfClass(studentId, classId)
 
-        return enrollment
+            if (existingEnrollment) throw new Error(`دانشجو قبلا در کلاس ${classId} ثبت نام کرده است`)
+
+            // ثبت نام دانشجویی
+            const enrollment = await EnrollmentModel.create({
+                student_id: studentId,
+                class_schedule_id: classScheduleId
+            })
+
+            // افزایش تعداد دانشجویان در کلاس
+            await ClassModel.update(
+                { enrolled_students: classData.dataValues.enrolled_students + 1 },
+                { where: { id: classId } }
+            )
+
+            enrollments.push(enrollment)
+        }
+
+        return enrollments
     },
     async checkEnrollmentOfClass(student_id: number, class_id: number) {
         const allSchedulesOfThisClass = await ClassScheduleModel.findAll({
@@ -262,28 +279,19 @@ const enrollmentService = {
 
         switch (checkImportantTime) {
             case 'not-started': {
-                return {
-                    status: false,
-                    message: 'زمان ثبت نام فرا نرسیده است'
-                }
+                return { status: false, message: 'زمان ثبت نام فرا نرسیده است' }
             }
             case 'ended': {
-                return {
-                    status: false,
-                    message: 'زمان ثبت نام به اتمام رسیده است'
-                }
+                return { status: false, message: 'زمان ثبت نام به اتمام رسیده است' }
             }
             case 'no-enrollment': {
-                return {
-                    status: false,
-                    message: 'زمان ثبت نام وجود ندارد'
-                }
+                return { status: false, message: 'زمان ثبت نام وجود ندارد' }
             }
         }
 
         return {
             status: true,
-            message: 'زمان ثبت نام صحیح است'
+            message: 'زمان ثبت نام آغاز شده است'
         }
     }
 }

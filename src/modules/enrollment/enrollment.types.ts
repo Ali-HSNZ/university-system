@@ -1,6 +1,6 @@
 type TEnrollmentRequestBodyType = {
     student_id: number
-    class_schedule_id: number
+    class_schedule_ids: number[]
 }
 
 type TEnrollmentUpdateRequestBodyType = {

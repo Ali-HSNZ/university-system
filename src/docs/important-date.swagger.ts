@@ -28,6 +28,10 @@
  * /important-date/create:
  *   post:
  *     tags: [Important Dates]
+ *     description: |
+ *       - **type**: نوع
+ *          - **enrollment**: ثبت نام (انتخاب واحد)
+ *          - **add_drop**: حذف و اضافه
  *     requestBody:
  *       required: true
  *       content:

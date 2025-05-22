@@ -1,12 +1,13 @@
 import { NextFunction, Request, Response } from 'express'
 import httpStatus from 'http-status'
-import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post, Put, UseMiddleware } from '../../decorators/router.decorator'
 import { validationHandling } from '../../core/utils/validation-handling'
 import { checkValidId } from '../../core/utils/check-valid-id'
 import enrollmentService from './enrollment.service'
 import { createEnrollmentValidation, updateEnrollmentValidation, classIdValidation } from './enrollment.validation'
 import studentService from '../student/student.service'
 import { TAuthenticatedRequestType } from '../../core/types/auth'
+import { serializeArray } from '../../core/middleware/serialize-array'
 
 @Controller('/enrollment')
 class EnrollmentController {
@@ -84,6 +85,7 @@ class EnrollmentController {
     }
 
     @Post('/create')
+    @UseMiddleware(serializeArray('class_schedule_ids'))
     async createEnrollment(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
             await validationHandling(req.body, createEnrollmentValidation)

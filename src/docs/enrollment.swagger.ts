@@ -84,7 +84,6 @@
  *         description: internal server error
  */
 
-
 /**
  * @swagger
  * /enrollment/create:
@@ -93,7 +92,7 @@
  *     summary: Create a new enrollment
  *     description: |
  *       - student_id: شناسه دانشجو
- *       - class_schedule_id: شناسه برنامه جلسه
+ *       - class_schedule_ids: شناسه برنامه جلسه
  *       - status: وضعیت ثبت نام
  *          - pending: درحال بررسی
  *          - approved: تایید شده
@@ -106,16 +105,16 @@
  *             type: object
  *             required:
  *               - student_id
- *               - class_schedule_id
+ *               - class_schedule_ids
  *             properties:
  *               student_id:
  *                 type: integer
  *                 description: شناسه دانشجو
  *                 example: 1
- *               class_schedule_id:
- *                 type: integer
+ *               class_schedule_ids:
+ *                 type: array
  *                 description: شناسه برنامه جلسه
- *                 example: 1
+ *                 example: [1]
  *     responses:
  *       "201":
  *         description: ثبت نام با موفقیت انجام شد
@@ -204,27 +203,7 @@
  *         description: Enrollment ID
  *     responses:
  *       "200":
- *         description: Enrollment deleted successfully
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 status:
- *                   type: integer
- *                   example: 200
- *                 message:
- *                   type: string
- *                   example: "Enrollment deleted successfully"
- *                 data:
- *                   type: object
- *                   properties:
- *                     success:
- *                       type: boolean
- *                       example: true
- *                     message:
- *                       type: string
- *                       example: "Enrollment deleted successfully"
+ *         description: Enrollment deleted successfully 
  *       "404":
  *         description: Enrollment not found
  */

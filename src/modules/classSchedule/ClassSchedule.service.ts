@@ -48,7 +48,7 @@ const classScheduleService = {
 
             grouped[classId].sessions.push({
                 class_schedule_id: item.id,
-                register_available: item.class.capacity - item.class.enrolled_students,
+                register_available: item.classroom.capacity - item.class.enrolled_students,
                 day_of_week: item.day_of_week,
                 start_time: item.start_time,
                 end_time: item.end_time,
