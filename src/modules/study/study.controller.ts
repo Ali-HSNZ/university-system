@@ -69,7 +69,7 @@ class StudyController {
 
             if (data.name) {
                 const existStudy = await studyServices.getByName(data.name)
-                if (existStudy) throw new Error('این رشته تحصیلی قبلا ثبت شده است')
+                if (existStudy.length > 0) throw new Error('این رشته تحصیلی قبلا ثبت شده است')
 
                 const study = await studyServices.create({ name: data.name, description: data.description })
                 if (!study) throw new Error('عملیات با مشکل مواجه شد')

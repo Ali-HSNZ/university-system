@@ -19,7 +19,7 @@ const studyServices = {
     },
 
     getByName: async (name: string) => {
-        const study = await StudyModel.findAll({ where: { name: { [Op.like]: `%${name}%` } } })
+        const study = await StudyModel.findAll({ where: { name: name.trim() } })
         return study
     },
 
