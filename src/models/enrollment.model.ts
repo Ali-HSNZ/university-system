@@ -23,6 +23,14 @@ const EnrollmentModel = sequelizeConfig.define(
                 model: ClassScheduleModel,
                 key: 'id'
             }
+        },
+        status_id: {
+            type: DataTypes.INTEGER,
+            allowNull: true,
+            references: {
+                model: EnrollmentStatusModel,
+                key: 'id'
+            }
         }
     },
     { timestamps: true, freezeTableName: true }
@@ -31,6 +39,6 @@ const EnrollmentModel = sequelizeConfig.define(
 // Define associations
 EnrollmentModel.belongsTo(StudentModel, { foreignKey: 'student_id', onDelete: 'CASCADE' })
 EnrollmentModel.belongsTo(ClassScheduleModel, { foreignKey: 'class_schedule_id', onDelete: 'CASCADE' })
-EnrollmentModel.hasMany(EnrollmentStatusModel, { foreignKey: 'enrollment_id', onDelete: 'CASCADE' })
+EnrollmentModel.belongsTo(EnrollmentStatusModel, { foreignKey: 'status_id', })
 
 export { EnrollmentModel }

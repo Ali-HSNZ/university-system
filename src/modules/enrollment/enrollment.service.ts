@@ -14,16 +14,21 @@ import { ClassroomModel } from '../../models/classroom.model'
 import { ProfessorModel } from '../../models/professor.model'
 import importantDateService from '../importantDate/importantDate.service'
 import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
+import { EnrollmentStatusModel } from '../../models/enrollmentStatus.model'
 
 const enrollmentService = {
     async list() {
         const enrollments = await EnrollmentModel.findAll({
-            attributes: { exclude: ['class_schedule_id', 'student_id'] },
+            attributes: { exclude: ['class_schedule_id', 'student_id', 'status_id', 'updated_at', 'created_at'] },
             include: [
                 {
                     model: StudentModel,
                     attributes: ['id', 'student_code'],
                     include: [{ model: UserModel, attributes: ['first_name', 'last_name', 'gender', 'national_code'] }]
+                },
+                {
+                    model: EnrollmentStatusModel,
+                    attributes: { exclude: ['id', 'enrollment_id', 'updated_at', 'created_at'] }
                 },
                 {
                     model: ClassScheduleModel,
@@ -91,7 +96,7 @@ const enrollmentService = {
             if (!isCourseAllowed) {
                 const courseName = classData.dataValues.course?.name
                 const entryYear = student.dataValues.entry_year
-                
+
                 throw new Error(`${courseName} برای سال ورود ${entryYear} مجاز نیست`)
             }
 
@@ -118,10 +123,22 @@ const enrollmentService = {
 
             if (existingEnrollment) throw new Error(`دانشجو قبلا در کلاس ${classId} ثبت نام کرده است`)
 
+            // Create initial enrollment status first
+            const enrollmentStatus = await EnrollmentStatusModel.create({
+                status: 'pending_department_head',
+                comment: 'ثبت نام اولیه'
+            })
+
             // ثبت نام دانشجویی
             const enrollment = await EnrollmentModel.create({
                 student_id: studentId,
-                class_schedule_id: classScheduleId
+                class_schedule_id: classScheduleId,
+                status_id: enrollmentStatus.dataValues.id
+            })
+
+            // Update enrollment status with enrollment_id
+            await enrollmentStatus.update({
+                enrollment_id: enrollment.dataValues.id
             })
 
             // افزایش تعداد دانشجویان در کلاس
@@ -157,12 +174,39 @@ const enrollmentService = {
         }
     },
 
-    async updateEnrollmentStatus(id: number, updateData: TEnrollmentUpdateRequestBodyType) {
-        const enrollment = await EnrollmentModel.findByPk(id)
+    async updateEnrollmentStatus(id: number, updateData: TEnrollmentUpdateRequestBodyType, userId: number) {
+        const enrollment = await EnrollmentModel.findByPk(id, {
+            include: [{ model: EnrollmentStatusModel, as: 'current_status' }]
+        })
         if (!enrollment) throw new Error('ثبت نامی با این شناسه یافت نشد')
 
-        const updated = await enrollment.update(updateData)
-        return updated
+        // Create new status record with appropriate approver ID based on status
+        const statusData: any = {
+            enrollment_id: enrollment.dataValues.id,
+            status: updateData.status
+        }
+
+        const currentDate = new Date()
+
+        // Set the appropriate approver ID and comment based on the status
+        if (updateData.status.includes('department_head')) {
+            statusData.department_head_id = userId
+            statusData.department_head_comment = updateData.comment
+            statusData.department_head_decision_date = currentDate
+        } else if (updateData.status.includes('education_assistant')) {
+            statusData.education_assistant_id = userId
+            statusData.education_assistant_comment = updateData.comment
+            statusData.education_assistant_decision_date = currentDate
+        }
+
+        const newStatus = await EnrollmentStatusModel.create(statusData)
+
+        // Update enrollment with new status
+        await enrollment.update({
+            status_id: newStatus.dataValues.id
+        })
+
+        return enrollment
     },
 
     async getEnrollmentById(id: number) {

@@ -119,14 +119,18 @@ class EnrollmentController {
     }
 
     @Put('/:id/update')
-    async updateEnrollment(req: Request, res: Response, next: NextFunction) {
+    async updateEnrollment(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
             checkValidId(id)
 
+            if (!req.user?.id) {
+                throw new Error('User ID is required')
+            }
+
             await validationHandling(req.body, updateEnrollmentValidation)
 
-            const enrollment = await enrollmentService.updateEnrollmentStatus(Number(id), req.body)
+            const enrollment = await enrollmentService.updateEnrollmentStatus(Number(id), req.body, req.user.id)
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
