@@ -67,7 +67,7 @@ const studentService = {
         const student = await StudentModel.findOne({ where: { user_id } })
         return student
     },
-    getStudentDetailByUserId: async (user_id: number | undefined) => {
+    getStudentDetailByUserId: async (user_id: number | null) => {
         const student = await StudentModel.findOne({
             where: { user_id },
             include: [

@@ -45,9 +45,9 @@ class StudentController {
     @Get('/info')
     async getByUserId(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
-            const student = await studentService.getStudentDetailByUserId(req.user?.id)
+            const student = await studentService.getStudentDetailByUserId(req.user?.id || null)
 
-            if (!student) throw new Error('دانشجویی با این اطلاعات یافت نشد')
+            if (!student) throw new Error('دانشجویی با این مشخصات یافت نشد')
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
