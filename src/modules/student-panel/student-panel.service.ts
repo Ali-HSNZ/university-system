@@ -13,6 +13,7 @@ import { ProfessorModel } from '../../models/professor.model'
 import { UserModel } from '../../models/user.model'
 import { ClassroomModel } from '../../models/classroom.model'
 import { SemesterModel } from '../../models/semester.model'
+import { ImportantDateModel } from '../../models/importantDate.model'
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
@@ -332,8 +333,60 @@ const studentPanelService = {
             registered_classes_count: registeredClassesCount,
             total_units: totalUnits
         }
+    },
+
+    async importantDates({
+        entry_year,
+        department_id,
+        degree_id,
+        study_id
+    }: {
+        entry_year: number
+        department_id: number
+        degree_id: number
+        study_id: number
+    }) {
+        const importantDates = await ImportantDateModel.findAll({
+            where: { entry_year, department_id, degree_id, study_id },
+            attributes: ['type', 'start_date', 'end_date']
+        })
+
+        const nowMoment = moment()
+
+        const typeDictionary: Record<string, string> = {
+            enrollment: 'انتخاب واحد',
+            add_drop: 'حذف و اضافه'
+        }
+
+        return importantDates.map((date) => {
+            const startMoment = moment(date.dataValues.start_date, 'jYYYY-jMM-jDDTHH:mm')
+            const endMoment = moment(date.dataValues.end_date, 'jYYYY-jMM-jDDTHH:mm')
+
+            let status = 'not_started'
+            if (nowMoment.isSameOrAfter(startMoment) && nowMoment.isSameOrBefore(endMoment)) {
+                status = 'in_progress'
+            } else if (nowMoment.isAfter(endMoment)) {
+                status = 'ended'
+            }
+
+            const startData = {
+                date: date.dataValues.start_date.split('T')[0].replaceAll('-', '/'),
+                time: date.dataValues.start_date.split('T')[1]
+            }
+
+            const endData = {
+                date: date.dataValues.end_date.split('T')[0].replaceAll('-', '/'),
+                time: date.dataValues.end_date.split('T')[1]
+            }
+
+            return {
+                type: typeDictionary[date.dataValues.type] || date.dataValues.type,
+                start_date: startData,
+                end_date: endData,
+                status: status
+            }
+        })
     }
 }
 
 export default studentPanelService
-

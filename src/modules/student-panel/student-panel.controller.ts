@@ -10,7 +10,7 @@ import semesterService from '../semester/semester.service'
 
 @Controller('/student-panel')
 class StudentPanelController {
-    @Get('/view-profile')
+    @Get('/profile')
     async viewProfile(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {
             const student = await studentService.getByUserId(req.user?.id)
@@ -31,6 +31,35 @@ class StudentPanelController {
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
                 data: studentProfile
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/important-dates')
+    async importantDates(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const existingStudent = await studentService.getByUserId(req.user?.id)
+
+            if (!existingStudent) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'دانشجویی یافت نشد'
+                })
+            }
+
+            const data = await studentPanelService.importantDates({
+                entry_year: existingStudent.dataValues.entry_year,
+                department_id: existingStudent.dataValues.department_id,
+                degree_id: existingStudent.dataValues.degree_id,
+                study_id: existingStudent.dataValues.study_id
+            })
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data
             })
         } catch (error) {
             next(error)
