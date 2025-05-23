@@ -91,7 +91,6 @@
  *     tags: [Enrollment]
  *     summary: Create a new enrollment
  *     description: |
- *       - student_id: شناسه دانشجو
  *       - class_schedule_ids: شناسه برنامه جلسه
  *       - status: وضعیت ثبت نام
  *          - pending: درحال بررسی
@@ -104,13 +103,8 @@
  *           schema:
  *             type: object
  *             required:
- *               - student_id
  *               - class_schedule_ids
  *             properties:
- *               student_id:
- *                 type: integer
- *                 description: شناسه دانشجو
- *                 example: 1
  *               class_schedule_ids:
  *                 type: array
  *                 description: شناسه برنامه جلسه
@@ -203,7 +197,7 @@
  *         description: Enrollment ID
  *     responses:
  *       "200":
- *         description: Enrollment deleted successfully 
+ *         description: Enrollment deleted successfully
  *       "404":
  *         description: Enrollment not found
  */

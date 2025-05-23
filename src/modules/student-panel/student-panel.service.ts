@@ -14,9 +14,25 @@ import { UserModel } from '../../models/user.model'
 import { ClassroomModel } from '../../models/classroom.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ImportantDateModel } from '../../models/importantDate.model'
-import { HighSchoolDiplomaModel } from '../../models/highSchoolDiploma.model'
 import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
 import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
+import { APP_ENV } from '../../core/config/dotenv.config'
+
+const PROTOCOL = APP_ENV.application.protocol
+const HOST = APP_ENV.application.host
+const PORT = APP_ENV.application.port
+
+const BASE_URL = `${PROTOCOL}://${HOST}:${PORT}`
+
+const dayOfWeekDictionary: Record<string, string> = {
+    '0': 'شنبه',
+    '1': 'یکشنبه',
+    '2': 'دوشنبه',
+    '3': 'سه شنبه',
+    '4': 'چهارشنبه',
+    '5': 'پنج شنبه',
+    '6': 'جمعه'
+}
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
@@ -72,6 +88,111 @@ const studentPanelService = {
         }
     },
 
+    async allowedEnrollmentCourses(studentDTO: TStudentType) {
+        // Get student's entry year courses
+        const entryYearCourses = await entryYearCourseService.groupeByEntryYear(studentDTO.entry_year)
+        const allEntryYearCourses = entryYearCourses[0].courses
+
+        // Get student's current enrollments
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentDTO.id },
+            include: [
+                {
+                    model: ClassScheduleModel,
+                    include: [
+                        {
+                            model: ClassModel,
+                            include: [{ model: CourseModel }]
+                        },
+                        {
+                            model: SemesterModel,
+                            attributes: ['id', 'academic_year', 'term_number', 'status']
+                        }
+                    ]
+                }
+            ]
+        })
+
+        // Get IDs of courses student has already enrolled in
+        const enrolledCourseIds = new Set(
+            enrollments.map((enrollment: any) => enrollment.dataValues.class_schedule.class.course.id)
+        )
+
+        // Filter out courses that student has already enrolled in
+        const allowedCourses = allEntryYearCourses.filter((course) => !enrolledCourseIds.has(course.id))
+
+        // Get detailed information for each allowed course
+        const coursesWithDetails = await Promise.all(
+            allowedCourses.map(async (course) => {
+                // Get class schedules for this course
+                const classSchedules = await ClassScheduleModel.findAll({
+                    include: [
+                        {
+                            model: ClassModel,
+                            where: { course_id: course.id },
+                            include: [{ model: CourseModel }]
+                        },
+                        {
+                            model: ProfessorModel,
+                            include: [{ model: UserModel, attributes: ['first_name', 'last_name', 'avatar'] }]
+                        },
+                        {
+                            model: ClassroomModel,
+                            attributes: ['name', 'building_name', 'floor_number', 'capacity']
+                        },
+                        {
+                            model: SemesterModel,
+                            where: { status: 'active' },
+                            attributes: ['id', 'academic_year', 'term_number']
+                        }
+                    ]
+                })
+
+                // Format class schedules
+                const schedules = classSchedules.map((schedule: any) => {
+                    const classroomCapacity = schedule.classroom.capacity
+                    const enrolledStudents = schedule.class.enrolled_students
+                    const availableSpots = classroomCapacity - enrolledStudents
+
+                    return {
+                        id: schedule.id,
+                        class_id: schedule.class.id,
+                        professor: {
+                            name: `${schedule.professor.user.first_name} ${schedule.professor.user.last_name}`,
+                            type: schedule.professor.type || 'عادی',
+                            avatar: `${BASE_URL}${schedule.professor.user.avatar}`
+                        },
+                        classroom: {
+                            name: schedule.classroom.name,
+                            building: schedule.classroom.building_name,
+                            floor:
+                                schedule.classroom.floor_number === '0'
+                                    ? 'همکف'
+                                    : `طبقه ${schedule.classroom.floor_number}`,
+                            capacity: classroomCapacity,
+                            enrolled_students: enrolledStudents,
+                            available_spots: availableSpots
+                        },
+                        day_of_week: dayOfWeekDictionary[schedule.day_of_week],
+                        start_time: schedule.start_time.substring(0, 5),
+                        end_time: schedule.end_time.substring(0, 5)
+                    }
+                })
+
+                return {
+                    course_name: course.name,
+                    course_code: course.code,
+                    course_unit: Number(course.theoretical_units) + Number(course.practical_units) || 0,
+                    prerequisites: course.prerequisites || [],
+                    corequisites: course.corequisites || [],
+                    schedules
+                }
+            })
+        )
+
+        return coursesWithDetails
+    },
+
     async enrollmentStatus(studentDTO: TStudentType) {
         const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
         const study = await studyServices.getStudyNameById(studentDTO.study_id)
@@ -83,6 +204,8 @@ const studentPanelService = {
             degree_id: studentDTO.degree_id,
             study_id: studentDTO.study_id
         })
+
+        const class_list = await this.allowedEnrollmentCourses(studentDTO)
 
         const semesterYear = enrolmentStatusTime?.start_date?.date.split('/')[0]
         const semesterMonth = Number(enrolmentStatusTime?.start_date?.date.split('/')[1])
@@ -107,7 +230,8 @@ const studentPanelService = {
                 study: study?.dataValues?.name,
                 department: department?.dataValues?.name
             },
-            enrolment_status_time: enrolmentStatusTime
+            enrolment_status_time: enrolmentStatusTime,
+            class_list
         }
     },
 
@@ -131,16 +255,6 @@ const studentPanelService = {
                 }
             ]
         })
-
-        const dayOfWeekDictionary: Record<string, string> = {
-            '0': 'شنبه',
-            '1': 'یکشنبه',
-            '2': 'دوشنبه',
-            '3': 'سه شنبه',
-            '4': 'چهارشنبه',
-            '5': 'پنج شنبه',
-            '6': 'جمعه'
-        }
 
         const serializedEnrollments = enrollments.map((enrollment: any) => {
             const classSchedule = enrollment.dataValues.class_schedule
@@ -605,8 +719,6 @@ const studentPanelService = {
             })
 
             const semester = latestEnrollment.dataValues.class_schedule.semester
-
-            console.log('semester: ', semester)
 
             const isActiveSemester = semester.status === 'active'
 

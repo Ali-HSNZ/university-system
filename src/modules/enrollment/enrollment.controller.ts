@@ -107,7 +107,10 @@ class EnrollmentController {
                 })
             }
 
-            await enrollmentService.createEnrollment(req.body)
+            await enrollmentService.createEnrollment({
+                class_schedule_ids: req.body.class_schedule_ids,
+                student_id: student.dataValues.id
+            })
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,

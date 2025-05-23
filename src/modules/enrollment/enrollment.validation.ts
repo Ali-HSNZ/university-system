@@ -2,11 +2,6 @@ import * as yup from 'yup'
 import { TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType } from './enrollment.types'
 
 const createEnrollmentValidation = yup.object<TEnrollmentRequestBodyType>().shape({
-    student_id: yup
-        .number()
-        .integer('شناسه دانشجو بایستی یک عدد صحیح باشد')
-        .positive('شناسه دانشجو بایستی یک عدد صحیح مثبت باشد')
-        .required('شناسه دانشجو الزامی است'),
     class_schedule_ids: yup
         .array()
         .of(
