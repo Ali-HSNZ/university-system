@@ -72,6 +72,45 @@ const studentPanelService = {
         }
     },
 
+    async enrollmentStatus(studentDTO: TStudentType) {
+        const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
+        const study = await studyServices.getStudyNameById(studentDTO.study_id)
+        const department = await departmentServices.getDepartmentNameById(studentDTO.department_id)
+
+        const enrolmentStatusTime = await this.enrolmentStatusTime({
+            entry_year: studentDTO.entry_year,
+            department_id: studentDTO.department_id,
+            degree_id: studentDTO.degree_id,
+            study_id: studentDTO.study_id
+        })
+
+        const semesterYear = enrolmentStatusTime?.start_date?.date.split('/')[0]
+        const semesterMonth = Number(enrolmentStatusTime?.start_date?.date.split('/')[1])
+
+        let semesterTitle = ''
+
+        if (semesterMonth >= 11 || semesterMonth === 12 || semesterMonth === 1) {
+            semesterTitle = 'ترم بهار'
+        } else if (semesterMonth >= 2 && semesterMonth <= 3) {
+            semesterTitle = 'ترم بهار'
+        } else if (semesterMonth >= 4 && semesterMonth <= 6) {
+            semesterTitle = 'ترم تابستان'
+        } else if (semesterMonth >= 7 && semesterMonth <= 10) {
+            semesterTitle = 'ترم پاییز'
+        }
+
+        return {
+            title: `${semesterTitle} ${semesterYear} - دانشکده مهندسی`,
+            student_information: {
+                entry_year: studentDTO.entry_year?.toString(),
+                degree: degree?.dataValues?.name,
+                study: study?.dataValues?.name,
+                department: department?.dataValues?.name
+            },
+            enrolment_status_time: enrolmentStatusTime
+        }
+    },
+
     async weeklySchedule(studentDTO: TStudentType) {
         const enrollments = await EnrollmentModel.findAll({
             where: { student_id: studentDTO.id },
@@ -478,7 +517,28 @@ const studentPanelService = {
         })
     },
 
-    async requiredCourses(studentDTO: TStudentType ) {
+    async enrolmentStatusTime(payload: {
+        entry_year: number
+        department_id: number
+        degree_id: number
+        study_id: number
+    }) {
+        const importantDates = await this.importantDates(payload)
+
+        const existingEnrolmentStatusTime = importantDates.find((date) => date.type === 'انتخاب واحد')
+
+        if (existingEnrolmentStatusTime) {
+            return {
+                start_date: existingEnrolmentStatusTime.start_date,
+                end_date: existingEnrolmentStatusTime.end_date,
+                status: existingEnrolmentStatusTime.status
+            }
+        }
+
+        return null
+    },
+
+    async requiredCourses(studentDTO: TStudentType) {
         const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
         const study = await studyServices.getStudyNameById(studentDTO.study_id)
         const department = await departmentServices.getDepartmentNameById(studentDTO.department_id)
