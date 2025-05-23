@@ -14,6 +14,21 @@
  */
 
 /**
+ *  @swagger
+ * /student-panel/required-courses:
+ *   get:
+ *     tags: [Student Panel]
+ *     description: Get student required courses
+ *     responses:
+ *       200:
+ *         description: Successfully retrieved student required courses
+ *       400:
+ *         description: Bad request
+ *       500:
+ *         description: Server error
+ */
+
+/**
  * @swagger
  * /student-panel/important-dates:
  *   get:

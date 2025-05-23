@@ -16,6 +16,7 @@ import { SemesterModel } from '../../models/semester.model'
 import { ImportantDateModel } from '../../models/importantDate.model'
 import { HighSchoolDiplomaModel } from '../../models/highSchoolDiploma.model'
 import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
+import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
 
 const studentPanelService = {
     async profile({ studentDTO, userDTO }: { studentDTO: TStudentType; userDTO: TUserType }) {
@@ -36,8 +37,6 @@ const studentPanelService = {
         const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
         const study = await studyServices.getStudyNameById(studentDTO.study_id)
         const department = await departmentServices.getDepartmentNameById(studentDTO.department_id)
-
-
 
         const highSchoolDiploma = await highSchoolDiplomaServices.getHighSchoolDiplomaById(
             studentDTO.high_school_diploma_id
@@ -477,7 +476,105 @@ const studentPanelService = {
                 status: status
             }
         })
+    },
+
+    async requiredCourses(studentDTO: TStudentType ) {
+        const degree = await degreeServices.getDegreeNameById(studentDTO.degree_id)
+        const study = await studyServices.getStudyNameById(studentDTO.study_id)
+        const department = await departmentServices.getDepartmentNameById(studentDTO.department_id)
+
+        // Get student's entry year as string (e.g., 1402)
+        const entryYear = String(studentDTO.entry_year)
+
+        // Get all enrollments for the student
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentDTO.id },
+            include: [
+                {
+                    model: ClassScheduleModel,
+                    include: [
+                        {
+                            model: ClassModel,
+                            include: [{ model: CourseModel }]
+                        },
+                        {
+                            model: SemesterModel,
+                            attributes: ['id', 'academic_year', 'term_number', 'status']
+                        }
+                    ]
+                }
+            ]
+        })
+
+        // Filter enrollments to only those in entry year
+        const entryYearEnrollments = enrollments.filter((enrollment: any) => {
+            const semester = enrollment.dataValues.class_schedule.semester
+            return semester && semester.academic_year.startsWith(entryYear)
+        })
+
+        // const allCourses = await CourseModel.findAll()
+        const entryYearCourses = await entryYearCourseService.groupeByEntryYear(studentDTO.entry_year)
+
+        const allCourses = entryYearCourses[0].courses
+
+        // Create a map of course statuses
+        const courseStatuses = allCourses.map((course) => {
+            const courseEnrollments = entryYearEnrollments.filter(
+                (enrollment) => enrollment.dataValues.class_schedule.class.course.id === course.id
+            )
+
+            if (courseEnrollments.length === 0) {
+                return {
+                    course_name: course.name,
+                    course_code: course.code,
+                    course_unit: course.theoretical_units + course.practical_units,
+                    status: 'not_taken',
+                    status_text: 'هنوز در انتخاب واحد آن درس را بر نداشته است',
+                    semester: null
+                }
+            }
+
+            // Get the latest enrollment for this course
+            const latestEnrollment = courseEnrollments.reduce((latest, current) => {
+                const latestSemester = latest.dataValues.class_schedule.semester
+                const currentSemester = current.dataValues.class_schedule.semester
+
+                if (latestSemester.academic_year > currentSemester.academic_year) return latest
+                if (latestSemester.academic_year < currentSemester.academic_year) return current
+                return latestSemester.term_number > currentSemester.term_number ? latest : current
+            })
+
+            const semester = latestEnrollment.dataValues.class_schedule.semester
+
+            console.log('semester: ', semester)
+
+            const isActiveSemester = semester.status === 'active'
+
+            return {
+                course_name: course.name,
+                course_code: course.code,
+                course_unit: Number(course.theoretical_units) + Number(course.practical_units) || 0,
+                status: isActiveSemester ? 'progress' : 'taken',
+                status_text: isActiveSemester ? 'در حال گذراندن درس' : 'درس را اخذ کرده است',
+                semester: {
+                    academic_year: semester.academic_year,
+                    term_text: semester.term_number === '1' ? 'نیمسال اول' : 'نیمسال دوم'
+                }
+            }
+        })
+
+        return {
+            courses: courseStatuses,
+            student_information: {
+                entry_year: studentDTO.entry_year?.toString(),
+                degree: degree?.dataValues?.name,
+                study: study?.dataValues?.name,
+                department: department?.dataValues?.name,
+                total_units: courseStatuses.reduce((acc, course) => acc + (course.course_unit || 0), 0)
+            }
+        }
     }
 }
 
 export default studentPanelService
+

@@ -23,13 +23,14 @@ const entryYearCourseService = {
 
         return !!entryYearCourse
     },
-    async list() {
+    async list(year?: number | null) {
         const rawResult = await EntryYearCourseModel.findAll({
             include: [
                 { model: CourseModel },
                 {
                     model: EntryYearModel,
                     attributes: ['id', 'year'],
+                    where: year ? { year } : undefined,
                     include: [
                         { model: DepartmentModel, attributes: ['id', 'name'] },
                         { model: DegreeModel, attributes: ['id', 'name'] },
@@ -44,8 +45,8 @@ const entryYearCourseService = {
         return rawResult
     },
 
-    async groupeByEntryYear() {
-        const rawResult = await this.list()
+    async groupeByEntryYear(year?: number | null) {
+        const rawResult = await this.list(year)
         const allCourses = await courseService.getAll()
 
         const grouped: TEntryYearCourseGroupedType[] = Object.values(
