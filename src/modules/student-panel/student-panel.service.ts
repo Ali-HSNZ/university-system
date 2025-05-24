@@ -17,6 +17,7 @@ import { ImportantDateModel } from '../../models/importantDate.model'
 import highSchoolDiplomaServices from '../highSchoolDiploma/highSchoolDiploma.service'
 import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
 import { APP_ENV } from '../../core/config/dotenv.config'
+import { EnrollmentStatusModel } from '../../models/enrollmentStatus.model'
 
 const PROTOCOL = APP_ENV.application.protocol
 const HOST = APP_ENV.application.host
@@ -383,10 +384,13 @@ const studentPanelService = {
             where: { student_id: studentDTO.id },
             include: [
                 {
+                    model: EnrollmentStatusModel
+                },
+                {
                     model: ClassScheduleModel,
                     include: [
                         {
-                            model: require('../../models/semester.model').SemesterModel,
+                            model: SemesterModel,
                             attributes: ['id', 'academic_year', 'term_number', 'start_date', 'end_date', 'status']
                         },
                         {
@@ -398,22 +402,58 @@ const studentPanelService = {
             ]
         })
 
+        const enrollmentStatusesDictionary: Record<string, { status_title: string; status: string; message?: string }> =
+            {
+                pending_department_head: {
+                    status_title: 'انتظار تایید از مدیر گروه',
+                    status: 'pending',
+                    message: 'درخواست شما در انتظار بررسی توسط مدیر گروه می‌باشد'
+                },
+                pending_education_assistant: {
+                    status_title: 'انتظار تایید از معاون آموزشی',
+                    status: 'pending',
+                    message: 'درخواست شما در انتظار بررسی توسط معاون آموزشی می‌باشد'
+                },
+                approved_by_department_head: {
+                    status_title: 'تایید از مدیر گروه',
+                    status: 'approved',
+                    message: 'درخواست شما توسط مدیر گروه تایید شده است - در انتظار تایید معاون آموزشی'
+                },
+                // approved_by_education_assistant: {
+                //     status_title: 'تایید از معاون آموزشی',
+                //     status: 'approved',
+                //     message: 'درخواست شما توسط معاون آموزشی تایید شده است - در انتظار تایید مدیر گروه'
+                // },
+                rejected_by_department_head: {
+                    status_title: 'رد از مدیر گروه',
+                    status: 'rejected',
+                    message: 'جهت تکمیل درخواست خود با مدیر گروه تماس بگیرید'
+                },
+                rejected_by_education_assistant: {
+                    status_title: 'رد از معاون آموزشی',
+                    status: 'rejected',
+                    message: 'جهت تکمیل درخواست خود با معاون آموزشی تماس بگیرید'
+                }
+            }
+
         const semesters: any = {}
         enrollments.forEach((enrollment: any) => {
             const schedule = enrollment.class_schedule
             const semester = schedule?.semester
             const course = schedule?.class?.course
+            const enrollmentStatus = enrollment.enrollment_status
             if (!semester) return
+
             if (!semesters[semester.id]) {
                 semesters[semester.id] = {
                     id: semester.id,
                     academic_year: semester.academic_year,
                     year: semester.academic_year.split('-')[0],
                     term_number: semester.term_number,
-                    start_date: semester.start_date,
-                    end_date: semester.end_date,
+                    start_date: semester.start_date.replaceAll('-', '/'),
+                    end_date: semester.end_date.replaceAll('-', '/'),
                     status: semester.status,
-                    courses: []
+                    courses: [],
                 }
             }
             if (course) {
@@ -422,7 +462,8 @@ const studentPanelService = {
                     name: course.name,
                     code: course.code,
                     theoretical_units: course.theoretical_units,
-                    practical_units: course.practical_units
+                    practical_units: course.practical_units,
+                    enrollment_status: enrollmentStatusesDictionary[enrollmentStatus?.status] || null
                 })
             }
         })
@@ -749,4 +790,5 @@ const studentPanelService = {
 }
 
 export default studentPanelService
+
 
