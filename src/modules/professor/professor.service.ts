@@ -44,15 +44,21 @@ const professorService = {
             return professor
         })
     },
-    checkExist: async (id: string|number | undefined) => {
+    checkExist: async (id: string | number | undefined) => {
         if (!id) return false
 
         const professor = await ProfessorModel.findByPk(id)
         return !!professor
     },
-    checkExistByUserId: async (user_id: number) => {
+    checkExistByUserId: async (user_id: number | undefined) => {
+        if (!user_id) return false
         const professor = await ProfessorModel.findOne({ where: { user_id } })
         return !!professor
+    },
+    getByUserId: async (user_id: number | undefined) => {
+        if (!user_id) return null
+        const professor = await ProfessorModel.findOne({ where: { user_id } })
+        return professor
     },
     delete: async (id: number) => {
         const professor = await ProfessorModel.destroy({ where: { id } })

@@ -9,6 +9,7 @@
  *   - name: Department Head
  *   - name: University President
  *   - name: Student Panel
+ *   - name: Professor Panel
  *   - name: Course
  *     description: مدیریت دروس
  *   - name: Class

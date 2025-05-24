@@ -21,3 +21,4 @@ import './modules/study/study.controller'
 import './modules/classroom/classroom.controller'
 // panel
 import './modules/student-panel/student-panel.controller'
+import './modules/professor-panel/professor-panel.controller'
