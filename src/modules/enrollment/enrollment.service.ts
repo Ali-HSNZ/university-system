@@ -282,6 +282,7 @@ const enrollmentService = {
             }
         }
 
+        await EnrollmentStatusModel.destroy({ where: { enrollment_id: id } })
         await enrollment.destroy()
         return true
     },
