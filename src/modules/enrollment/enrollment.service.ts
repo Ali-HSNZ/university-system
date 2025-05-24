@@ -15,6 +15,7 @@ import { ProfessorModel } from '../../models/professor.model'
 import importantDateService from '../importantDate/importantDate.service'
 import entryYearCourseService from '../entryYearCourse/entryYearCourse.service'
 import { EnrollmentStatusModel } from '../../models/enrollmentStatus.model'
+import { Op } from 'sequelize'
 
 const enrollmentService = {
     async list() {
@@ -100,14 +101,121 @@ const enrollmentService = {
                 throw new Error(`${courseName} برای سال ورود ${entryYear} مجاز نیست`)
             }
 
+            // Get course details
+            const courseId = classData.dataValues.course_id
+            const course = await CourseModel.findByPk(courseId)
+            if (!course) throw new Error('درس مورد نظر یافت نشد')
+
+            // Get student's passed courses
+            const studentEnrollments = await EnrollmentModel.findAll({
+                where: { student_id: studentId },
+                include: [
+                    {
+                        model: ClassScheduleModel,
+                        include: [
+                            {
+                                model: ClassModel,
+                                include: [{ model: CourseModel }]
+                            }
+                        ]
+                    }
+                ]
+            })
+
+            // Get list of passed course codes
+            const passedCourseCodes = studentEnrollments.map(
+                (enrollment) => enrollment.dataValues.class_schedule.class.course.dataValues.code
+            )
+
+            // Get current enrollment requests from the same request
+            const currentRequestSchedules = await ClassScheduleModel.findAll({
+                where: {
+                    id: {
+                        [Op.in]: enrollmentData.class_schedule_ids.map((id) => Number(id))
+                    }
+                },
+                include: [
+                    {
+                        model: ClassModel,
+                        include: [{ model: CourseModel }]
+                    }
+                ]
+            })
+
+            const currentRequestCodes = currentRequestSchedules
+                .filter((schedule) => schedule.dataValues.class?.course)
+                .map((schedule) => schedule.dataValues.class.course.dataValues.code)
+
+            // Combine passed courses with current request courses
+            const allCourseCodes = [...passedCourseCodes, ...currentRequestCodes]
+
+            // Parse prerequisites and corequisites codes
+            let prerequisitesCodes: string[] = []
+            let corequisitesCodes: string[] = []
+            try {
+                prerequisitesCodes = course.dataValues.prerequisites
+                corequisitesCodes = course.dataValues.corequisites
+            } catch (err) {
+                prerequisitesCodes = []
+                corequisitesCodes = []
+            }
+
+            // Get prerequisite course codes
+            const prerequisiteCourses = await CourseModel.findAll({
+                where: {
+                    code: {
+                        [Op.in]: prerequisitesCodes
+                    }
+                },
+                attributes: ['id', 'name', 'code']
+            })
+
+            // Check if student has passed all prerequisites or is enrolling in them now
+            const missingPrerequisites = prerequisiteCourses.filter(
+                (prerequisite) => !allCourseCodes.includes(prerequisite.dataValues.code)
+            )
+
+            if (missingPrerequisites.length > 0) {
+                const prerequisiteNames = missingPrerequisites.map((c) => c.dataValues.name).join('، ')
+                throw new Error(
+                    `برای ثبت نام در درس ${course.dataValues.name} ابتدا باید درس‌${
+                        missingPrerequisites.length > 1 ? 'های' : ''
+                    } ${prerequisiteNames} را پاس کرده باشید یا همزمان انتخاب کنید`
+                )
+            }
+
+            // Get corequisite course codes
+            const corequisiteCourses = await CourseModel.findAll({
+                where: {
+                    code: {
+                        [Op.in]: corequisitesCodes
+                    }
+                },
+                attributes: ['id', 'name', 'code']
+            })
+
+            // Check if student is enrolled in all corequisites
+            const missingCorequisites = corequisiteCourses.filter(
+                (corequisite) => !allCourseCodes.includes(corequisite.dataValues.code)
+            )
+
+            if (missingCorequisites.length > 0) {
+                const corequisiteNames = missingCorequisites.map((c) => c.dataValues.name).join('، ')
+                throw new Error(
+                    `برای ثبت نام در درس ${course.dataValues.name} باید همزمان درس‌${
+                        missingCorequisites.length > 1 ? 'های' : ''
+                    } ${corequisiteNames} را نیز بردارید`
+                )
+            }
+
             // بررسی وضعیت کلاس
             if (classData.dataValues.status !== 'open') {
-                throw new Error(`کلاس ${classId} برای ثبت نام باز نیست`)
+                throw new Error(`کلاس ${classData.dataValues.course.dataValues.name} برای ثبت نام باز نیست`)
             }
 
             // بررسی ظرفیت کلاس
             if (classData.dataValues.enrolled_students >= classData.dataValues.capacity) {
-                throw new Error(`کلاس ${classId} به حداکثر ظرفیت خود رسیده است`)
+                throw new Error(`کلاس درس ${classData.dataValues.course.dataValues.name} به حداکثر ظرفیت خود رسیده است`)
             }
 
             // بررسی ثبت نام دانشجویی در این برنامه جلسه
@@ -121,7 +229,8 @@ const enrollmentService = {
             // check student is enrolled in this class or course
             await this.checkEnrollmentOfClass(studentId, classId)
 
-            if (existingEnrollment) throw new Error(`دانشجو قبلا در کلاس ${classId} ثبت نام کرده است`)
+            if (existingEnrollment)
+                throw new Error(`دانشجو قبلا در کلاس ${classData.dataValues.course.dataValues.name} ثبت نام کرده است`)
 
             // Create initial enrollment status first
             const enrollmentStatus = await EnrollmentStatusModel.create({
