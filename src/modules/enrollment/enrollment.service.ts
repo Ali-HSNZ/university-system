@@ -178,9 +178,9 @@ const enrollmentService = {
             if (missingPrerequisites.length > 0) {
                 const prerequisiteNames = missingPrerequisites.map((c) => c.dataValues.name).join('، ')
                 throw new Error(
-                    `برای ثبت نام در درس ${course.dataValues.name} ابتدا باید درس‌${
+                    `برای ثبت نام در درس "${course.dataValues.name}" ابتدا باید درس‌${
                         missingPrerequisites.length > 1 ? 'های' : ''
-                    } ${prerequisiteNames} را پاس کرده باشید یا همزمان انتخاب کنید`
+                    } "${prerequisiteNames}" را پاس کرده باشید یا همزمان انتخاب کنید`
                 )
             }
 
@@ -202,9 +202,9 @@ const enrollmentService = {
             if (missingCorequisites.length > 0) {
                 const corequisiteNames = missingCorequisites.map((c) => c.dataValues.name).join('، ')
                 throw new Error(
-                    `برای ثبت نام در درس ${course.dataValues.name} باید همزمان درس‌${
+                    `برای ثبت نام در درس "${course.dataValues.name}" باید همزمان درس‌${
                         missingCorequisites.length > 1 ? 'های' : ''
-                    } ${corequisiteNames} را نیز بردارید`
+                    } "${corequisiteNames}" را نیز بردارید`
                 )
             }
 

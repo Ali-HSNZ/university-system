@@ -16,8 +16,8 @@ type TEntryYearCourseGroupedType = {
         theoretical_units: number
         practical_units: number
         type: string
-        prerequisites: string
-        corequisites: string
+        prerequisites: string[]
+        corequisites: string[]
     }[]
 }
 

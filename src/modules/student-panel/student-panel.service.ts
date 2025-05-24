@@ -757,12 +757,17 @@ const studentPanelService = {
                 (enrollment) => enrollment.dataValues.class_schedule.class.course.id === course.id
             )
 
+            const courseCorequisites = course.corequisites.map((e: any) => e.name) || []
+            const coursePrerequisites = course.prerequisites.map((e: any) => e.name) || []
+
             if (courseEnrollments.length === 0) {
                 return {
                     course_name: course.name,
                     course_code: course.code,
                     course_unit: course.theoretical_units + course.practical_units,
                     status: 'not_taken',
+                    prerequisites: coursePrerequisites,
+                    corequisites: courseCorequisites,
                     status_text: 'هنوز در انتخاب واحد آن درس را بر نداشته است',
                     semester: null
                 }
@@ -785,6 +790,8 @@ const studentPanelService = {
             return {
                 course_name: course.name,
                 course_code: course.code,
+                corequisites: courseCorequisites,
+                prerequisites: coursePrerequisites,
                 course_unit: Number(course.theoretical_units) + Number(course.practical_units) || 0,
                 status: isActiveSemester ? 'progress' : 'taken',
                 status_text: isActiveSemester ? 'در حال گذراندن درس' : 'درس را اخذ کرده است',
@@ -795,8 +802,19 @@ const studentPanelService = {
             }
         })
 
+        // Sort courses by status using Map for better performance
+        const statusPriority = new Map([
+            ['progress', 0],
+            ['taken', 1],
+            ['not_taken', 2]
+        ])
+
+        const sortedCourseStatuses = courseStatuses.sort(
+            (a, b) => (statusPriority.get(a.status) || 0) - (statusPriority.get(b.status) || 0)
+        )
+
         return {
-            courses: courseStatuses,
+            courses: sortedCourseStatuses,
             student_information: {
                 entry_year: studentDTO.entry_year?.toString(),
                 degree: degree?.dataValues?.name,
