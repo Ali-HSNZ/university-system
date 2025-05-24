@@ -453,7 +453,7 @@ const studentPanelService = {
                     start_date: semester.start_date.replaceAll('-', '/'),
                     end_date: semester.end_date.replaceAll('-', '/'),
                     status: semester.status,
-                    courses: [],
+                    courses: []
                 }
             }
             if (course) {
@@ -680,13 +680,32 @@ const studentPanelService = {
     }) {
         const importantDates = await this.importantDates(payload)
 
-        const existingEnrolmentStatusTime = importantDates.find((date) => date.type === 'انتخاب واحد')
+        const enrollmentTimes = importantDates.filter((date) => date.type === 'انتخاب واحد')
 
-        if (existingEnrolmentStatusTime) {
+        if (enrollmentTimes.length > 0) {
+            // Find the active enrollment time
+            const activeEnrollmentTime = enrollmentTimes.find((time) => time.status === 'in_progress')
+
+            // If there's an active enrollment time, return it
+            if (activeEnrollmentTime) {
+                return {
+                    start_date: activeEnrollmentTime.start_date,
+                    end_date: activeEnrollmentTime.end_date,
+                    status: activeEnrollmentTime.status
+                }
+            }
+
+            // If no active enrollment time, return the most recent one
+            const sortedTimes = enrollmentTimes.sort((a, b) => {
+                const aDate = moment(a.start_date.date, 'jYYYY/jMM/jDD')
+                const bDate = moment(b.start_date.date, 'jYYYY/jMM/jDD')
+                return bDate.valueOf() - aDate.valueOf()
+            })
+
             return {
-                start_date: existingEnrolmentStatusTime.start_date,
-                end_date: existingEnrolmentStatusTime.end_date,
-                status: existingEnrolmentStatusTime.status
+                start_date: sortedTimes[0].start_date,
+                end_date: sortedTimes[0].end_date,
+                status: sortedTimes[0].status
             }
         }
 
@@ -790,5 +809,4 @@ const studentPanelService = {
 }
 
 export default studentPanelService
-
 
