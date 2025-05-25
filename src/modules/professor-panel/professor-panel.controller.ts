@@ -4,6 +4,8 @@ import professorPanelService from './professor-panel.service'
 import httpStatus from 'http-status'
 import professorService from '../professor/professor.service'
 import { TAuthenticatedRequestType } from '../../core/types/auth'
+import { TUserType } from '../../core/types/user'
+import { TProfessorType } from '../../core/types/professor'
 
 interface ISemesterGroup {
     academic_year: string
@@ -25,6 +27,33 @@ interface ISemesterGroups {
 
 @Controller('/professor-panel')
 export class ProfessorPanelController {
+    @Get('/profile')
+    async viewProfile(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const professor = await professorService.getByUserId(req.user?.id)
+
+            if (!professor) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'داده ای یافت نشد'
+                })
+            }
+
+            const professorProfile = await professorPanelService.profile({
+                professorDTO: professor as unknown as TProfessorType,
+                userDTO: req.user as TUserType
+            })
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: professorProfile
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     @Get('/class-list')
     async getClasses(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {

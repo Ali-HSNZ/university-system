@@ -4,6 +4,7 @@ import { UserModel } from './user.model'
 import { DepartmentModel } from './department.model'
 import { DegreeModel } from './degree.model'
 import { APP_ENV } from '../core/config/dotenv.config'
+import { StudyModel } from './study.model'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -23,6 +24,7 @@ const ProfessorModel = sequelizeConfig.define(
         hire_date: { type: DataTypes.DATEONLY, allowNull: false },
         specialization: { type: DataTypes.STRING(255), allowNull: true },
         office_phone: { type: DataTypes.STRING(11), allowNull: true },
+        study_id: { type: DataTypes.INTEGER, allowNull: false },
         office_address: { type: DataTypes.STRING(255), allowNull: true },
         degree_id: { type: DataTypes.INTEGER, allowNull: true },
         cv_file: { type: DataTypes.STRING(255), allowNull: true },
@@ -41,6 +43,7 @@ const ProfessorModel = sequelizeConfig.define(
 ProfessorModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
 ProfessorModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 ProfessorModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
+ProfessorModel.belongsTo(StudyModel, { foreignKey: 'study_id', onDelete: 'CASCADE' })
 
 ProfessorModel.addHook('afterFind', (result) => {
     if (!result) return
