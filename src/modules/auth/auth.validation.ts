@@ -243,19 +243,19 @@ const registerDepartmentHeadValidation = Yup.object({
     national_card_image: validateFile({
         title: 'کارت ملی',
         uniqueTitle: 'check-auth-department-head-national-card-image',
-        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
         maxSize: 10 * 1024 * 1024
     }),
     birth_certificate_image: validateFile({
         title: 'شناسنامه',
         uniqueTitle: 'check-auth-department-head-birth-certificate-image',
-        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
         maxSize: 10 * 1024 * 1024
     }),
     military_service_image: validateFile({
         title: 'نظام وظیفه',
         uniqueTitle: 'check-auth-department-head-military-service-image',
-        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
         maxSize: 10 * 1024 * 1024
     }),
     employment_contract_file: validateFile({
