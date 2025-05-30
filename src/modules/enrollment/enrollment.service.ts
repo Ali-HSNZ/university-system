@@ -283,9 +283,17 @@ const enrollmentService = {
         }
     },
 
-    async updateEnrollmentStatus(id: number, updateData: TEnrollmentUpdateRequestBodyType, userId: number) {
+    async updateEnrollmentStatus({
+        id,
+        updateData,
+        userId
+    }: {
+        id: number
+        updateData: TEnrollmentUpdateRequestBodyType
+        userId: number
+    }) {
         const enrollment = await EnrollmentModel.findByPk(id, {
-            include: [{ model: EnrollmentStatusModel, as: 'current_status' }]
+            include: [{ model: EnrollmentStatusModel, as: 'enrollment_status' }]
         })
         if (!enrollment) throw new Error('ثبت نامی با این شناسه یافت نشد')
 

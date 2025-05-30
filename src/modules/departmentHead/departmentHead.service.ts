@@ -180,12 +180,9 @@ const departmentHeadService = {
                     enrollment_status: {
                         code: e.enrollment_status.status,
                         status: statusDictionary[e.enrollment_status.status] || e.enrollment_status.status,
-                        comment:
-                            e.enrollment_status.status === 'pending_department_head'
-                                ? e.enrollment_status.department_head_comment
-                                : e.enrollment_status.status === 'pending_education_assistant'
-                                ? e.enrollment_status.education_assistant_comment
-                                : null
+                        comment: e.enrollment_status.status.includes('department_head')
+                            ? e.enrollment_status.department_head_comment
+                            : e.enrollment_status.education_assistant_comment
                     }
                 })
 

@@ -133,7 +133,11 @@ class EnrollmentController {
 
             await validationHandling(req.body, updateEnrollmentValidation)
 
-            const enrollment = await enrollmentService.updateEnrollmentStatus(Number(id), req.body, req.user.id)
+            const enrollment = await enrollmentService.updateEnrollmentStatus({
+                id: Number(id),
+                updateData: req.body,
+                userId: req.user.id
+            })
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
@@ -164,3 +168,4 @@ class EnrollmentController {
 }
 
 export default new EnrollmentController()
+

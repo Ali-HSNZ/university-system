@@ -1,3 +1,6 @@
+import { InferType } from 'yup'
+import { updateEnrollmentValidation } from '../enrollment/enrollment.validation'
+
 type EnrollmentType = {
     id: number
     student_id: number
@@ -105,4 +108,6 @@ type EnrollmentType = {
     }
 }
 
-export type { EnrollmentType }
+type TUpdateEnrollmentStatusInferType = InferType<typeof updateEnrollmentValidation>
+
+export type { EnrollmentType, TUpdateEnrollmentStatusInferType }

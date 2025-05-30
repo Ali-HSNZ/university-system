@@ -15,7 +15,16 @@ const createEnrollmentValidation = yup.object<TEnrollmentRequestBodyType>().shap
 })
 
 const updateEnrollmentValidation = yup.object<TEnrollmentUpdateRequestBodyType>().shape({
-    status: yup.string().oneOf(['pending', 'approved', 'rejected']).required()
+    data: yup
+        .array()
+        .of(
+            yup.object().shape({
+                id: yup.number().integer().positive().required(),
+                status: yup.string().oneOf(['approved_by_department_head', 'rejected_by_department_head']).required(),
+                comment: yup.string()
+            })
+        )
+        .required('داده‌ها الزامی است')
 })
 
 const studentIdValidation = yup.object().shape({
