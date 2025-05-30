@@ -189,6 +189,41 @@ const departmentHeadService = {
                 return acc
             }, {} as Record<string, any>)
         )
+    },
+    getDepartmentHeadProfile: async (userId: number) => {
+        const departmentHead = await DepartmentHeadModel.findOne({
+            where: { user_id: userId },
+            include: [{ model: DepartmentModel }, { model: DegreeModel }, { model: UserModel }]
+        })
+
+        return {
+            profile_information: {
+                full_name: `${departmentHead?.dataValues.user.first_name} ${departmentHead?.dataValues.user.last_name}`,
+                national_code: departmentHead?.dataValues.user.national_code,
+                gender: departmentHead?.dataValues.user.gender === 'male' ? 'آقا' : 'خانم',
+                birth_date: departmentHead?.dataValues.user.birth_date,
+                phone_number: departmentHead?.dataValues.user.phone,
+                email: departmentHead?.dataValues.user.email,
+                address: departmentHead?.dataValues?.user?.address || null,
+                avatar: BASE_URL + departmentHead?.dataValues?.user?.avatar || null
+            },
+            work_information: {
+                department_head_code: departmentHead?.dataValues.department_head_code,
+                degree: departmentHead?.dataValues.degree.name,
+                department: departmentHead?.dataValues.department.name,
+                hire_date: departmentHead?.dataValues.hire_date,
+                office_phone: departmentHead?.dataValues.office_phone,
+                office_address: departmentHead?.dataValues.office_address,
+                responsibilities: departmentHead?.dataValues.responsibilities,
+                status: departmentHead?.dataValues.status === 'active' ? 'فعال' : 'غیرفعال'
+            },
+            files: {
+                national_card_image: departmentHead?.dataValues.national_card_image,
+                birth_certificate_image: departmentHead?.dataValues.birth_certificate_image,
+                military_service_image: departmentHead?.dataValues.military_service_image,
+                employment_contract_file: departmentHead?.dataValues.employment_contract_file
+            }
+        }
     }
 }
 

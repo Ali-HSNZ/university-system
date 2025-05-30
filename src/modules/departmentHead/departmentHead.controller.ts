@@ -42,6 +42,20 @@ class DepartmentHeadController {
         }
     }
 
+    @Get('/profile')
+    async getDepartmentHeadProfile(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const departmentHead = await departmentHeadService.getDepartmentHeadProfile(req.user?.id!)
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: departmentHead
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     @Put('/enrollment/update')
     async updateEnrollmentStatus(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
         try {

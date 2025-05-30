@@ -241,8 +241,11 @@ const studentPanelService = {
             where: { student_id: studentDTO.id },
             include: [
                 {
+                    model: EnrollmentStatusModel,
+                    attributes: { exclude: ['id', 'enrollment_id', 'updated_at', 'created_at'] }
+                },
+                {
                     model: ClassScheduleModel,
-
                     include: [
                         { model: SemesterModel, where: { status: 'active' } },
                         { model: ClassroomModel },
@@ -257,11 +260,28 @@ const studentPanelService = {
             ]
         })
 
+        const statusDictionary: Record<string, string | null> = {
+            pending_department_head: null,
+            pending_education_assistant: null,
+            approved_by_department_head: 'تایید از مدیر گروه',
+            approved_by_education_assistant: 'تایید از معاون آموزشی',
+            rejected_by_department_head: 'رد از مدیر گروه',
+            rejected_by_education_assistant: 'رد از معاون آموزشی'
+        }
+
         const serializedEnrollments = enrollments.map((enrollment: any) => {
             const classSchedule = enrollment.dataValues.class_schedule
 
             return {
                 id: enrollment.dataValues.id,
+                status: {
+                    title: statusDictionary[enrollment.dataValues.enrollment_status.status],
+                    status: enrollment.dataValues.enrollment_status.status.includes('pending')
+                        ? 'pending'
+                        : enrollment.dataValues.enrollment_status.status.includes('rejected')
+                        ? 'rejected'
+                        : 'approved'
+                },
                 day: dayOfWeekDictionary[classSchedule.day_of_week],
                 start_time: classSchedule.start_time.substring(0, 5),
                 end_time: classSchedule.end_time.substring(0, 5),

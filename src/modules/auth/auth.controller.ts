@@ -456,7 +456,7 @@ class AuthController {
                 military_service_image: images?.military_service_image,
                 office_address: data.office_address,
                 office_phone: data.office_phone,
-                status: 'inactive'
+                status: 'active'
             })
 
             if (!departmentHead || !departmentHead?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')
