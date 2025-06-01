@@ -119,12 +119,9 @@ const studentPanelService = {
             enrollments.map((enrollment: any) => enrollment.dataValues.class_schedule.class.course.id)
         )
 
-        // Filter out courses that student has already enrolled in
-        const allowedCourses = allEntryYearCourses.filter((course) => !enrolledCourseIds.has(course.id))
-
         // Get detailed information for each allowed course
         const coursesWithDetails = await Promise.all(
-            allowedCourses.map(async (course) => {
+            allEntryYearCourses.map(async (course) => {
                 // Get class schedules for this course
                 const classSchedules = await ClassScheduleModel.findAll({
                     include: [
