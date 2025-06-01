@@ -13,7 +13,8 @@ import { ProfessorModel } from '../../models/professor.model'
 import { StudyModel } from '../../models/study.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ClassroomModel } from '../../models/classroom.model'
-import { EnrollmentType } from './educationAssistant.types'
+import { EnrollmentType, TEnrollmentUpdateRequestBodyType } from './educationAssistant.types'
+import { Op } from 'sequelize'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -89,7 +90,12 @@ const educationAssistantService = {
                 },
                 {
                     model: EnrollmentStatusModel,
-                    attributes: { exclude: ['id', 'enrollment_id', 'updated_at', 'created_at'] }
+                    attributes: { exclude: ['id', 'enrollment_id', 'updated_at', 'created_at'] },
+                    where: {
+                        status: {
+                            [Op.not]: ['pending_department_head', 'pending_education_assistant']
+                        }
+                    }
                 }
             ],
             order: [['createdAt', 'DESC']]
@@ -158,9 +164,16 @@ const educationAssistantService = {
                     enrollment_status: {
                         code: e.enrollment_status.status,
                         status: statusDictionary[e.enrollment_status.status] || e.enrollment_status.status,
-                        comment: e.enrollment_status.status.includes('department_head')
-                            ? e.enrollment_status.department_head_comment
-                            : e.enrollment_status.education_assistant_comment
+                        department_head_comment: e.enrollment_status.department_head_comment,
+                        comment: e.enrollment_status.education_assistant_comment
+                    },
+                    department_head_comment: {
+                        title: 'نظر مدیر گروه',
+                        comment: e.enrollment_status.department_head_comment
+                    },
+                    education_assistant_comment: {
+                        title: 'نظر معاون آموزشی',
+                        comment: e.enrollment_status.education_assistant_comment
                     }
                 })
 
@@ -226,6 +239,45 @@ const educationAssistantService = {
                 employment_contract: educationAssistant?.dataValues.employment_contract_file
             }
         }
+    },
+    async updateEnrollmentStatus({
+        id,
+        updateData,
+        userId
+    }: {
+        id: number
+        updateData: TEnrollmentUpdateRequestBodyType
+        userId: number
+    }) {
+        const enrollment = await EnrollmentModel.findByPk(id, {
+            include: [{ model: EnrollmentStatusModel, as: 'enrollment_status' }]
+        })
+        if (!enrollment) throw new Error('ثبت نامی با این شناسه یافت نشد')
+
+        // Create new status record with appropriate approver ID based on status
+        const statusData: any = {
+            enrollment_id: enrollment.dataValues.id,
+            status: updateData.status
+        }
+
+        const currentDate = new Date()
+
+        // Set the appropriate approver ID and comment based on the status
+        if (updateData.status.includes('department_head')) {
+            statusData.department_head_id = userId
+            statusData.department_head_comment = updateData.comment
+            statusData.department_head_decision_date = currentDate
+        } else if (updateData.status.includes('education_assistant')) {
+            statusData.education_assistant_id = userId
+            statusData.education_assistant_comment = updateData.comment
+            statusData.education_assistant_decision_date = currentDate
+        }
+
+        const newStatus = await EnrollmentStatusModel.update(statusData, {
+            where: { enrollment_id: enrollment.dataValues.id }
+        })
+
+        return newStatus
     }
 }
 

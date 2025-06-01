@@ -4,8 +4,7 @@ import educationAssistantService from './educationAssistant.service'
 import httpStatus from 'http-status'
 import { TAuthenticatedRequestType } from '../../core/types/auth'
 import { validationHandling } from '../../core/utils/validation-handling'
-import enrollmentService from '../enrollment/enrollment.service'
-import { updateEnrollmentValidation } from '../enrollment/enrollment.validation'
+import { updateEnrollmentValidation } from './educationAssistant.validation'
 import { TUpdateEnrollmentStatusInferType } from './educationAssistant.types'
 
 @Controller('/education-assistant')
@@ -73,7 +72,7 @@ class EducationAssistantController {
             )
 
             for (const item of data.data) {
-                await enrollmentService.updateEnrollmentStatus({
+                await educationAssistantService.updateEnrollmentStatus({
                     id: item.id,
                     updateData: {
                         user_role: 'education_assistant',

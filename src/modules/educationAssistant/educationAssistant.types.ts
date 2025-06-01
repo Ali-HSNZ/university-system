@@ -1,5 +1,5 @@
 import { InferType } from 'yup'
-import { updateEnrollmentValidation } from '../enrollment/enrollment.validation'
+import { updateEnrollmentValidation } from './educationAssistant.validation'
 
 type EnrollmentType = {
     id: number
@@ -108,6 +108,23 @@ type EnrollmentType = {
     }
 }
 
+type TEnrollmentRequestBodyType = {
+    student_id: number
+    class_schedule_ids: number[]
+}
+
+type TEnrollmentUpdateRequestBodyType = {
+    status:
+        | 'pending_department_head'
+        | 'pending_education_assistant'
+        | 'approved_by_department_head'
+        | 'approved_by_education_assistant'
+        | 'rejected_by_department_head'
+        | 'rejected_by_education_assistant'
+    comment: string
+    user_role: 'department_head' | 'education_assistant'
+}
+
 export type TUpdateEnrollmentStatusInferType = InferType<typeof updateEnrollmentValidation>
 
-export type { EnrollmentType }
+export type { EnrollmentType, TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType }

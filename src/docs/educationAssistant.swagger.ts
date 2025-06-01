@@ -17,3 +17,13 @@
  *       200:
  *         description: Education assistant profile
  */
+
+/**
+ * @swagger
+ * /education-assistant/enrollments:
+ *   get:
+ *     tags: [Education Assistant]
+ *     responses:
+ *       200:
+ *         description: Education assistant enrollments
+ */

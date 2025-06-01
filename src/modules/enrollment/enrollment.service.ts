@@ -316,14 +316,12 @@ const enrollmentService = {
             statusData.education_assistant_decision_date = currentDate
         }
 
-        const newStatus = await EnrollmentStatusModel.create(statusData)
-
-        // Update enrollment with new status
-        await enrollment.update({
-            status_id: newStatus.dataValues.id
+        const newStatus = await EnrollmentStatusModel.update(statusData, {
+            where: { enrollment_id: enrollment.dataValues.id },
+            returning: true
         })
 
-        return enrollment
+        return newStatus
     },
 
     async getEnrollmentById(id: number) {
