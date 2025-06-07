@@ -1,6 +1,7 @@
 import { InferType } from 'yup'
-import classSchema from './class.validation'
+import { classSchema, updateClassSchema } from './class.validation'
 
 type TClassInferType = InferType<typeof classSchema>
+type TUpdateClassInferType = InferType<typeof updateClassSchema>
 
-export default TClassInferType
+export { TUpdateClassInferType, TClassInferType }

@@ -1,11 +1,11 @@
 import { Request, Response, NextFunction } from 'express'
-import { Controller, Delete, Get, Post } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import { validationHandling } from '../../core/utils/validation-handling'
-import classSchema from './class.validation'
+import { classSchema, updateClassSchema } from './class.validation'
 import classService from './class.service'
 import httpStatus from 'http-status'
 import { checkValidId } from '../../core/utils/check-valid-id'
-import TClassInferType from './class.types'
+import { TClassInferType, TUpdateClassInferType } from './class.types'
 
 @Controller('/class')
 class ClassController {
@@ -66,6 +66,34 @@ class ClassController {
             await classService.create(req.body)
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
+                message: 'عملیات با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Put('/:id/update')
+    async update(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params
+            checkValidId(id)
+
+            const data = await validationHandling<TUpdateClassInferType>(req.body, updateClassSchema)
+
+            const existClass = await classService.checkExist(Number(id))
+
+            if (!existClass) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'کلاس یافت نشد'
+                })
+            }
+
+            await classService.update(Number(id), data)
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {

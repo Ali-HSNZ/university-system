@@ -1,7 +1,6 @@
 import { ClassModel } from '../../models/class.model'
 import { CourseModel } from '../../models/course.model'
-import { SemesterModel } from '../../models/semester.model'
-import TClassInferType from './class.types'
+import { TClassInferType, TUpdateClassInferType } from './class.types'
 
 const classService = {
     async list() {
@@ -17,6 +16,10 @@ const classService = {
             ]
         })
         return classes
+    },
+    async update(id: number, classDTO: TUpdateClassInferType) {
+        const updatedClass = await ClassModel.update({ status: classDTO.status }, { where: { id } })
+        return updatedClass
     },
     async existClass(course_id: number) {
         const findClass = await ClassModel.findOne({
@@ -37,8 +40,7 @@ const classService = {
                     attributes: {
                         exclude: ['prerequisites', 'corequisites', 'total_units']
                     }
-                },
-                { model: SemesterModel, attributes: { exclude: ['is_deleted', 'deleted_at'] } }
+                }
             ]
         })
         return findClass
