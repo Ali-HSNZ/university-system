@@ -1,9 +1,14 @@
 import { NextFunction, Request, Response } from 'express'
-import { Controller, Delete, Get, Put } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Put, UseMiddleware } from '../../decorators/router.decorator'
 import userServices from './user.service'
 import httpStatus from 'http-status'
 import { checkValidId } from '../../core/utils/check-valid-id'
 import { TAuthenticatedRequestType } from '../../core/types/auth'
+import { fileUpload } from '../../core/utils/file-upload'
+import { serializeFilePath } from '../../core/utils/serialize-file-path'
+import { hashString } from '../../core/utils/hash-string'
+import updateUserValidation from './user.validations'
+import { validationHandling } from '../../core/utils/validation-handling'
 
 @Controller('/user')
 class UserController {
@@ -103,13 +108,22 @@ class UserController {
     }
 
     @Put('/:id/update')
+    @UseMiddleware(fileUpload.single('avatar'))
     async update(req: Request, res: Response, next: NextFunction) {
         try {
             const id = req.params.id
             checkValidId(id)
-            const data = req.body
 
-            await userServices.update(Number(id), data)
+            req.body.avatar = req.file
+            await validationHandling(req.body, updateUserValidation)
+
+            const hashedPassword = req?.body?.password ? hashString(req.body.password) : undefined
+
+            await userServices.update(Number(id), {
+                ...req.body,
+                avatar: serializeFilePath(req?.file?.path),
+                password: hashedPassword
+            })
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,

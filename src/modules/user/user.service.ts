@@ -8,7 +8,10 @@ const userServices = {
         const users = await UserModel.findAll({
             attributes: { exclude: ['password'] }
         })
-        return users
+        return users.map((user) => ({
+            ...user.dataValues,
+            gender: user.dataValues.gender === 'male' ? 'مرد' : 'زن'
+        }))
     },
     count: async () => {
         const usersCount = await UserModel.count()

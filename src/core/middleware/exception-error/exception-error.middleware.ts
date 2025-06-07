@@ -21,7 +21,7 @@ const exceptionErrorMiddleware = (app: Express) => {
                 validationError.inner.map((err: any) => [err.path, err.message]).filter(([path]: any) => path)
             )
             return res.status(httpStatus.UNPROCESSABLE_ENTITY).json({
-                status: httpStatus.UNPROCESSABLE_ENTITY,
+                code: httpStatus.UNPROCESSABLE_ENTITY,
                 message: 'اطلاعات وارد شده معتبر نیست',
                 errors: formattedErrors
             })
