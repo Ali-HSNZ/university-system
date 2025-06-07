@@ -14,7 +14,7 @@ const HighSchoolDiplomaModel = sequelizeConfig.define(
         },
         school_name: { type: DataTypes.STRING(255), allowNull: false },
         diploma_date: { type: DataTypes.DATE, allowNull: false },
-        grade: { type: DataTypes.FLOAT, allowNull: false },
+        grade: { type: DataTypes.FLOAT, allowNull: true },
         pre_study_id: {
             type: DataTypes.INTEGER,
             allowNull: false,

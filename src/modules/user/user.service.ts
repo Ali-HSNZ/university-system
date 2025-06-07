@@ -45,7 +45,10 @@ const userServices = {
         const user = await UserModel.findByPk(id, {
             attributes: { exclude: ['password'] }
         })
-        return user
+        return {
+            ...user?.dataValues,
+            birth_date: user?.dataValues.birth_date.replaceAll('-', '/')
+        }
     },
     checkExistById: async (id: number) => {
         const user = await UserModel.findByPk(id)
@@ -78,3 +81,4 @@ const userServices = {
 }
 
 export default userServices
+

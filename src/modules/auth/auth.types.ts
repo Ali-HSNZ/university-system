@@ -23,11 +23,11 @@ type TRegisterDepartmentHeadInferType = InferType<typeof registerDepartmentHeadV
 type TRegisterUniversityPresidentInferType = InferType<typeof registerUniversityPresidentValidation>
 
 type TBaseUserDataType = {
-    first_name: string
-    last_name: string
-    national_code: string
-    gender: TUserGenderType
-    birth_date: string
+    first_name: string //
+    last_name: string //
+    national_code: string //
+    gender: TUserGenderType //
+    birth_date: string //
     phone?: string
     email?: string
     address?: string

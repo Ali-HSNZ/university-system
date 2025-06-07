@@ -92,7 +92,7 @@ const studentPanelService = {
     async allowedEnrollmentCourses(studentDTO: TStudentType) {
         // Get student's entry year courses
         const entryYearCourses = await entryYearCourseService.groupeByEntryYear(studentDTO.entry_year)
-        const allEntryYearCourses = entryYearCourses[0].courses
+        const allEntryYearCourses = entryYearCourses?.[0]?.courses || []
 
         // Get student's current enrollments
         const enrollments = await EnrollmentModel.findAll({
@@ -178,12 +178,12 @@ const studentPanelService = {
                 })
 
                 return {
-                    course_name: course.name,
-                    course_code: course.code,
-                    course_unit: Number(course.theoretical_units) + Number(course.practical_units) || 0,
-                    prerequisites: course.prerequisites || [],
-                    corequisites: course.corequisites || [],
-                    schedules
+                    course_name: course?.name,
+                    course_code: course?.code,
+                    course_unit: Number(course?.theoretical_units) + Number(course?.practical_units) || 0,
+                    prerequisites: course?.prerequisites || [],
+                    corequisites: course?.corequisites || [],
+                    schedules: schedules || []
                 }
             })
         )
@@ -458,7 +458,7 @@ const studentPanelService = {
             const schedule = enrollment.class_schedule
             const semester = schedule?.semester
             const course = schedule?.class?.course
-            const enrollmentStatus = enrollment.enrollment_status
+            const enrollmentStatus = enrollment?.enrollment_status
             if (!semester) return
 
             if (!semesters[semester.id]) {
@@ -766,10 +766,10 @@ const studentPanelService = {
         // const allCourses = await CourseModel.findAll()
         const entryYearCourses = await entryYearCourseService.groupeByEntryYear(studentDTO.entry_year)
 
-        const allCourses = entryYearCourses[0].courses
+        const allCourses = entryYearCourses?.[0]?.courses
 
         // Create a map of course statuses
-        const courseStatuses = allCourses.map((course) => {
+        const courseStatuses = allCourses?.map((course) => {
             const courseEnrollments = entryYearEnrollments.filter(
                 (enrollment) => enrollment.dataValues.class_schedule.class.course.id === course.id
             )
@@ -826,18 +826,18 @@ const studentPanelService = {
             ['not_taken', 2]
         ])
 
-        const sortedCourseStatuses = courseStatuses.sort(
+        const sortedCourseStatuses = courseStatuses?.sort(
             (a, b) => (statusPriority.get(a.status) || 0) - (statusPriority.get(b.status) || 0)
         )
 
         return {
-            courses: sortedCourseStatuses,
+            courses: sortedCourseStatuses || [],
             student_information: {
                 entry_year: studentDTO.entry_year?.toString(),
                 degree: degree?.dataValues?.name,
                 study: study?.dataValues?.name,
                 department: department?.dataValues?.name,
-                total_units: courseStatuses.reduce((acc, course) => acc + (course.course_unit || 0), 0)
+                total_units: courseStatuses?.reduce((acc, course) => acc + (course?.course_unit || 0), 0) || 0
             }
         }
     }

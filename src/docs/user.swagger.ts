@@ -59,6 +59,21 @@
  *         description: User not found
  */
 
+
+/**
+ * @swagger
+ * /user/info:
+ *   get:
+ *     tags: [User]
+ *     responses:
+ *       200:
+ *         description: A user
+ *       404:
+ *         description: User not found
+ */
+
+
+
 /**
  * @swagger
  * /user/{id}/update:
