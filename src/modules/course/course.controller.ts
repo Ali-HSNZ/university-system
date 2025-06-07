@@ -23,11 +23,33 @@ class CourseController {
         }
     }
 
+    @Get('/summary-list')
+    async getSummaryList(req: Request, res: Response, next: NextFunction) {
+        try {
+            const courses = await courseService.getSummaryList()
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: courses
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
     @Get('/:id/info')
     async getInfo(req: Request, res: Response, next: NextFunction) {
         try {
             const { id } = req.params
             checkValidId(id)
+
+            const checkExistCourse = await courseService.checkExistId(Number(id))
+            if (!checkExistCourse) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'درس یافت نشد'
+                })
+            }
 
             const course = await courseService.getInfo(Number(id))
 
