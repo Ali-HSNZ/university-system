@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Put } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import { Request, Response, NextFunction } from 'express'
 import classroomService from './classroom.service'
 import httpStatus from 'http-status'
@@ -99,6 +99,23 @@ class ClassroomController {
             }
 
             await classroomService.update(classroomId, data)
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Delete('/:id/delete')
+    async delete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const classroomId = req.params.id?.trim()
+            checkValidId(classroomId)
+
+            await classroomService.delete(classroomId)
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,

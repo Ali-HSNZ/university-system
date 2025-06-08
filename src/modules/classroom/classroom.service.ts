@@ -34,6 +34,10 @@ const classroomService = {
     async update(id: number | string, data: TClassroomInferType) {
         const classroom = await ClassroomModel.update(data, { where: { id } })
         return classroom
+    },
+    async delete(id: number | string) {
+        const classroom = await ClassroomModel.destroy({ where: { id } })
+        return !!classroom
     }
 }
 
