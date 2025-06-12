@@ -5,7 +5,8 @@ import {
     registerEducationAssistantValidation,
     registerProfessorValidation,
     registerStudentValidation,
-    registerUniversityPresidentValidation
+    registerUniversityPresidentValidation,
+    updateProfessorValidation
 } from './auth.validation'
 
 type TUserGenderType = 'male' | 'female'
@@ -21,6 +22,8 @@ type TRegisterEducationAssistantInferType = InferType<typeof registerEducationAs
 type TRegisterDepartmentHeadInferType = InferType<typeof registerDepartmentHeadValidation>
 
 type TRegisterUniversityPresidentInferType = InferType<typeof registerUniversityPresidentValidation>
+
+type TUpdateProfessorInferType = InferType<typeof updateProfessorValidation>
 
 type TBaseUserDataType = {
     first_name: string
@@ -81,5 +84,6 @@ export type {
     TRegisterUniversityPresidentInferType,
     TUserGenderType,
     TBaseUserDataType,
+    TUpdateProfessorInferType,
     TRegisterDepartmentHeadInferType
 }

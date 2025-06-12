@@ -17,6 +17,7 @@ const userServices = {
         const usersCount = await UserModel.count()
         return usersCount
     },
+    //
     update: async (id: number, data: TBaseUserDataType) => {
         const user = await UserModel.update(data, { where: { id } })
         return user
@@ -77,6 +78,31 @@ const userServices = {
         })
         return !!user
     },
+    checkExistInUpdate: async (user_id: number, data: TFindOneUserType) => {
+        const orConditions = []
+
+        if (data.national_code?.trim()) {
+            orConditions.push({ national_code: data.national_code.trim() })
+        }
+
+        if (data.phone?.trim()) {
+            orConditions.push({ phone: data.phone.trim() })
+        }
+
+        if (data.email?.trim()) {
+            orConditions.push({ email: data.email.trim() })
+        }
+
+        if (orConditions.length === 0) return false
+
+        const existingUser = await UserModel.findOne({
+            where: {
+                [Op.and]: [{ id: { [Op.ne]: user_id } }, { [Op.or]: orConditions }]
+            }
+        })
+
+        return !!existingUser
+    },
     delete: async (id: number) => {
         const user = await UserModel.destroy({ where: { id } })
         return user
@@ -84,4 +110,5 @@ const userServices = {
 }
 
 export default userServices
+
 

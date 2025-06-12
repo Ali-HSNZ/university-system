@@ -21,7 +21,7 @@ const ProfessorModel = sequelizeConfig.define(
             type: DataTypes.ENUM('instructor', 'assistant_professor', 'associate_professor', 'professor'),
             allowNull: false
         },
-        hire_date: { type: DataTypes.DATEONLY, allowNull: false },
+        hire_date: { type: DataTypes.STRING, allowNull: false },
         specialization: { type: DataTypes.STRING(255), allowNull: true },
         office_phone: { type: DataTypes.STRING(11), allowNull: true },
         study_id: { type: DataTypes.INTEGER, allowNull: false },

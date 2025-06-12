@@ -14,7 +14,8 @@ import {
     TBaseUserDataType,
     TRegisterEducationAssistantInferType,
     TRegisterUniversityPresidentInferType,
-    TRegisterDepartmentHeadInferType
+    TRegisterDepartmentHeadInferType,
+    TUpdateProfessorInferType
 } from './auth.types'
 
 const authServices = {
@@ -28,6 +29,11 @@ const authServices = {
         return user
     },
 
+    updateUser: async (id: number, data: Omit<TBaseUserDataType, 'password'> & { password?: string }) => {
+        const user = await UserModel.update(data, { where: { id } })
+        return user
+    },
+
     registerStudent: async (data: Omit<TRegisterStudentInferType, keyof TBaseUserDataType> & { user_id: number }) => {
         const student = await StudentModel.create(data)
         return student
@@ -37,6 +43,11 @@ const authServices = {
         data: Omit<TRegisterProfessorInferType, keyof TBaseUserDataType> & { user_id: number }
     ) => {
         const professor = await ProfessorModel.create(data)
+        return professor
+    },
+
+    updateProfessor: async (id: number, data: Omit<TUpdateProfessorInferType, keyof TBaseUserDataType>) => {
+        const professor = await ProfessorModel.update(data, { where: { id } })
         return professor
     },
 
