@@ -4,17 +4,30 @@ import { SemesterModel } from '../../models/semester.model'
 const semesterService = {
     async list() {
         const semesters = await SemesterModel.findAll()
-        return semesters
+
+        return semesters.map((e) => ({
+            ...e.dataValues,
+            start_date: e.dataValues.start_date.replaceAll('-', '/'),
+            end_date: e.dataValues.end_date.replaceAll('-', '/')
+        }))
     },
     async info(id: number) {
         const semester = await SemesterModel.findOne({ where: { id } })
-        return semester
+        return {
+            ...semester?.dataValues,
+            start_date: semester?.dataValues.start_date.replaceAll('-', '/'),
+            end_date: semester?.dataValues.end_date.replaceAll('-', '/')
+        }
     },
     async getActiveSemester() {
         const semester = await SemesterModel.findOne({ where: { status: 'active' } })
         return semester
     },
     async create(data: any) {
+        if (data.status === 'active') {
+            await SemesterModel.update({ status: 'de-active' }, { where: { status: 'active' } })
+        }
+
         const semester = await SemesterModel.create(data)
         return semester
     },
@@ -42,6 +55,10 @@ const semesterService = {
         return !!conflictingSemester
     },
     async update(id: number, data: any) {
+        if (data.status === 'active') {
+            await SemesterModel.update({ status: 'de-active' }, { where: { status: 'active' } })
+        }
+
         const semester = await SemesterModel.update(data, { where: { id } })
         return semester
     },

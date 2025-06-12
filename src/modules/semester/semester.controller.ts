@@ -12,6 +12,7 @@ class SemesterController {
     async list(req: Request, res: Response, next: NextFunction) {
         try {
             const semesters = await semesterService.list()
+            
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد',
