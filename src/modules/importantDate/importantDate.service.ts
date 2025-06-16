@@ -7,13 +7,14 @@ import moment from 'moment-jalaali'
 moment.loadPersian({ usePersianDigits: false }) // فقط یک بار اجرا شود
 
 const importantDateService = {
-    list: async () => {
+    list: async (id: number | null = null) => {
         const importantDates = await ImportantDateModel.findAll({
+            where: id ? { id } : undefined,
             attributes: { exclude: ['department_id', 'degree_id', 'study_id'] },
             include: [
-                { model: DepartmentModel, attributes: ['name'] },
-                { model: DegreeModel, attributes: ['name'] },
-                { model: StudyModel, attributes: ['name'] }
+                { model: DepartmentModel, attributes: ['id', 'name'] },
+                { model: DegreeModel, attributes: ['id', 'name'] },
+                { model: StudyModel, attributes: ['id', 'name'] }
             ]
         })
         return importantDates
@@ -27,14 +28,17 @@ const importantDateService = {
         return importantDate
     },
     info: async (id: number) => {
-        const importantDate = await ImportantDateModel.findByPk(id)
-        return importantDate
+        const importantDate = await importantDateService.list(id)
+        return importantDate[0]
     },
     update: async (id: number, data: TImportantDateInferType) => {
         const importantDate = await ImportantDateModel.update(data, { where: { id } })
         return importantDate
     },
     checkExist: async (data: TImportantDateInferType) => {
+
+        console.log('data::::: ',data);
+        
         const importantDate = await ImportantDateModel.findOne({
             where: { ...data, start_date: data.start_date?.trim(), end_date: data.end_date?.trim() }
         })

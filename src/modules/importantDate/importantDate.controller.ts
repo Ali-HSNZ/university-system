@@ -50,7 +50,15 @@ class ImportantDateController {
     @Post('/create')
     async createImportantDate(req: Request, res: Response, next: NextFunction) {
         try {
-            const data = await validationHandling<TImportantDateInferType>(req.body, importantDateSchema)
+            await validationHandling<TImportantDateInferType>(req.body, importantDateSchema)
+
+            const data = {
+                ...req.body,
+                start_date: `${req.body.start_date?.trim()}T${req.body.start_time?.trim()}`,
+                end_date: `${req.body.end_date?.trim()}T${req.body.end_time?.trim()}`
+            }
+            delete data.start_time
+            delete data.end_time
 
             const checkExistImportantDate = await importantDateService.checkExist(data)
             if (checkExistImportantDate) throw new Error('اطلاع رسانی مورد نظر قبلا ایجاد شده است')
@@ -64,7 +72,7 @@ class ImportantDateController {
             const checkExistStudy = await studyService.checkExistId(req.body.study_id)
             if (!checkExistStudy) throw new Error('رشته تحصیلی مورد نظر یافت نشد')
 
-            await importantDateService.create(req.body)
+            await importantDateService.create(data)
 
             return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
@@ -83,10 +91,28 @@ class ImportantDateController {
 
             await validationHandling(req.body, importantDateSchema)
 
+            const data = {
+                ...req.body,
+                start_date: `${req.body.start_date?.trim()}T${req.body.start_time?.trim()}`,
+                end_date: `${req.body.end_date?.trim()}T${req.body.end_time?.trim()}`
+            }
+
+            delete data.start_time
+            delete data.end_time
+
             const checkExistImportantDate = await importantDateService.checkExistId(Number(id))
             if (!checkExistImportantDate) throw new Error('اطلاع رسانی مورد نظر یافت نشد')
 
-            await importantDateService.update(Number(id), req.body)
+            const checkExistDepartment = await departmentService.checkExistId(data.department_id)
+            if (!checkExistDepartment) throw new Error('گروه آموزشی مورد نظر یافت نشد')
+
+            const checkExistDegree = await degreeServices.checkExistId(data.degree_id)
+            if (!checkExistDegree) throw new Error('مقطع تحصیلی مورد نظر یافت نشد')
+
+            const checkExistStudy = await studyService.checkExistId(data.study_id)
+            if (!checkExistStudy) throw new Error('رشته تحصیلی مورد نظر یافت نشد')
+
+            await importantDateService.update(Number(id), data)
 
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,

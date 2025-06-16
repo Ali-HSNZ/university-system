@@ -140,7 +140,7 @@ class DepartmentController {
                     dependencies: {
                         users: users
                     }
-                },
+                }
             })
         }
         const isDeleted = await departmentServices.delete(id)

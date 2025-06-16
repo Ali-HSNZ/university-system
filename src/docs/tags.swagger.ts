@@ -21,7 +21,7 @@
  *   - name: Enrollment
  *     description: Enrollment management APIs
  *   - name: Semester
- *     description: مدیریت ترم ها
+ *     description: مدیریت ترم ها 
  *   - name: Classroom
  *     description: مدیریت سالن ها و مکان های کلاس
  *   - name: Important Dates
