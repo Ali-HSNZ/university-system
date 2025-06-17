@@ -92,7 +92,7 @@ class DepartmentController {
                     message: 'گروه آموزشی یافت نشد'
                 })
             }
-            const existDepartment = await departmentServices.checkExistName(name)
+            const existDepartment = await departmentServices.checkExistNameInUpdate(Number(id), name)
             if (existDepartment) {
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,

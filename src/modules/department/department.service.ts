@@ -1,11 +1,11 @@
+import { Op } from 'sequelize'
 import { DepartmentModel } from '../../models/department.model'
 import { UserModel } from '../../models/user.model'
+import { StudentModel } from '../../models/student.model'
 
 const departmentServices = {
     findAll: async () => {
-        const departments = await DepartmentModel.findAll({
-            attributes: ['id', 'name']
-        })
+        const departments = await DepartmentModel.findAll({})
         return departments
     },
     getDepartmentNameById: async (id: number) => {
@@ -18,6 +18,10 @@ const departmentServices = {
     },
     checkExistName: async (name: string) => {
         const department = await DepartmentModel.findOne({ where: { name: name.trim() } })
+        return !!department
+    },
+    checkExistNameInUpdate: async (id: number, name: string) => {
+        const department = await DepartmentModel.findOne({ where: { id: { [Op.ne]: id }, name } })
         return !!department
     },
     checkExistId: async (id: string) => {
@@ -36,10 +40,15 @@ const departmentServices = {
         await department.update({ name: name.trim() })
         return true
     },
-    checkUsersInDepartment: async (id: string) => {
-        const users = await UserModel.findAll({
-            where: { department_id: id },
-            attributes: ['id', 'username', 'full_name', 'role']
+    checkUsersInDepartment: async (department_id: string) => {
+        const users = await StudentModel.findAll({
+            where: { department_id },
+            include: [
+                {
+                    model: UserModel,
+                    attributes: ['first_name', 'last_name', 'national_code']
+                }
+            ]
         })
         return users
     },
