@@ -9,7 +9,7 @@ const studyServices = {
         return studies
     },
     getStudyNameById: async (id: number) => {
-        const study = await StudyModel.findByPk(id, { attributes: ['name'] })
+        const study = await StudyModel.findByPk(id)
         return study
     },
 

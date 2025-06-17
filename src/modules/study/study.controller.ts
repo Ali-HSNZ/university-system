@@ -28,9 +28,12 @@ class StudyController {
             const studyId = req.params.id
             checkValidId(studyId)
 
-            const study = await studyServices.checkExistId(studyId)
+            const study = await studyServices.getStudyNameById(Number(studyId))
             if (!study) {
-                throw new Error('رشته تحصیلی یافت نشد')
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'داده ایی یافت نشد'
+                })
             }
 
             return res.status(httpStatus.OK).json({
