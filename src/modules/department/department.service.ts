@@ -43,12 +43,7 @@ const departmentServices = {
     checkUsersInDepartment: async (department_id: string) => {
         const users = await StudentModel.findAll({
             where: { department_id },
-            include: [
-                {
-                    model: UserModel,
-                    attributes: ['first_name', 'last_name', 'national_code']
-                }
-            ]
+            include: [{ model: UserModel, attributes: ['first_name', 'last_name', 'national_code'] }]
         })
         return users
     },

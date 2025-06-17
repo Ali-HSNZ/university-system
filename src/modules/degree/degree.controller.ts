@@ -68,13 +68,23 @@ class DegreeController {
 
         const { name } = req.body
         const existDegree = await degreeServices.checkExistId(id)
+
         if (!existDegree) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
                 message: 'مقطع تحصیلی یافت نشد'
             })
         }
+        const existDegreeName = await degreeServices.checkExistNameInUpdate(Number(id), name)
+
+        if (existDegreeName) {
+            return res.status(httpStatus.BAD_REQUEST).json({
+                status: httpStatus.BAD_REQUEST,
+                message: 'این مقطع تحصیلی قبلا ثبت شده است'
+            })
+        }
         const updatedDegree = await degreeServices.update(id, name)
+
         if (!updatedDegree) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
@@ -101,13 +111,13 @@ class DegreeController {
         }
 
         const users = await degreeServices.checkUsersWithDegree(id)
-        if (users) {
+        if (users.length > 0) {
             return res.status(httpStatus.BAD_REQUEST).json({
                 status: httpStatus.BAD_REQUEST,
                 message: 'مقطع تحصیلی دارای کاربر است',
                 data: {
                     dependencies: users
-                },
+                }
             })
         }
 

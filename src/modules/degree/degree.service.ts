@@ -1,4 +1,6 @@
+import { Op } from 'sequelize'
 import { DegreeModel } from '../../models/degree.model'
+import { StudentModel } from '../../models/student.model'
 import { UserModel } from '../../models/user.model'
 
 const degreeServices = {
@@ -19,12 +21,16 @@ const degreeServices = {
         return !!degree
     },
     create: async (name: string) => {
-        const degree = await DegreeModel.create({ name })
+        const degree = await DegreeModel.create({ name: name.trim() })
         return degree
     },
     checkExistName: async (name: string) => {
-        const degree = await DegreeModel.findOne({ where: { name }, attributes: ['id', 'name'] })
+        const degree = await DegreeModel.findOne({ where: { name: name.trim() }, attributes: ['id', 'name'] })
         return degree
+    },
+    checkExistNameInUpdate: async (id: number, name: string) => {
+        const degree = await DegreeModel.findOne({ where: { id: { [Op.ne]: id }, name: name.trim() } })
+        return !!degree
     },
     checkExistId: async (id: string) => {
         const degree = await DegreeModel.findOne({ where: { id }, attributes: ['id', 'name'] })
@@ -35,13 +41,13 @@ const degreeServices = {
         return degree
     },
     update: async (id: string, name: string) => {
-        const degree = await DegreeModel.update({ name }, { where: { id: Number(id) } })
+        const degree = await DegreeModel.update({ name: name.trim() }, { where: { id: Number(id) } })
         return degree
     },
     checkUsersWithDegree: async (id: string) => {
-        const users = await UserModel.findOne({
-            where: { degree_id: Number(id) },
-            attributes: ['id', 'username', 'full_name', 'role']
+        const users = await StudentModel.findAll({
+            where: { degree_id: id },
+            include: [{ model: UserModel, attributes: ['first_name', 'last_name', 'national_code'] }]
         })
         return users
     }
