@@ -10,10 +10,17 @@ const entryYearValidation = Yup.object().shape({
 
         return true
     }),
-    degree_id: Yup.string().test('degree_id', 'شناسه رشته الزامی می باشد', function (value) {
+    study_id: Yup.string().test('study_id', 'شناسه رشته الزامی می باشد', function (value) {
         if (!value) return this.createError({ message: 'شناسه رشته الزامی می باشد' })
 
         if (isNaN(Number(value))) return this.createError({ message: 'شناسه رشته بایستی عدد باشد' })
+
+        return true
+    }),
+    degree_id: Yup.string().test('degree_id', 'شناسه مقطع الزامی می باشد', function (value) {
+        if (!value) return this.createError({ message: 'شناسه مقطع الزامی می باشد' })
+
+        if (isNaN(Number(value))) return this.createError({ message: 'شناسه مقطع بایستی عدد باشد' })
 
         return true
     }),

@@ -32,7 +32,7 @@ const degreeServices = {
         const degree = await DegreeModel.findOne({ where: { id: { [Op.ne]: id }, name: name.trim() } })
         return !!degree
     },
-    checkExistId: async (id: string) => {
+    checkExistId: async (id: string | number) => {
         const degree = await DegreeModel.findOne({ where: { id }, attributes: ['id', 'name'] })
         return degree
     },

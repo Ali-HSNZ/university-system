@@ -8,6 +8,7 @@ import degreeService from '../degree/degree.service'
 import departmentService from '../department/department.service'
 import TEntryYearBodyInferType from './entryYear.types'
 import { validationHandling } from '../../core/utils/validation-handling'
+import studyServices from '../study/study.service'
 
 @Controller('/entry-year')
 class EntryYearController {
@@ -25,7 +26,7 @@ class EntryYearController {
         }
     }
 
-    @Get('/:id')
+    @Get('/:id/info')
     async getById(req: Request, res: Response, next: NextFunction) {
         try {
             const id = req.params.id
@@ -47,19 +48,33 @@ class EntryYearController {
             const data = await validationHandling<TEntryYearBodyInferType>(req.body, entryYearValidation)
 
             // check valid degree
-            const degree = await degreeService.checkExistId(req.body.degree_id)
+            const degree = await degreeService.checkExistId(Number(data.degree_id))
             if (!degree) throw new Error('رشته مورد نظر یافت نشد')
 
             // check valid department
-            const department = await departmentService.checkExistId(req.body.department_id)
+            const department = await departmentService.checkExistId(Number(data.department_id))
             if (!department) throw new Error('گروه آموزشی مورد نظر یافت نشد')
 
-            const checkExistEntryYear = await entryYearService.checkExistEntryYear(Number(data.year))
-            if (checkExistEntryYear) throw new Error('سال ورودی مورد نظر قبلاً ایجاد شده است')
+            // check valid department
+            const study = await studyServices.checkExistId(Number(data.study_id))
+            if (!study) throw new Error('رشته تحصیلی مورد نظر یافت نشد')
+
+            const checkExistEntryYear = await entryYearService.checkExistEntryYearInAdd({
+                year: Number(data.year),
+                degree_id: Number(data.degree_id),
+                department_id: Number(data.department_id),
+                study_id: Number(data.study_id)
+            })
+            if (checkExistEntryYear) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'سال ورودی مورد نظر قبلاً ایجاد شده است'
+                })
+            }
 
             await entryYearService.create(data)
 
-            res.status(httpStatus.CREATED).json({
+            return res.status(httpStatus.CREATED).json({
                 status: httpStatus.CREATED,
                 message: 'عملیات با موفقیت انجام شد'
             })
@@ -71,7 +86,39 @@ class EntryYearController {
     @Put('/:id/update')
     async update(req: Request, res: Response, next: NextFunction) {
         try {
+            const { id } = req.params
+            checkValidId(id)
+
+            const data = await validationHandling<TEntryYearBodyInferType>(req.body, entryYearValidation)
+
+            // check valid degree
+            const degree = await degreeService.checkExistId(Number(data.degree_id))
+            if (!degree) throw new Error('رشته مورد نظر یافت نشد')
+
+            // check valid department
+            const department = await departmentService.checkExistId(Number(data.department_id))
+            if (!department) throw new Error('گروه آموزشی مورد نظر یافت نشد')
+
+            // check valid department
+            const study = await studyServices.checkExistId(Number(data.study_id))
+            if (!study) throw new Error('رشته تحصیلی مورد نظر یافت نشد')
+
+            const checkExistEntryYear = await entryYearService.checkExistEntryYearInUpdate(Number(id), {
+                year: Number(data.year),
+                degree_id: Number(data.degree_id),
+                department_id: Number(data.department_id),
+                study_id: Number(data.study_id)
+            })
+
+            if (checkExistEntryYear) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'سال ورودی مورد نظر قبلاً ایجاد شده است'
+                })
+            }
+
             await entryYearService.update(Number(req.params.id), req.body)
+
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'

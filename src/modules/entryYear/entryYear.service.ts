@@ -1,3 +1,4 @@
+import { Op } from 'sequelize'
 import { DegreeModel } from '../../models/degree.model'
 import { DepartmentModel } from '../../models/department.model'
 import { EntryYearModel } from '../../models/entryYear.model'
@@ -9,18 +10,9 @@ const entryYearService = {
         return await EntryYearModel.findAll({
             attributes: ['id', 'year'],
             include: [
-                {
-                    model: DegreeModel,
-                    attributes: ['name']
-                },
-                {
-                    model: DepartmentModel,
-                    attributes: ['name']
-                },
-                {
-                    model: StudyModel,
-                    attributes: ['name', 'description']
-                }
+                { model: DegreeModel },
+                { model: DepartmentModel },
+                { model: StudyModel, attributes: ['name', 'id'] }
             ]
         })
     },
@@ -28,9 +20,30 @@ const entryYearService = {
         const entryYear = await EntryYearModel.findOne({ where: { year } })
         return !!entryYear
     },
+    checkExistEntryYearInUpdate: async (
+        id: number,
+        data: {
+            year: number
+            degree_id: number
+            study_id: number
+            department_id: number
+        }
+    ) => {
+        const entryYear = await EntryYearModel.findOne({ where: { ...data, id: { [Op.ne]: id } } })
+        return !!entryYear
+    },
+    checkExistEntryYearInAdd: async (data: {
+        year: number
+        degree_id: number
+        study_id: number
+        department_id: number
+    }) => {
+        const entryYear = await EntryYearModel.findOne({ where: data })
+        return !!entryYear
+    },
     async getById(id: number) {
         const entryYear = await EntryYearModel.findByPk(id, {
-            include: ['degree', 'department']
+            include: ['degree', 'department', 'study']
         })
         if (!entryYear) {
             throw new Error('دوره ورودی مورد نظر یافت نشد')

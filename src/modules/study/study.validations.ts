@@ -4,9 +4,9 @@ const studyValidation = Yup.object({
     name: Yup.string()
         .required('نام رشته تحصیلی الزامی است')
         .test('is-valid-name', 'این رشته تحصیلی قبلا ثبت شده است', function (value) {
-            if (value.length < 3) {
+            if (value.length < 2) {
                 return this.createError({
-                    message: 'نام رشته تحصیلی باید حداقل 3 کاراکتر باشد'
+                    message: 'نام رشته تحصیلی باید حداقل 2 کاراکتر باشد'
                 })
             }
             if (value.length > 100) {

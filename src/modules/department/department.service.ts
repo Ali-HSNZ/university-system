@@ -24,7 +24,7 @@ const departmentServices = {
         const department = await DepartmentModel.findOne({ where: { id: { [Op.ne]: id }, name } })
         return !!department
     },
-    checkExistId: async (id: string) => {
+    checkExistId: async (id: string | number) => {
         const department = await DepartmentModel.findByPk(id)
         return department
     },
