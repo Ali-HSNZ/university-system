@@ -128,7 +128,7 @@ class EntryYearController {
         }
     }
 
-    @Delete('/:id')
+    @Delete('/:id/delete')
     async delete(req: Request, res: Response, next: NextFunction) {
         try {
             await entryYearService.delete(Number(req.params.id))

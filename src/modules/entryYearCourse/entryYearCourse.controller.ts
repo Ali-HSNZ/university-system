@@ -92,7 +92,11 @@ class EntryYearCourseController {
     @Put('/:id/update')
     async update(req: Request, res: Response, next: NextFunction) {
         try {
-            await entryYearCourseService.update(Number(req.params.id), req.body)
+            const entryYearId = req.params.id
+            checkValidId(entryYearId)
+
+            await entryYearCourseService.update(Number(entryYearId), req.body.course_ids)
+
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'عملیات با موفقیت انجام شد'
@@ -107,9 +111,6 @@ class EntryYearCourseController {
         try {
             const id = req.params.id?.trim()
             checkValidId(id)
-
-            // const existEntryYearCourse = await entryYearCourseService.checkExist(Number(id))
-            // if (!existEntryYearCourse) throw new Error('درس مورد نظر یافت نشد')
 
             await entryYearCourseService.delete(Number(id))
 

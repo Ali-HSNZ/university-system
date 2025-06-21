@@ -46,63 +46,76 @@ const entryYearCourseService = {
     },
 
     async groupeByEntryYear(year?: number | null) {
+        // First, get all entry years
+        const allEntryYears = await EntryYearModel.findAll({
+            where: year ? { year } : undefined,
+            include: [
+                { model: DepartmentModel, attributes: ['id', 'name'] },
+                { model: DegreeModel, attributes: ['id', 'name'] },
+                { model: StudyModel, attributes: ['id', 'name'] }
+            ],
+            raw: true,
+            nest: true
+        })
+
+        // Get entry year courses data
         const rawResult = await this.list(year)
         const allCourses = await courseService.getAll()
 
-        const grouped: TEntryYearCourseGroupedType[] = Object.values(
-            rawResult.reduce((acc, item) => {
-                const entryYear = (item as any).entry_year
-                const course = (item as any).course
-                const yearId = entryYear.id
+        // Create a map of entry year courses for quick lookup
+        const entryYearCoursesMap = rawResult.reduce((acc, item) => {
+            const entryYear = (item as any).entry_year
+            const course = (item as any).course
+            const yearId = entryYear.id
 
-                if (!acc[yearId]) {
-                    acc[yearId] = {
-                        id: entryYear.id,
-                        year: entryYear.year,
-                        department: entryYear.department,
-                        degree: entryYear.degree,
-                        study: entryYear.study,
-                        courses: []
-                    }
-                }
+            if (!acc[yearId]) {
+                acc[yearId] = []
+            }
 
-                // parse prerequisites & corequisites
-                let prerequisiteCodes: string[] = []
-                let corequisiteCodes: string[] = []
+            // parse prerequisites & corequisites
+            let prerequisiteCodes: string[] = []
+            let corequisiteCodes: string[] = []
 
-                try {
-                    prerequisiteCodes = JSON.parse(course.prerequisites || '[]')
-                    corequisiteCodes = JSON.parse(course.corequisites || '[]')
-                } catch (err) {
-                    prerequisiteCodes = []
-                    corequisiteCodes = []
-                }
+            try {
+                prerequisiteCodes = JSON.parse(course.prerequisites || '[]')
+                corequisiteCodes = JSON.parse(course.corequisites || '[]')
+            } catch (err) {
+                prerequisiteCodes = []
+                corequisiteCodes = []
+            }
 
-                // match by course code
-                // پیش نیازها را از همه دروس موجود در سیستم می‌گیریم
-                const prerequisites: any = allCourses
-                    .filter((c: any) => prerequisiteCodes.includes(c.code))
-                    .map((c: any) => ({ id: c.id, name: c.name, code: c.code }))
+            // match by course code
+            const prerequisites: any = allCourses
+                .filter((c: any) => prerequisiteCodes.includes(c.code))
+                .map((c: any) => ({ id: c.id, name: c.name, code: c.code }))
 
-                // هم‌نیازها را از همه دروس موجود در سیستم می‌گیریم
-                const corequisites: any = allCourses
-                    .filter((c: any) => corequisiteCodes.includes(c.code))
-                    .map((c: any) => ({ id: c.id, name: c.name, code: c.code }))
+            const corequisites: any = allCourses
+                .filter((c: any) => corequisiteCodes.includes(c.code))
+                .map((c: any) => ({ id: c.id, name: c.name, code: c.code }))
 
-                acc[yearId].courses.push({
-                    id: course.id,
-                    name: course.name,
-                    code: course.code,
-                    theoretical_units: course.theoretical_units,
-                    practical_units: course.practical_units,
-                    type: course.type,
-                    prerequisites,
-                    corequisites
-                })
+            acc[yearId].push({
+                id: course.id,
+                name: course.name,
+                code: course.code,
+                theoretical_units: course.theoretical_units,
+                practical_units: course.practical_units,
+                type: course.type,
+                prerequisites,
+                corequisites
+            })
 
-                return acc
-            }, {} as Record<number, TEntryYearCourseGroupedType>)
-        )
+            return acc
+        }, {} as Record<number, any[]>)
+
+        // Build the final result with all entry years
+        const grouped: TEntryYearCourseGroupedType[] = allEntryYears.map((entryYear: any) => ({
+            id: entryYear.id,
+            year: entryYear.year,
+            department: entryYear.department,
+            degree: entryYear.degree,
+            study: entryYear.study,
+            courses: entryYearCoursesMap[entryYear.id] || []
+        }))
 
         return grouped
     },
@@ -128,17 +141,49 @@ const entryYearCourseService = {
         return await EntryYearCourseModel.create(data)
     },
 
-    async update(id: number, data: any) {
-        const entryYearCourse = await EntryYearCourseModel.findOne({
-            where: { id: id.toString().trim() }
+    async update(entryYearId: number, courseIds: number[]) {
+        // Get current course IDs for this entry year
+        const existingEntryYearCourses = await EntryYearCourseModel.findAll({
+            where: { entry_year_id: entryYearId }
         })
-        return await entryYearCourse?.update(data)
+
+        const existingCourseIds = existingEntryYearCourses.map((eyc) => eyc.dataValues.course_id)
+
+        // Find course IDs to add (new ones)
+        const courseIdsToAdd = courseIds.filter((courseId) => !existingCourseIds.includes(courseId))
+
+        // Find course IDs to remove (existing ones not in new list)
+        const courseIdsToRemove = existingCourseIds.filter((courseId) => !courseIds.includes(courseId))
+
+        // Add new entries
+        if (courseIdsToAdd.length > 0) {
+            const newEntries = courseIdsToAdd.map((courseId) => ({
+                entry_year_id: entryYearId,
+                course_id: courseId
+            }))
+            await EntryYearCourseModel.bulkCreate(newEntries)
+        }
+
+        // Remove entries that are no longer selected
+        if (courseIdsToRemove.length > 0) {
+            await EntryYearCourseModel.destroy({
+                where: {
+                    entry_year_id: entryYearId,
+                    course_id: courseIdsToRemove
+                }
+            })
+        }
+
+        return true
     },
 
-    async delete(id: number) {
-        const course = await EntryYearCourseModel.destroy({ where: { id } })
-        return course
+    async delete(entryYearId: number) {
+        const result = await EntryYearCourseModel.destroy({
+            where: { entry_year_id: entryYearId }
+        })
+        return result
     }
 }
 
 export default entryYearCourseService
+
