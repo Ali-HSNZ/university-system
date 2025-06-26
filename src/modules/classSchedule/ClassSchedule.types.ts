@@ -1,7 +1,8 @@
 import { InferType } from 'yup'
-import classScheduleSchema from './ClassSchedule.validation'
+import classScheduleSchema, { classScheduleUpdateSchema } from './ClassSchedule.validation'
 
 type TClassScheduleInferType = InferType<typeof classScheduleSchema>
+type TClassScheduleUpdateInferType = InferType<typeof classScheduleUpdateSchema>
 
 type TClassScheduleListType = {
     id: number
@@ -42,4 +43,4 @@ type TClassScheduleListType = {
     }
 }
 
-export { TClassScheduleInferType, TClassScheduleListType }
+export { TClassScheduleInferType, TClassScheduleListType, TClassScheduleUpdateInferType }

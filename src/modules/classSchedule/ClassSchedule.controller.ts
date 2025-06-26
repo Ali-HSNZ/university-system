@@ -1,13 +1,13 @@
 import { Request, Response, NextFunction } from 'express'
 
-import { Controller, Delete, Get, Post } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Post, Put } from '../../decorators/router.decorator'
 import classScheduleService from './ClassSchedule.service'
 import httpStatus from 'http-status'
 import { validationHandling } from '../../core/utils/validation-handling'
-import classScheduleSchema from './ClassSchedule.validation'
+import classScheduleSchema, { classScheduleUpdateSchema } from './ClassSchedule.validation'
 import classService from '../class/class.service'
 import professorService from '../professor/professor.service'
-import { TClassScheduleInferType } from './ClassSchedule.types'
+import { TClassScheduleInferType, TClassScheduleUpdateInferType } from './ClassSchedule.types'
 import classroomService from '../classroom/classroom.service'
 import { checkValidId } from '../../core/utils/check-valid-id'
 import semesterService from '../semester/semester.service'
@@ -29,12 +29,26 @@ class ClassScheduleController {
     }
 
     @Get('/:semester_id/group-by-class')
-    async groupByClass(req: Request, res: Response, next: NextFunction) {
+    async groupByClassBySemester(req: Request, res: Response, next: NextFunction) {
         try {
             const { semester_id } = req.params
             checkValidId(semester_id)
 
             const classSchedule = await classScheduleService.groupByClass(semester_id)
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: classSchedule
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+    @Get('/group-by-class')
+    async groupByClassBy(req: Request, res: Response, next: NextFunction) {
+        try {
+            const classSchedule = await classScheduleService.groupByClass()
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
@@ -59,9 +73,6 @@ class ClassScheduleController {
 
             const checkExistProfessor = await professorService.checkExist(data.professor_id)
             if (!checkExistProfessor) throw new Error('استاد یافت نشد')
-
-            const checkExistClassSchedule = await classScheduleService.checkExist(data.class_id, data.professor_id)
-            if (checkExistClassSchedule) throw new Error('کلاس قبلاً ایجاد شده است')
 
             const activeSemester = await semesterService.getActiveSemester()
             if (!activeSemester) throw new Error('ترم فعال یافت نشد')
@@ -96,6 +107,47 @@ class ClassScheduleController {
             next(error)
         }
     }
+
+    @Put('/:id/update')
+    async update(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { id } = req.params
+            checkValidId(id)
+
+            const data = await validationHandling<TClassScheduleUpdateInferType>(req.body, classScheduleUpdateSchema)
+
+            const checkExistClassSchedule = await classScheduleService.checkExistById(id)
+            if (!checkExistClassSchedule) throw new Error('ساعات کلاس یافت نشد')
+
+            // Validate class_id if provided
+            if (data.class_id) {
+                const checkExistClass = await classService.checkExist(data.class_id)
+                if (!checkExistClass) throw new Error('کلاس یافت نشد')
+            }
+
+            // Validate classroom_id if provided
+            if (data.classroom_id) {
+                const checkExistClassroom = await classroomService.checkExist(data.classroom_id)
+                if (!checkExistClassroom) throw new Error('سالن یافت نشد')
+            }
+
+            // Validate professor_id if provided
+            if (data.professor_id) {
+                const checkExistProfessor = await professorService.checkExist(data.professor_id)
+                if (!checkExistProfessor) throw new Error('استاد یافت نشد')
+            }
+
+            await classScheduleService.update(id, data)
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new ClassScheduleController()
+

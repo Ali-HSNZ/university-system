@@ -38,4 +38,39 @@ const classScheduleSchema = yup.object().shape({
     })
 })
 
+const classScheduleUpdateSchema = yup.object().shape({
+    course_name: yup.string().optional(),
+    class_id: yup.string().optional().test('class_id', 'شناسه کلاس بایستی عددی باشد', function (value) {
+        if (value && isNaN(Number(value))) return this.createError({ message: 'شناسه کلاس بایستی عددی باشد' })
+        return true
+    }),
+    classroom_id: yup.string().optional().test('classroom_id', 'شناسه سالن بایستی عددی باشد', function (value) {
+        if (value && isNaN(Number(value))) return this.createError({ message: 'شناسه سالن بایستی عددی باشد' })
+        return true
+    }),
+    professor_id: yup.string().optional().test('professor_id', 'شناسه استاد بایستی عددی باشد', function (value) {
+        if (value && isNaN(Number(value))) return this.createError({ message: 'شناسه استاد بایستی عددی باشد' })
+        return true
+    }),
+    day_of_week: yup
+        .string()
+        .optional()
+        .oneOf(['0', '1', '2', '3', '4', '5', '6'], 'روز هفته معتبر نیست'),
+    start_time: yup.string().optional().test('start_time', 'ساعت شروع بایستی به صورت ساعت:دقیقه باشد', function (value) {
+        if (value) {
+            const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+            if (!timeRegex.test(value)) return this.createError({ message: 'ساعت شروع بایستی به صورت ساعت:دقیقه باشد' })
+        }
+        return true
+    }),
+    end_time: yup.string().optional().test('end_time', 'ساعت پایان بایستی به صورت ساعت:دقیقه باشد', function (value) {
+        if (value) {
+            const timeRegex = /^([01]?[0-9]|2[0-3]):[0-5][0-9]$/
+            if (!timeRegex.test(value)) return this.createError({ message: 'ساعت پایان بایستی به صورت ساعت:دقیقه باشد' })
+        }
+        return true
+    })
+})
+
 export default classScheduleSchema
+export { classScheduleUpdateSchema }
