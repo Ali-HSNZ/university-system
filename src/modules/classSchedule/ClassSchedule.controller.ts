@@ -45,6 +45,7 @@ class ClassScheduleController {
             next(error)
         }
     }
+
     @Get('/group-by-class')
     async groupByClassBy(req: Request, res: Response, next: NextFunction) {
         try {
@@ -55,6 +56,199 @@ class ClassScheduleController {
                 message: 'عملیات با موفقیت انجام شد',
                 data: classSchedule
             })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/check-exist')
+    async checkExist(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { course_name, professor_id, class_id, day_of_week } = req.query
+
+            if (!course_name || !professor_id || !class_id || !day_of_week) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'پارامترهای course_name، professor_id، class_id و day_of_week الزامی هستند'
+                })
+            }
+
+            const exists = await classScheduleService.checkExistByCourseProfessorClassDay(
+                course_name as string,
+                professor_id as string,
+                class_id as string,
+                day_of_week as string
+            )
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: {
+                    exists,
+                    message: exists
+                        ? 'کلاس در این روز با این استاد وجود دارد'
+                        : 'کلاس در این روز با این استاد وجود ندارد'
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/check-professor-class-day')
+    async checkProfessorClassDay(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { professor_id, class_id, day_of_week } = req.query
+
+            if (!professor_id || !class_id || !day_of_week) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'پارامترهای professor_id، class_id و day_of_week الزامی هستند'
+                })
+            }
+
+            const exists = await classScheduleService.checkExistByProfessorClassDay(
+                professor_id as string,
+                class_id as string,
+                day_of_week as string
+            )
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: {
+                    exists,
+                    message: exists
+                        ? 'این استاد قبلاً در این روز برای این کلاس برنامه‌ریزی شده است'
+                        : 'این استاد در این روز برای این کلاس برنامه‌ریزی نشده است'
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/check-professor-schedule')
+    async checkProfessorSchedule(req: Request, res: Response, next: NextFunction) {
+        try {
+            const { professor_id, start_time, end_time, day_of_week } = req.query
+
+            if (!professor_id || !start_time || !end_time) {
+                return res.status(httpStatus.BAD_REQUEST).json({
+                    status: httpStatus.BAD_REQUEST,
+                    message: 'پارامترهای professor_id، start_time و end_time الزامی هستند'
+                })
+            }
+
+            // Check conflicts for specific day if provided
+            let conflicts: any[] = []
+            let availableDays: string[] = []
+
+            if (day_of_week) {
+                conflicts = await classScheduleService.checkProfessorTimeConflicts(
+                    professor_id as string,
+                    day_of_week as string,
+                    start_time as string,
+                    end_time as string
+                )
+            }
+
+            // Get available days
+            availableDays = await classScheduleService.checkProfessorAvailableDays(
+                professor_id as string,
+                start_time as string,
+                end_time as string
+            )
+
+            const conflictDetails = conflicts.map((conflict: any) => ({
+                course_name: conflict.class?.course?.name || 'نامشخص',
+                start_time: conflict.start_time,
+                end_time: conflict.end_time,
+                day_of_week: conflict.day_of_week,
+                classroom: conflict.classroom?.name || 'نامشخص'
+            }))
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد',
+                data: {
+                    hasConflicts: conflicts.length > 0,
+                    conflicts: conflictDetails,
+                    availableDays,
+                    dayNames: {
+                        '0': 'شنبه',
+                        '1': 'یکشنبه',
+                        '2': 'دوشنبه',
+                        '3': 'سه‌شنبه',
+                        '4': 'چهارشنبه',
+                        '5': 'پنج‌شنبه',
+                        '6': 'جمعه'
+                    }
+                }
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/test-conflicts')
+    async testConflicts(req: Request, res: Response, next: NextFunction) {
+        try {
+            const testResults = await classScheduleService.testConflictChecking()
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'تست بررسی تداخل‌ها انجام شد',
+                data: testResults
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/test-create')
+    async testCreate(req: Request, res: Response, next: NextFunction) {
+        try {
+            const testResults = await classScheduleService.testCreateWithConflicts()
+
+            res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'تست ایجاد کلاس انجام شد',
+                data: testResults
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Get('/test-same-professor-class')
+    async testSameProfessorClass(req: Request, res: Response, next: NextFunction) {
+        try {
+            // Test creating same professor-class combination
+            const testData = {
+                classroom_id: '2', // Different classroom
+                professor_id: '1',
+                class_id: '1',
+                day_of_week: '2', // Different day
+                start_time: '14:00', // Different time
+                end_time: '16:00',
+                semester_id: 1
+            }
+
+            try {
+                const result = await classScheduleService.create(testData)
+                res.status(httpStatus.OK).json({
+                    status: httpStatus.OK,
+                    message: 'تست موفق: کلاس با استاد تکراری ایجاد شد',
+                    data: { success: true, result }
+                })
+            } catch (error) {
+                res.status(httpStatus.OK).json({
+                    status: httpStatus.OK,
+                    message: 'تست: خطا در ایجاد کلاس',
+                    data: { success: false, error: (error as Error).message }
+                })
+            }
         } catch (error) {
             next(error)
         }

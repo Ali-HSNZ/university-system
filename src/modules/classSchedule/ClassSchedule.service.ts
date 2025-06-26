@@ -9,6 +9,16 @@ import { TClassScheduleInferType, TClassScheduleListType, TClassScheduleUpdateIn
 import courseService from '../course/course.service'
 import { Op } from 'sequelize'
 
+const DAY_OF_WEEK: Record<string, string> = {
+    '0': 'شنبه',
+    '1': 'یکشنبه',
+    '2': 'دوشنبه',
+    '3': 'سه شنبه',
+    '4': 'چهارشنبه',
+    '5': 'پنجشنبه',
+    '6': 'جمعه'
+}
+
 const classScheduleService = {
     list: async (semester_id?: string) => {
         const classSchedule = await ClassScheduleModel.findAll({
@@ -152,18 +162,60 @@ const classScheduleService = {
         const conflict = await ClassScheduleModel.findOne({ where: whereClause })
         return !!conflict
     },
-    checkDuplicateClassProfessor: async (class_id: string, professor_id: string, excludeId?: string) => {
+    checkExistByProfessorClassDay: async (
+        professor_id: string,
+        class_id: string,
+        day_of_week: string,
+        excludeId?: string
+    ) => {
         const whereClause: any = {
+            professor_id,
             class_id,
-            professor_id
+            day_of_week
         }
 
         if (excludeId) {
             whereClause.id = { [Op.ne]: excludeId }
         }
 
-        const duplicate = await ClassScheduleModel.findOne({ where: whereClause })
-        return !!duplicate
+        const existingSchedule = await ClassScheduleModel.findOne({ where: whereClause })
+        return !!existingSchedule
+    },
+    checkExistByCourseProfessorClassDay: async (
+        course_name: string,
+        professor_id: string,
+        class_id: string,
+        day_of_week: string,
+        excludeId?: string
+    ) => {
+        // First find the course by name
+        const course = await courseService.checkExistName(course_name)
+        if (!course) {
+            return false
+        }
+
+        // Find class for this course
+        const classForCourse = await ClassModel.findOne({
+            where: { course_id: course.dataValues.id }
+        })
+
+        if (!classForCourse) {
+            return false
+        }
+
+        // Check if class schedule exists with these criteria
+        const whereClause: any = {
+            class_id: classForCourse.dataValues.id,
+            professor_id,
+            day_of_week
+        }
+
+        if (excludeId) {
+            whereClause.id = { [Op.ne]: excludeId }
+        }
+
+        const existingSchedule = await ClassScheduleModel.findOne({ where: whereClause })
+        return !!existingSchedule
     },
     create: async (classSchedule: TClassScheduleInferType & { semester_id: number }) => {
         // Check for conflicts before creating
@@ -171,15 +223,33 @@ const classScheduleService = {
             throw new Error('شناسه‌های کلاس، استاد و سالن الزامی هستند')
         }
 
-        // Check for duplicate class-professor combination
-        const duplicateClassProfessor = await classScheduleService.checkDuplicateClassProfessor(
-            classSchedule.class_id!,
-            classSchedule.professor_id!
+        // Check professor time conflicts on the same day
+        const professorTimeConflicts = await classScheduleService.checkProfessorTimeConflicts(
+            classSchedule.professor_id!,
+            classSchedule.day_of_week,
+            classSchedule.start_time!,
+            classSchedule.end_time!
         )
-        if (duplicateClassProfessor) {
-            throw new Error('کلاس قبلاً با این استاد ایجاد شده است')
+
+        if (professorTimeConflicts.length > 0) {
+            // Get available days for this professor at this time
+            const availableDays = await classScheduleService.checkProfessorAvailableDays(
+                classSchedule.professor_id!,
+                classSchedule.start_time!,
+                classSchedule.end_time!
+            )
+
+            const conflictDetails = professorTimeConflicts.map((conflict: any) => ({
+                course_name: conflict.class?.course?.name || 'نامشخص',
+                start_time: conflict.start_time,
+                end_time: conflict.end_time,
+                day_of_week: conflict.day_of_week
+            }))
+
+            throw new Error('استاد در این زمان در روز ' + DAY_OF_WEEK[classSchedule.day_of_week] + ' مشغول است')
         }
 
+        // Check classroom conflict (time-based)
         const classroomConflict = await classScheduleService.checkClassroomConflict(
             classSchedule.classroom_id!,
             classSchedule.day_of_week,
@@ -190,16 +260,7 @@ const classScheduleService = {
             throw new Error('سالن در این زمان در دسترس نیست')
         }
 
-        const professorConflict = await classScheduleService.checkProfessorConflict(
-            classSchedule.professor_id!,
-            classSchedule.day_of_week,
-            classSchedule.start_time!,
-            classSchedule.end_time!
-        )
-        if (professorConflict) {
-            throw new Error('استاد در این زمان در دسترس نیست')
-        }
-
+        // Check class conflict (time-based) - same class can't be scheduled at same time
         const classConflict = await classScheduleService.checkClassConflict(
             classSchedule.class_id!,
             classSchedule.day_of_week,
@@ -280,15 +341,35 @@ const classScheduleService = {
 
         // Check professor conflict - always check if professor_id is being updated or if time is being updated
         if (filteredData.professor_id || filteredData.day_of_week || filteredData.start_time || filteredData.end_time) {
-            const professorConflict = await classScheduleService.checkProfessorConflict(
+            const professorTimeConflicts = await classScheduleService.checkProfessorTimeConflicts(
                 professor_id.toString(),
                 day_of_week,
                 start_time,
                 end_time,
                 id
             )
-            if (professorConflict) {
-                throw new Error('استاد در این زمان در دسترس نیست')
+
+            if (professorTimeConflicts.length > 0) {
+                // Get available days for this professor at this time
+                const availableDays = await classScheduleService.checkProfessorAvailableDays(
+                    professor_id.toString(),
+                    start_time,
+                    end_time,
+                    id
+                )
+
+                const conflictDetails = professorTimeConflicts.map((conflict: any) => ({
+                    course_name: conflict.class?.course?.name || 'نامشخص',
+                    start_time: conflict.start_time,
+                    end_time: conflict.end_time,
+                    day_of_week: conflict.day_of_week
+                }))
+
+                throw new Error(
+                    `استاد در این زمان در روز ${day_of_week} مشغول است. تداخل‌ها: ${JSON.stringify(
+                        conflictDetails
+                    )}. روزهای آزاد: ${availableDays.join(', ')}`
+                )
             }
         }
 
@@ -306,20 +387,157 @@ const classScheduleService = {
             }
         }
 
-        // Check for duplicate class-professor combination
-        if (filteredData.class_id || filteredData.professor_id) {
-            const duplicateClassProfessor = await classScheduleService.checkDuplicateClassProfessor(
-                class_id.toString(),
-                professor_id.toString(),
-                id
-            )
-            if (duplicateClassProfessor) {
-                throw new Error('کلاس قبلاً با این استاد ایجاد شده است')
-            }
-        }
-
         const updatedClassSchedule = await ClassScheduleModel.update(filteredData, { where: { id } })
         return updatedClassSchedule
+    },
+    // Test method to verify conflict checking
+    testConflictChecking: async () => {
+        // Test data
+        const testData = {
+            classroom_id: '1',
+            professor_id: '1',
+            class_id: '1',
+            day_of_week: '1',
+            start_time: '08:00',
+            end_time: '10:00'
+        }
+
+        console.log('Testing conflict checking...')
+
+        // Test professor time conflicts
+        const professorTimeConflicts = await classScheduleService.checkProfessorTimeConflicts(
+            testData.professor_id,
+            testData.day_of_week,
+            testData.start_time,
+            testData.end_time
+        )
+        console.log('Professor time conflicts:', professorTimeConflicts.length)
+
+        // Test available days for professor
+        const availableDays = await classScheduleService.checkProfessorAvailableDays(
+            testData.professor_id,
+            testData.start_time,
+            testData.end_time
+        )
+        console.log('Available days for professor:', availableDays)
+
+        // Test professor-class-day combination
+        const existingProfessorClassDay = await classScheduleService.checkExistByProfessorClassDay(
+            testData.professor_id,
+            testData.class_id,
+            testData.day_of_week
+        )
+        console.log('Professor-Class-Day exists:', existingProfessorClassDay)
+
+        // Test classroom conflict
+        const classroomConflict = await classScheduleService.checkClassroomConflict(
+            testData.classroom_id,
+            testData.day_of_week,
+            testData.start_time,
+            testData.end_time
+        )
+        console.log('Classroom conflict:', classroomConflict)
+
+        // Test class conflict
+        const classConflict = await classScheduleService.checkClassConflict(
+            testData.class_id,
+            testData.day_of_week,
+            testData.start_time,
+            testData.end_time
+        )
+        console.log('Class conflict:', classConflict)
+
+        return {
+            professorTimeConflicts: professorTimeConflicts.length,
+            availableDays,
+            existingProfessorClassDay,
+            classroomConflict,
+            classConflict
+        }
+    },
+    // Test method to verify create with conflicts
+    testCreateWithConflicts: async () => {
+        const testData = {
+            classroom_id: '1',
+            professor_id: '1',
+            class_id: '1',
+            day_of_week: '1',
+            start_time: '08:00',
+            end_time: '10:00',
+            semester_id: 1
+        }
+
+        try {
+            console.log('Testing create with conflicts...')
+            const result = await classScheduleService.create(testData)
+            console.log('Create successful:', result)
+            return { success: true, data: result }
+        } catch (error) {
+            console.log('Create failed with error:', (error as Error).message)
+            return { success: false, error: (error as Error).message }
+        }
+    },
+    checkProfessorTimeConflicts: async (
+        professor_id: string,
+        day_of_week: string,
+        start_time: string,
+        end_time: string,
+        excludeId?: string
+    ) => {
+        const whereClause: any = {
+            professor_id,
+            day_of_week,
+            [Op.or]: [
+                // Check if new time overlaps with existing times
+                {
+                    start_time: { [Op.lt]: end_time },
+                    end_time: { [Op.gt]: start_time }
+                }
+            ]
+        }
+
+        if (excludeId) {
+            whereClause.id = { [Op.ne]: excludeId }
+        }
+
+        const conflicts = await ClassScheduleModel.findAll({
+            where: whereClause,
+            include: [
+                {
+                    model: ClassModel,
+                    include: [{ model: CourseModel, attributes: ['name'] }]
+                }
+            ]
+        })
+        return conflicts
+    },
+    checkProfessorAvailableDays: async (
+        professor_id: string,
+        start_time: string,
+        end_time: string,
+        excludeId?: string
+    ) => {
+        // Get all days where professor has conflicts
+        const conflictDays = await ClassScheduleModel.findAll({
+            where: {
+                professor_id,
+                [Op.or]: [
+                    {
+                        start_time: { [Op.lt]: end_time },
+                        end_time: { [Op.gt]: start_time }
+                    }
+                ]
+            },
+            attributes: ['day_of_week'],
+            group: ['day_of_week'],
+            raw: true
+        })
+
+        const conflictDaySet = new Set(conflictDays.map((day: any) => day.day_of_week))
+        const allDays = ['0', '1', '2', '3', '4', '5', '6']
+        const availableDays = allDays.filter((day) => !conflictDaySet.has(day))
+
+        return availableDays
     }
 }
 
