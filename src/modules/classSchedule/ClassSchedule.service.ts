@@ -8,8 +8,9 @@ import { UserModel } from '../../models/user.model'
 import { TClassScheduleInferType, TClassScheduleListType } from './ClassSchedule.types'
 
 const classScheduleService = {
-    list: async () => {
+    list: async (semester_id?: string) => {
         const classSchedule = await ClassScheduleModel.findAll({
+            where: semester_id ? { semester_id } : {},
             attributes: {
                 exclude: ['class_id', 'professor_id', 'classroom_id', 'semester_id']
             },
@@ -23,7 +24,7 @@ const classScheduleService = {
                 {
                     model: ProfessorModel,
                     attributes: ['id'],
-                    include: [{ model: UserModel, attributes: ['id', 'first_name', 'last_name'] }]
+                    include: [{ model: UserModel, attributes: ['first_name', 'last_name'] }]
                 }
             ]
         })
@@ -31,8 +32,8 @@ const classScheduleService = {
         return classSchedule as unknown as TClassScheduleListType[]
     },
 
-    groupByClass: async () => {
-        const classSchedule = await classScheduleService.list()
+    groupByClass: async (semester_id: string) => {
+        const classSchedule = await classScheduleService.list(semester_id)
 
         const grouped: Record<string, any> = {}
 
@@ -54,7 +55,6 @@ const classScheduleService = {
                 end_time: item.end_time,
                 session_count: item.session_count,
                 professor: item.professor,
-                semester: item.semester,
                 classroom: item.classroom
             })
         }

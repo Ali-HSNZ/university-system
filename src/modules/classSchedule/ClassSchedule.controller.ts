@@ -28,10 +28,13 @@ class ClassScheduleController {
         }
     }
 
-    @Get('/group-by-class')
+    @Get('/:semester_id/group-by-class')
     async groupByClass(req: Request, res: Response, next: NextFunction) {
         try {
-            const classSchedule = await classScheduleService.groupByClass()
+            const { semester_id } = req.params
+            checkValidId(semester_id)
+
+            const classSchedule = await classScheduleService.groupByClass(semester_id)
 
             res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
