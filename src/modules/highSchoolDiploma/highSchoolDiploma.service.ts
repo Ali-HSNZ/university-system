@@ -9,6 +9,10 @@ const highSchoolDiplomaServices = {
     getHighSchoolDiplomaById: async (id: number) => {
         const highSchoolDiploma = await HighSchoolDiplomaModel.findByPk(id)
         return highSchoolDiploma
+    },
+    update: async (id: number, data: THighSchoolDiplomaType) => {
+        const highSchoolDiploma = await HighSchoolDiplomaModel.update(data, { where: { id } })
+        return highSchoolDiploma
     }
 }
 

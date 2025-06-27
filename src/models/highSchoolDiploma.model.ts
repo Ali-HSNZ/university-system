@@ -13,7 +13,7 @@ const HighSchoolDiplomaModel = sequelizeConfig.define(
             onDelete: 'CASCADE'
         },
         school_name: { type: DataTypes.STRING(255), allowNull: false },
-        diploma_date: { type: DataTypes.DATE, allowNull: false },
+        diploma_date: { type: DataTypes.STRING, allowNull: false },
         grade: { type: DataTypes.FLOAT, allowNull: true },
         pre_study_id: {
             type: DataTypes.INTEGER,

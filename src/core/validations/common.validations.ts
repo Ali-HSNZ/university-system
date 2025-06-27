@@ -11,7 +11,7 @@ const validateFile = ({ validTypes, maxSize, title, uniqueTitle, required = true
 
         const fileType = file.originalname.split('.').pop()?.toLowerCase() || ''
         if (!validTypes.includes(fileType)) {
-            return this.createError({ message: `می باشد ${validTypes.join(', ')} ،فرمت مجاز برای ${title} ` })
+            return this.createError({ message: `فرمت مجاز برای ${title}، ${validTypes.join(', ')} می باشد ` })
         }
 
         if (file.size > maxSize) {

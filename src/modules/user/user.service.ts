@@ -104,11 +104,12 @@ const userServices = {
         return !!existingUser
     },
     delete: async (id: number) => {
-        const user = await UserModel.destroy({ where: { id } })
+        const user = await UserModel.destroy({ where: { id: Number(id) } })
         return user
     }
 }
 
 export default userServices
+
 
 

@@ -38,7 +38,7 @@ const registerStudentValidation = Yup.object({
         .required('شناسه آخرین رشته تحصیلی الزامی است')
         .positive('شناسه آخرین رشته تحصیلی معتبر نیست')
         .integer('شناسه آخرین رشته تحصیلی باید یک عدد صحیح باشد'),
-    pre_grade: Yup.number()
+    grade: Yup.number()
         .required('نمره آخرین رشته تحصیلی الزامی است')
         .positive('نمره آخرین رشته تحصیلی معتبر نیست')
         .min(0, 'نمره آخرین رشته تحصیلی باید بیشتر از 0 باشد'),
@@ -66,6 +66,78 @@ const registerStudentValidation = Yup.object({
         uniqueTitle: 'student-military-image',
         validTypes: ['png', 'jpg', 'jpeg', 'webp', 'pdf'],
         maxSize: 10 * 1024 * 1024
+    }),
+    department_id: Yup.number().required('شناسه گروه آموزشی الزامی است'),
+    study_id: Yup.number().required('شناسه رشته تحصیلی الزامی است'),
+    degree_id: Yup.number().required('شناسه مقطع تحصیلی الزامی است'),
+    entry_year: Yup.number().required('سال ورود الزامی است'),
+    entry_semester: Yup.string().oneOf(['1', '2'], 'نیمسال ورود معتبر نیست').required('نیمسال ورود الزامی است')
+})
+const updateStudentValidation = Yup.object({
+    first_name: Yup.string().required('نام الزامی است'),
+    last_name: Yup.string().required('نام خانوادگی الزامی است'),
+    password: Yup.string().nullable().optional(),
+    national_code: Yup.string()
+        .length(10, 'کد ملی باید 10 رقم باشد')
+        .matches(/^\d+$/, 'کد ملی فقط میتواند شامل اعداد باشد')
+        .required('کد ملی الزامی است'),
+    gender: Yup.string().oneOf(['male', 'female'], 'جنسیت معتبر نیست').required('جنسیت الزامی است'),
+    guardian_name: Yup.string().nullable(),
+    guardian_phone: Yup.string().nullable(),
+    student_code: Yup.string().nullable(),
+    student_status: Yup.string().nullable(),
+    total_passed_units: Yup.number().nullable(),
+    high_school_diploma_id: Yup.number().nullable(),
+    current_term_units: Yup.number().nullable(),
+    probation_terms: Yup.number().nullable(),
+    term_gpa: Yup.number().nullable(),
+    total_gpa: Yup.number().nullable(),
+    military_status: Yup.string().nullable(),
+    school_name: Yup.string().nullable(),
+    diploma_date: Yup.string()
+        .matches(/^\d{4}\/\d{2}\/\d{2}$/, 'فرمت تاریخ معتبر نیست')
+        .required('تاریخ آخرین اخذ مدارک دانشگاهی الزامی است'),
+    birth_date: Yup.string()
+        .matches(/^\d{4}\/\d{2}\/\d{2}$/, 'فرمت تاریخ معتبر نیست')
+        .required('تاریخ تولد الزامی است'),
+    phone: Yup.string().nullable(),
+    email: Yup.string().email('ایمیل معتبر نیست').nullable(),
+    pre_study_id: Yup.number()
+        .required('شناسه آخرین رشته تحصیلی الزامی است')
+        .positive('شناسه آخرین رشته تحصیلی معتبر نیست')
+        .integer('شناسه آخرین رشته تحصیلی باید یک عدد صحیح باشد'),
+    grade: Yup.number()
+        .required('نمره آخرین رشته تحصیلی الزامی است')
+        .positive('نمره آخرین رشته تحصیلی معتبر نیست')
+        .min(0, 'نمره آخرین رشته تحصیلی باید بیشتر از 0 باشد'),
+    address: Yup.string().nullable(),
+    avatar: validateFile({
+        title: 'تصویر پروفایل',
+        uniqueTitle: 'check-auth-student-avatar',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
+    }),
+    national_card_image: validateFile({
+        title: 'کارت ملی',
+        uniqueTitle: 'check-auth-student-national-card-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
+    }),
+    birth_certificate_image: validateFile({
+        title: 'شناسنامه',
+        uniqueTitle: 'student-birth-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
+    }),
+    military_service_image: validateFile({
+        title: 'نظام وظیفه',
+        uniqueTitle: 'student-military-image',
+        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        maxSize: 10 * 1024 * 1024,
+        required: false
     }),
     department_id: Yup.number().required('شناسه گروه آموزشی الزامی است'),
     study_id: Yup.number().required('شناسه رشته تحصیلی الزامی است'),
@@ -425,5 +497,6 @@ export {
     registerEducationAssistantValidation,
     registerDepartmentHeadValidation,
     registerUniversityPresidentValidation,
-    updateProfessorValidation
+    updateProfessorValidation,
+    updateStudentValidation
 }

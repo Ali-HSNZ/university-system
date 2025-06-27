@@ -13,6 +13,13 @@ import { EnrollmentModel } from '../../models/enrollment.model'
 import { Op } from 'sequelize'
 import { sequelizeConfig } from '../../core/config/database.config'
 import { StudyModel } from '../../models/study.model'
+import { serializeFilePath } from '../../core/utils/serialize-file-path'
+import { TUpdateStudentFilesType, TUpdateStudentInferType } from './student.types'
+import { EnrollmentStatusModel } from '../../models/enrollmentStatus.model'
+import enrollmentService from '../enrollment/enrollment.service'
+import { GradeModel } from '../../models/grade.model'
+import { AttendanceModel } from '../../models/attendance.model'
+import userServices from '../user/user.service'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -39,16 +46,24 @@ const studentService = {
                         ]
                     }
                 },
-                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
-                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                { model: DegreeModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: StudyModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
                 {
                     model: HighSchoolDiplomaModel,
-                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] },
-                    include: [{ model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }]
+                    attributes: { exclude: ['createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] }
                 }
             ],
             attributes: {
-                exclude: ['updatedAt', 'pre_degree_id', 'department_id', 'high_school_diploma_id', 'user_id']
+                exclude: [
+                    'updatedAt',
+                    'pre_degree_id',
+                    'department_id',
+                    'high_school_diploma_id',
+                    'user_id',
+                    'study_id',
+                    'degree_id'
+                ]
             }
         })
 
@@ -58,6 +73,12 @@ const studentService = {
             }
             return student
         })
+    },
+    checkExist: async (id: string | number | undefined) => {
+        if (!id) return false
+
+        const student = await StudentModel.findByPk(id)
+        return student
     },
     checkExistByUserId: async (user_id: number) => {
         const student = await StudentModel.findOne({ where: { user_id } })
@@ -130,16 +151,14 @@ const studentService = {
                         ]
                     }
                 },
-                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
-                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
+                { model: DegreeModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
                 {
                     model: HighSchoolDiplomaModel,
-                    attributes: { exclude: ['id', 'createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] },
-                    include: [{ model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }]
+                    attributes: { exclude: ['createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] }
                 },
                 {
-                    model: StudyModel,
-                    attributes: ['name']
+                    model: StudyModel
                 }
             ],
             attributes: {
@@ -282,6 +301,138 @@ const studentService = {
 
         // Convert map to array
         return Array.from(classMap.values())
+    },
+    update: async (studentId: number, updateData: TUpdateStudentInferType, files?: TUpdateStudentFilesType) => {
+        // Get the student with user information
+        const student = await StudentModel.findByPk(studentId, {
+            include: [{ model: UserModel }]
+        })
+
+        if (!student) {
+            throw new Error('دانشجویی با این اطلاعات یافت نشد')
+        }
+
+        const userId = student.dataValues.user_id
+
+        // Prepare user update data
+        const userUpdateData: any = {}
+        if (updateData.first_name) userUpdateData.first_name = updateData.first_name
+        if (updateData.last_name) userUpdateData.last_name = updateData.last_name
+        if (updateData.phone !== undefined) userUpdateData.phone = updateData.phone
+        if (updateData.email !== undefined) userUpdateData.email = updateData.email
+        if (updateData.address !== undefined) userUpdateData.address = updateData.address
+        if (files?.avatar?.[0]) {
+            userUpdateData.avatar = serializeFilePath(files.avatar[0].path)
+        }
+
+        // Prepare student update data
+        const studentUpdateData: any = {}
+        if (updateData.guardian_name !== undefined) studentUpdateData.guardian_name = updateData.guardian_name
+        if (updateData.guardian_phone !== undefined) studentUpdateData.guardian_phone = updateData.guardian_phone
+        if (updateData.student_status) studentUpdateData.student_status = updateData.student_status
+        if (updateData.military_status) studentUpdateData.military_status = updateData.military_status
+
+        // Handle file uploads for student
+        if (files?.national_card_image?.[0]) {
+            studentUpdateData.national_card_image = serializeFilePath(files.national_card_image[0].path)
+        }
+        if (files?.birth_certificate_image?.[0]) {
+            studentUpdateData.birth_certificate_image = serializeFilePath(files.birth_certificate_image[0].path)
+        }
+        if (files?.military_service_image?.[0]) {
+            studentUpdateData.military_service_image = serializeFilePath(files.military_service_image[0].path)
+        }
+
+        // Update user if there are user fields to update
+        if (Object.keys(userUpdateData).length > 0) {
+            await UserModel.update(userUpdateData, { where: { id: userId } })
+        }
+
+        // Update student if there are student fields to update
+        if (Object.keys(studentUpdateData).length > 0) {
+            await StudentModel.update(studentUpdateData, { where: { id: studentId } })
+        }
+
+        // Return updated student with user information
+        const updatedStudent = await StudentModel.findByPk(studentId, {
+            include: [
+                {
+                    model: UserModel,
+                    attributes: {
+                        exclude: [
+                            'id',
+                            'createdAt',
+                            'updatedAt',
+                            'password',
+                            'is_deleted',
+                            'deleted_by',
+                            'deleted_at',
+                            'updated_at'
+                        ]
+                    }
+                },
+                { model: DegreeModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                {
+                    model: HighSchoolDiplomaModel,
+                    attributes: { exclude: ['createdAt', 'updatedAt', 'user_id', 'pre_degree_id'] }
+                },
+                {
+                    model: StudyModel,
+                    attributes: ['name']
+                }
+            ],
+            attributes: {
+                exclude: ['updatedAt', 'pre_degree_id', 'department_id', 'high_school_diploma_id', 'user_id']
+            }
+        })
+
+        return updatedStudent
+    },
+    delete: async (studentId: number) => {
+        // First, check if the student exists
+        const student = await StudentModel.findByPk(studentId, {
+            include: [{ model: UserModel }]
+        })
+
+        if (!student) {
+            throw new Error('دانشجویی با این اطلاعات یافت نشد')
+        }
+
+        console.log('student.dataValues.user_i: ', student.dataValues.user.dataValues.id)
+
+        const userId = student.dataValues.user.dataValues.id
+        // Delete the user account
+        await userServices.delete(userId)
+        const user1 = await userServices.checkExistById(userId)
+        console.log({ 'user1: ': user1?.dataValues, userId })
+        // Get all enrollments for this student
+        const enrollments = await EnrollmentModel.findAll({
+            where: { student_id: studentId },
+            attributes: ['id']
+        })
+
+        const enrollmentIds = enrollments.map((enrollment) => enrollment.dataValues.id)
+
+        // Delete enrollment status records first
+        if (enrollmentIds.length > 0) {
+            await EnrollmentStatusModel.destroy({
+                where: { enrollment_id: enrollmentIds }
+            })
+        }
+
+        // Delete all enrollments for this student
+        await EnrollmentModel.destroy({
+            where: { student_id: studentId }
+        })
+
+        const user = await userServices.checkExistById(userId)
+        console.log({ 'user: ': user?.dataValues, userId })
+
+        // Delete the student record
+        await StudentModel.destroy({ where: { id: studentId } })
+
+        return true
     }
 }
 

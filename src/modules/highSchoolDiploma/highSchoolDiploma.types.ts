@@ -3,7 +3,7 @@ type THighSchoolDiplomaType = {
     school_name: string | null | undefined
     diploma_date: string
     pre_study_id: number | undefined
-    pre_grade: number | undefined
+    grade: number | undefined
 }
 
 export default THighSchoolDiplomaType

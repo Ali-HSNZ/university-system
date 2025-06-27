@@ -7,6 +7,7 @@ import { UserModel } from '../../models/user.model'
 import educationAssistantServices from '../educationAssistant/educationAssistant.service'
 import professorService from '../professor/professor.service'
 import studentService from '../student/student.service'
+import { TUpdateStudentInferType } from '../student/student.types'
 import universityPresidentService from '../universityPresident/universityPresident.service'
 import {
     TRegisterProfessorInferType,
@@ -34,7 +35,9 @@ const authServices = {
         return user
     },
 
-    registerStudent: async (data: Omit<TRegisterStudentInferType, keyof TBaseUserDataType> & { user_id: number }) => {
+    registerStudent: async (
+        data: Omit<TRegisterStudentInferType, keyof TBaseUserDataType | 'pre_study_id'> & { user_id: number }
+    ) => {
         const student = await StudentModel.create(data)
         return student
     },
@@ -49,6 +52,23 @@ const authServices = {
     updateProfessor: async (id: number, data: Omit<TUpdateProfessorInferType, keyof TBaseUserDataType>) => {
         const professor = await ProfessorModel.update(data, { where: { id } })
         return professor
+    },
+
+    updateStudent: async (
+        id: number,
+        data: Omit<
+            TUpdateStudentInferType,
+            | keyof TBaseUserDataType
+            | 'high_school_diploma_id'
+            | 'user_id'
+            | 'grade'
+            | 'pre_study_id'
+            | 'diploma_date'
+            | 'school_name'
+        >
+    ) => {
+        const student = await StudentModel.update(data, { where: { id } })
+        return student
     },
 
     registerEducationAssistant: async (

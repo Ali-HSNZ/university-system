@@ -108,7 +108,9 @@ class AuthController {
             const existStudy = await studyServices.checkExistId(String(data.study_id))
             if (!existStudy) throw new Error('رشته تحصیلی موجود نمی باشد')
 
-            const hashedPassword = hashString(data.national_code)
+            console.log('data.national_code: ', data.national_code)
+
+            const hashedPassword = hashString(data.national_code.trim())
 
             const images = {
                 avatar: serializeFilePath(req.body.avatar?.path),
@@ -138,15 +140,14 @@ class AuthController {
                 school_name: data.school_name,
                 diploma_date: data.diploma_date,
                 pre_study_id: data.pre_study_id,
-                pre_grade: data.pre_grade
+                grade: data.grade
             })
 
             const studentCode = `${data.national_code}${user.dataValues.id}`
 
             await authServices.registerStudent({
                 user_id: user.dataValues.id,
-                pre_study_id: data.pre_study_id,
-                pre_grade: data.pre_grade,
+                grade: data.grade,
                 student_code: studentCode,
                 study_id: data.study_id,
                 degree_id: data.degree_id,
