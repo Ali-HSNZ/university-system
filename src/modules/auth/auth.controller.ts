@@ -108,8 +108,6 @@ class AuthController {
             const existStudy = await studyServices.checkExistId(String(data.study_id))
             if (!existStudy) throw new Error('رشته تحصیلی موجود نمی باشد')
 
-            console.log('data.national_code: ', data.national_code)
-
             const hashedPassword = hashString(data.national_code.trim())
 
             const images = {
@@ -353,6 +351,7 @@ class AuthController {
                 education_assistant_code: educationAssistantCode,
                 department_id: data.department_id,
                 degree_id: data.degree_id,
+                study_id: data.study_id,
                 national_card_image: images?.national_card_image,
                 work_experience_years: data.work_experience_years,
                 hire_date: data.hire_date,
@@ -362,7 +361,7 @@ class AuthController {
                 military_service_image: images?.military_service_image,
                 office_address: data.office_address,
                 office_phone: data.office_phone,
-                status: 'inactive'
+                status: data.status
             })
 
             if (!educationAssistant || !educationAssistant?.dataValues?.id) throw new Error('ثبت نام با مشکل مواجه شد')

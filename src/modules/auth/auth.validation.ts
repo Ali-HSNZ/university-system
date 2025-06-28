@@ -342,6 +342,7 @@ const registerEducationAssistantValidation = Yup.object({
     birth_date: Yup.string().required('تاریخ تولد الزامی است'),
     phone: Yup.string().nullable(),
     email: Yup.string().email('ایمیل معتبر نیست').nullable(),
+    study_id: Yup.number().required('شناسه رشته تحصیلی الزامی است'),
     address: Yup.string().nullable(),
     department_id: Yup.number().required('شناسه گروه آموزشی الزامی است'),
     degree_id: Yup.number().required('شناسه مقطع تحصیلی الزامی است'),

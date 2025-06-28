@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from 'express'
-import { Controller, Get, Put } from '../../decorators/router.decorator'
+import { Controller, Delete, Get, Put } from '../../decorators/router.decorator'
 import educationAssistantService from './educationAssistant.service'
 import httpStatus from 'http-status'
 import { TAuthenticatedRequestType } from '../../core/types/auth'
@@ -230,6 +230,25 @@ class EducationAssistantController {
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'اطلاعات با موفقیت بروزرسانی شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
+
+    @Delete('/:id/delete')
+    async deleteEducationAssistant(req: Request, res: Response, next: NextFunction) {
+        try {
+            checkValidId(req.params.id)
+
+            const existEducationAssistant = await educationAssistantService.checkExist(Number(req.params.id))
+            if (!existEducationAssistant) throw new Error('معاون آموزشی با این شناسه یافت نشد')
+
+            await educationAssistantService.delete(Number(req.params.id))
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد'
             })
         } catch (error) {
             next(error)

@@ -63,10 +63,7 @@ const educationAssistantService = {
             return educationAssistant
         })
     },
-    update: async (
-        id: number,
-        data: Omit<TUpdateEducationAssistantInferType, keyof TBaseUserDataType | 'user_id'>
-    ) => {
+    update: async (id: number, data: Omit<TUpdateEducationAssistantInferType, keyof TBaseUserDataType | 'user_id'>) => {
         const educationAssistant = await EducationAssistantModel.update(data, { where: { id } })
         return educationAssistant
     },
@@ -300,6 +297,16 @@ const educationAssistantService = {
         })
 
         return newStatus
+    },
+    delete: async (id: number) => {
+        const educationAssistant = await EducationAssistantModel.findByPk(id)
+        if (!educationAssistant) throw new Error('معاون آموزشی با این شناسه یافت نشد')
+
+        await EnrollmentStatusModel.destroy({ where: { education_assistant_id: id } })
+        await EducationAssistantModel.destroy({ where: { id } })
+        await UserModel.destroy({ where: { id: educationAssistant.dataValues.user_id } })
+
+        return educationAssistant
     }
 }
 
