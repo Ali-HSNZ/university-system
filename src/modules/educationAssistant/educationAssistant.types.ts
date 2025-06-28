@@ -1,5 +1,6 @@
 import { InferType } from 'yup'
 import { updateEnrollmentValidation } from './educationAssistant.validation'
+import { updateEducationAssistantValidation } from '../auth/auth.validation'
 
 type EnrollmentType = {
     id: number
@@ -125,6 +126,22 @@ type TEnrollmentUpdateRequestBodyType = {
     user_role: 'department_head' | 'education_assistant'
 }
 
+type TUpdateEducationAssistantInferType = InferType<typeof updateEducationAssistantValidation>
+
+type TUpdateEducationAssistantFilesType = {
+    avatar?: Express.Multer.File[]
+    national_card_image?: Express.Multer.File[]
+    birth_certificate_image?: Express.Multer.File[]
+    military_service_image?: Express.Multer.File[]
+    employment_contract_file?: Express.Multer.File[]
+}
+
 export type TUpdateEnrollmentStatusInferType = InferType<typeof updateEnrollmentValidation>
 
-export type { EnrollmentType, TEnrollmentRequestBodyType, TEnrollmentUpdateRequestBodyType }
+export type {
+    EnrollmentType,
+    TEnrollmentRequestBodyType,
+    TEnrollmentUpdateRequestBodyType,
+    TUpdateEducationAssistantInferType,
+    TUpdateEducationAssistantFilesType
+}

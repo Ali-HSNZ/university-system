@@ -13,8 +13,13 @@ import { ProfessorModel } from '../../models/professor.model'
 import { StudyModel } from '../../models/study.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ClassroomModel } from '../../models/classroom.model'
-import { EnrollmentType, TEnrollmentUpdateRequestBodyType } from './educationAssistant.types'
+import {
+    EnrollmentType,
+    TEnrollmentUpdateRequestBodyType,
+    TUpdateEducationAssistantInferType
+} from './educationAssistant.types'
 import { Op } from 'sequelize'
+import { TBaseUserDataType } from '../auth/auth.types'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -23,8 +28,9 @@ const port = APP_ENV.application.port
 const BASE_URL = `${protocol}://${host}:${port}`
 
 const educationAssistantService = {
-    list: async () => {
+    list: async (id?: number) => {
         const educationAssistants = await EducationAssistantModel.findAll({
+            where: id ? { id } : undefined,
             include: [
                 {
                     model: UserModel,
@@ -41,8 +47,9 @@ const educationAssistantService = {
                         ]
                     }
                 },
-                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
-                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }
+                { model: StudyModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DegreeModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['createdAt', 'updatedAt'] } }
             ],
             attributes: {
                 exclude: ['updatedAt', 'degree_id', 'department_id', 'user_id']
@@ -55,6 +62,21 @@ const educationAssistantService = {
             }
             return educationAssistant
         })
+    },
+    update: async (
+        id: number,
+        data: Omit<TUpdateEducationAssistantInferType, keyof TBaseUserDataType | 'user_id'>
+    ) => {
+        const educationAssistant = await EducationAssistantModel.update(data, { where: { id } })
+        return educationAssistant
+    },
+    checkExist: async (id: number) => {
+        const educationAssistant = await EducationAssistantModel.findByPk(id)
+        return educationAssistant
+    },
+    getDetailById: async (id: number) => {
+        const educationAssistant = await educationAssistantService.list(id)
+        return educationAssistant?.[0]
     },
     checkExistByUserId: async (user_id: number) => {
         const educationAssistant = await EducationAssistantModel.findOne({ where: { user_id } })

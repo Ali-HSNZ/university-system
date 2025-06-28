@@ -181,11 +181,6 @@ class StudentController {
 
             const hashedPassword = data.password ? hashString(data.password) : undefined
 
-
-            console.log({ hashedPassword, password: data.password })
-
-
-
             const images = {
                 avatar: serializeFilePath(req.body.avatar?.path),
                 national_card_image: serializeFilePath(req.body.national_card_image?.path),
@@ -208,11 +203,6 @@ class StudentController {
             })
 
             if (!user) throw new Error('بروزرسانی با مشکل مواجه شد')
-
-            console.log(
-                'existStudent.dataValues.high_school_diploma_id: ',
-                existStudent.dataValues.high_school_diploma_id
-            )
 
             await highSchoolDiplomaServices.update(Number(existStudent.dataValues.high_school_diploma_id), {
                 user_id: existStudent.dataValues.user_id,

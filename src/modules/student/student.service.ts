@@ -399,13 +399,11 @@ const studentService = {
             throw new Error('دانشجویی با این اطلاعات یافت نشد')
         }
 
-        console.log('student.dataValues.user_i: ', student.dataValues.user.dataValues.id)
-
         const userId = student.dataValues.user.dataValues.id
         // Delete the user account
         await userServices.delete(userId)
         const user1 = await userServices.checkExistById(userId)
-        console.log({ 'user1: ': user1?.dataValues, userId })
+
         // Get all enrollments for this student
         const enrollments = await EnrollmentModel.findAll({
             where: { student_id: studentId },

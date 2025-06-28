@@ -81,6 +81,8 @@ const userServices = {
     checkExistInUpdate: async (user_id: number, data: TFindOneUserType) => {
         const orConditions = []
 
+        const errors: Record<string, string> = {}
+
         if (data.national_code?.trim()) {
             orConditions.push({ national_code: data.national_code.trim() })
         }
@@ -95,13 +97,39 @@ const userServices = {
 
         if (orConditions.length === 0) return false
 
-        const existingUser = await UserModel.findOne({
-            where: {
-                [Op.and]: [{ id: { [Op.ne]: user_id } }, { [Op.or]: orConditions }]
-            }
-        })
+        if (data?.national_code?.trim()) {
+            const existingNationalCodeUser = await UserModel.findOne({
+                where: {
+                    [Op.and]: [
+                        { id: { [Op.ne]: user_id } },
+                        { [Op.or]: [{ national_code: data?.national_code?.trim() }] }
+                    ]
+                }
+            })
+            if (existingNationalCodeUser) errors.national_code = 'کاربری با این کد ملی قبلا ثبت نام کرده است'
+        }
 
-        return !!existingUser
+        if (data?.phone?.trim()) {
+            const existingPhoneUser = await UserModel.findOne({
+                where: {
+                    [Op.and]: [{ id: { [Op.ne]: user_id } }, { phone: data?.phone?.trim() }]
+                }
+            })
+            if (existingPhoneUser) errors.phone = 'کاربری با این شماره تلفن قبلا ثبت نام کرده است'
+        }
+
+        if (data?.email?.trim()) {
+            const existingEmailUser = await UserModel.findOne({
+                where: {
+                    [Op.and]: [{ id: { [Op.ne]: user_id } }, { email: data?.email?.trim() }]
+                }
+            })
+            if (existingEmailUser) errors.email = 'کاربری با این ایمیل قبلا ثبت نام کرده است'
+        }
+
+        if (Object.keys(errors).length > 0) return errors
+
+        return false
     },
     delete: async (id: number) => {
         const user = await UserModel.destroy({ where: { id: Number(id) } })
@@ -110,6 +138,4 @@ const userServices = {
 }
 
 export default userServices
-
-
 

@@ -4,6 +4,7 @@ import { UserModel } from './user.model'
 import { DepartmentModel } from './department.model'
 import { DegreeModel } from './degree.model'
 import { APP_ENV } from '../core/config/dotenv.config'
+import { StudyModel } from './study.model'
 
 const PROTOCOL = APP_ENV.application.protocol
 const HOST = APP_ENV.application.host
@@ -18,14 +19,15 @@ const EducationAssistantModel = sequelizeConfig.define(
         department_id: { type: DataTypes.INTEGER, allowNull: false },
         work_experience_years: { type: DataTypes.INTEGER, allowNull: false },
         office_phone: { type: DataTypes.STRING(11), allowNull: true },
+        study_id: { type: DataTypes.INTEGER, allowNull: false },
         office_address: { type: DataTypes.STRING(255), allowNull: true },
-        hire_date: { type: DataTypes.DATEONLY, allowNull: false },
+        hire_date: { type: DataTypes.STRING, allowNull: false },
         responsibilities: { type: DataTypes.TEXT, allowNull: true },
         national_card_image: { type: DataTypes.STRING(255), allowNull: false },
         birth_certificate_image: { type: DataTypes.STRING(255), allowNull: false },
         military_service_image: { type: DataTypes.STRING(255), allowNull: false },
         employment_contract_file: { type: DataTypes.STRING(255), allowNull: true },
-        status: { type: DataTypes.ENUM('active', 'inactive', 'retired'), allowNull: false, defaultValue: 'inactive' }
+        status: { type: DataTypes.ENUM('active', 'inactive', 'retired'), allowNull: false, defaultValue: 'active' }
     },
     { timestamps: true, freezeTableName: true }
 )
@@ -33,6 +35,7 @@ const EducationAssistantModel = sequelizeConfig.define(
 EducationAssistantModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
 EducationAssistantModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 EducationAssistantModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
+EducationAssistantModel.belongsTo(StudyModel, { foreignKey: 'study_id', onDelete: 'CASCADE' })
 
 EducationAssistantModel.addHook('afterFind', (result) => {
     if (!result) return
