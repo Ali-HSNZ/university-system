@@ -1,7 +1,8 @@
 import { UserModel } from '../../models/user.model'
 import { Op } from 'sequelize'
-import { TFindOneUserType } from './user.types'
+import { TFindOneUserType, TUpdateUserPasswordInferType } from './user.types'
 import { TBaseUserDataType } from '../auth/auth.types'
+import { compareHash, hashString } from '../../core/utils/hash-string'
 
 const userServices = {
     getAll: async () => {
@@ -134,6 +135,26 @@ const userServices = {
     delete: async (id: number) => {
         const user = await UserModel.destroy({ where: { id: Number(id) } })
         return user
+    },
+    updatePassword: async (id: number, data: TUpdateUserPasswordInferType) => {
+        // check current password
+        // check new password is not the same as the current password
+        // check equal confirm password with password
+
+        const user = await UserModel.findByPk(id)
+        if (!user) throw new Error('کاربری با این اطلاعات یافت نشد')
+
+        const isPasswordCorrect = await compareHash(data.current_password, user.dataValues.password)
+        if (!isPasswordCorrect) throw new Error('رمز عبور فعلی صحیح نیست')
+
+        if (hashString(data.password!) === user.dataValues.password)
+            throw new Error('رمز عبور جدید نمیتواند با رمز عبور فعلی یکسان باشد')
+
+        const hashedPassword = hashString(data.password!)
+
+        await UserModel.update({ password: hashedPassword }, { where: { id } })
+
+        return true
     }
 }
 

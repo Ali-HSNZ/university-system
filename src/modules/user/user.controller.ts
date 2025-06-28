@@ -7,8 +7,9 @@ import { TAuthenticatedRequestType } from '../../core/types/auth'
 import { fileUpload } from '../../core/utils/file-upload'
 import { serializeFilePath } from '../../core/utils/serialize-file-path'
 import { hashString } from '../../core/utils/hash-string'
-import updateUserValidation from './user.validations'
+import { updateUserValidation, updateUserPasswordValidation } from './user.validations'
 import { validationHandling } from '../../core/utils/validation-handling'
+import { TUpdateUserPasswordInferType } from './user.types'
 
 @Controller('/user')
 class UserController {
@@ -133,7 +134,27 @@ class UserController {
             next(error)
         }
     }
+
+    @Put('/profile/update-password')
+    async updatePassword(req: TAuthenticatedRequestType, res: Response, next: NextFunction) {
+        try {
+            const id = req.user?.id
+            checkValidId(id)
+
+            const data = await validationHandling<TUpdateUserPasswordInferType>(req.body, updateUserPasswordValidation)
+
+            await userServices.updatePassword(Number(id), data)
+
+            return res.status(httpStatus.OK).json({
+                status: httpStatus.OK,
+                message: 'عملیات با موفقیت انجام شد'
+            })
+        } catch (error) {
+            next(error)
+        }
+    }
 }
 
 export default new UserController()
+
 

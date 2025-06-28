@@ -34,4 +34,24 @@ const updateUserValidation = Yup.object({
     })
 })
 
-export default updateUserValidation
+const updateUserPasswordValidation = Yup.object({
+    current_password: Yup.string().trim().required('رمز عبور فعلی الزامی است'),
+    password: Yup.string()
+        .trim()
+        .test('edit-password-test', 'کلمه عبور باید کمتر از 32 کاراکتر باشد', function (value) {
+            if (value && value.length > 32)
+                return this.createError({ message: 'کلمه عبور باید کمتر از 32 کاراکتر باشد' })
+            return true
+        }),
+    confirm_password: Yup.string()
+        .trim()
+        .test('confirm-password-test', 'کلمه عبور باید کمتر از 32 کاراکتر باشد', function (value) {
+            if (value !== this.parent.password)
+                return this.createError({ message: 'کلمه عبور باید کمتر از 32 کاراکتر باشد' })
+
+            if (value && value.length > 32)
+                return this.createError({ message: 'کلمه عبور باید کمتر از 32 کاراکتر باشد' })
+            return true
+        })
+})
+export { updateUserValidation, updateUserPasswordValidation }
