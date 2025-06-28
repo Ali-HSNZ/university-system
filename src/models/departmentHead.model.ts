@@ -4,6 +4,7 @@ import { UserModel } from './user.model'
 import { DepartmentModel } from './department.model'
 import { DegreeModel } from './degree.model'
 import { APP_ENV } from '../core/config/dotenv.config'
+import { StudyModel } from './study.model'
 
 const PROTOCOL = APP_ENV.application.protocol
 const HOST = APP_ENV.application.host
@@ -19,7 +20,8 @@ const DepartmentHeadModel = sequelizeConfig.define(
         work_experience_years: { type: DataTypes.INTEGER, allowNull: false },
         office_phone: { type: DataTypes.STRING(11), allowNull: true },
         office_address: { type: DataTypes.STRING(255), allowNull: true },
-        hire_date: { type: DataTypes.DATEONLY, allowNull: false },
+        hire_date: { type: DataTypes.STRING, allowNull: false },
+        study_id: { type: DataTypes.INTEGER, allowNull: false },
         responsibilities: { type: DataTypes.TEXT, allowNull: true },
         national_card_image: { type: DataTypes.STRING(255), allowNull: false },
         birth_certificate_image: { type: DataTypes.STRING(255), allowNull: false },
@@ -33,6 +35,7 @@ const DepartmentHeadModel = sequelizeConfig.define(
 DepartmentHeadModel.belongsTo(UserModel, { foreignKey: 'user_id', onDelete: 'CASCADE' })
 DepartmentHeadModel.belongsTo(DepartmentModel, { foreignKey: 'department_id', onDelete: 'CASCADE' })
 DepartmentHeadModel.belongsTo(DegreeModel, { foreignKey: 'degree_id', onDelete: 'CASCADE' })
+DepartmentHeadModel.belongsTo(StudyModel, { foreignKey: 'study_id', onDelete: 'CASCADE' })
 
 DepartmentHeadModel.addHook('afterFind', (result) => {
     if (!result) return

@@ -1,5 +1,6 @@
 import { InferType } from 'yup'
 import { updateEnrollmentValidation } from '../enrollment/enrollment.validation'
+import { updateDepartmentHeadValidation } from '../auth/auth.validation'
 
 type EnrollmentType = {
     id: number
@@ -110,4 +111,18 @@ type EnrollmentType = {
 
 type TUpdateEnrollmentStatusInferType = InferType<typeof updateEnrollmentValidation>
 
-export type { EnrollmentType, TUpdateEnrollmentStatusInferType }
+type TUpdateDepartmentHeadFilesType = {
+    avatar?: Express.Multer.File[]
+    national_card_image?: Express.Multer.File[]
+    birth_certificate_image?: Express.Multer.File[]
+    military_service_image?: Express.Multer.File[]
+    employment_contract_file?: Express.Multer.File[]
+}
+type TUpdateDepartmentHeadInferType = InferType<typeof updateDepartmentHeadValidation>
+
+export type {
+    EnrollmentType,
+    TUpdateEnrollmentStatusInferType,
+    TUpdateDepartmentHeadInferType,
+    TUpdateDepartmentHeadFilesType
+}

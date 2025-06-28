@@ -447,6 +447,7 @@ class AuthController {
                 department_head_code: departmentHeadCode,
                 department_id: data.department_id,
                 degree_id: data.degree_id,
+                study_id: data.study_id,
                 national_card_image: images?.national_card_image,
                 work_experience_years: data.work_experience_years,
                 hire_date: data.hire_date,

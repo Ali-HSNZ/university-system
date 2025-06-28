@@ -114,11 +114,6 @@ const studentPanelService = {
             ]
         })
 
-        // Get IDs of courses student has already enrolled in
-        const enrolledCourseIds = new Set(
-            enrollments.map((enrollment: any) => enrollment.dataValues.class_schedule.class.course.id)
-        )
-
         // Get detailed information for each allowed course
         const coursesWithDetails = await Promise.all(
             allEntryYearCourses.map(async (course) => {
@@ -203,7 +198,9 @@ const studentPanelService = {
             study_id: studentDTO.study_id
         })
 
-        const class_list = await this.allowedEnrollmentCourses(studentDTO)
+        const class_list = (await this.allowedEnrollmentCourses(studentDTO)).filter(
+            (course: any) => course?.schedules?.length > 0
+        )
 
         const semesterYear = enrolmentStatusTime?.start_date?.date.split('/')[0]
         const semesterMonth = Number(enrolmentStatusTime?.start_date?.date.split('/')[1])
@@ -284,7 +281,7 @@ const studentPanelService = {
                 end_time: classSchedule.end_time.substring(0, 5),
                 course_name: classSchedule.class.course.name,
                 professor: classSchedule.professor.user.first_name + ' ' + classSchedule.professor.user.last_name,
-                address: `${classSchedule.classroom.building_name} - طبقه ${classSchedule.classroom.floor_number} - کلاس ${classSchedule.classroom.name}`
+                address: `ساختمان ${classSchedule.classroom.building_name} - طبقه ${classSchedule.classroom.floor_number} - کلاس شماره ${classSchedule.classroom.name}`
             }
         })
 

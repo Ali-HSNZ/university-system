@@ -41,13 +41,8 @@ const UserModel = sequelizeConfig.define(
     {
         timestamps: true,
         freezeTableName: true,
-        paranoid: true,
-        deletedAt: 'deleted_at',
         createdAt: 'created_at',
-        updatedAt: 'updated_at',
-        defaultScope: {
-            attributes: { exclude: ['created_at', 'updated_at'] }
-        }
+        updatedAt: 'updated_at'
     }
 )
 

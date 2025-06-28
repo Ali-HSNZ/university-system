@@ -14,7 +14,8 @@ import { ProfessorModel } from '../../models/professor.model'
 import { StudyModel } from '../../models/study.model'
 import { SemesterModel } from '../../models/semester.model'
 import { ClassroomModel } from '../../models/classroom.model'
-import { EnrollmentType } from './departmentHead.types'
+import { EnrollmentType, TUpdateDepartmentHeadInferType } from './departmentHead.types'
+import { TBaseUserDataType } from '../auth/auth.types'
 
 const protocol = APP_ENV.application.protocol
 const host = APP_ENV.application.host
@@ -23,8 +24,9 @@ const port = APP_ENV.application.port
 const BASE_URL = `${protocol}://${host}:${port}`
 
 const departmentHeadService = {
-    list: async () => {
+    list: async (id?: number) => {
         const departmentHeads = await DepartmentHeadModel.findAll({
+            where: id ? { id } : undefined,
             include: [
                 {
                     model: UserModel,
@@ -41,8 +43,9 @@ const departmentHeadService = {
                         ]
                     }
                 },
-                { model: DegreeModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } },
-                { model: DepartmentModel, attributes: { exclude: ['id', 'createdAt', 'updatedAt'] } }
+                { model: StudyModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DegreeModel, attributes: { exclude: ['createdAt', 'updatedAt'] } },
+                { model: DepartmentModel, attributes: { exclude: ['createdAt', 'updatedAt'] } }
             ],
             attributes: {
                 exclude: ['updatedAt', 'degree_id', 'department_id', 'user_id']
@@ -55,6 +58,10 @@ const departmentHeadService = {
             }
             return departmentHead
         })
+    },
+    getDetailById: async (id: number) => {
+        const departmentHead = await departmentHeadService.list(id)
+        return departmentHead?.[0]
     },
     checkExistByUserId: async (user_id: number) => {
         const educationAssistant = await EducationAssistantModel.findOne({ where: { user_id } })
@@ -188,6 +195,24 @@ const departmentHeadService = {
                 return acc
             }, {} as Record<string, any>)
         )
+    },
+    update: async (id: number, data: Omit<TUpdateDepartmentHeadInferType, keyof TBaseUserDataType | 'user_id'>) => {
+        const departmentHead = await DepartmentHeadModel.update(data, { where: { id } })
+        return departmentHead
+    },
+    delete: async (id: number) => {
+        const departmentHead = await DepartmentHeadModel.findByPk(id)
+        if (!departmentHead) throw new Error('مدیر گروه با این شناسه یافت نشد')
+
+        await EnrollmentStatusModel.destroy({ where: { department_head_id: id } })
+        await DepartmentHeadModel.destroy({ where: { id } })
+        await UserModel.destroy({ where: { id: departmentHead.dataValues.user_id } })
+
+        return departmentHead
+    },
+    checkExist: async (id: number) => {
+        const departmentHead = await DepartmentHeadModel.findByPk(id)
+        return departmentHead
     },
     getDepartmentHeadProfile: async (userId: number) => {
         const departmentHead = await DepartmentHeadModel.findOne({
