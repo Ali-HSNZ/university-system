@@ -7,6 +7,22 @@ const GradeModel = sequelizeConfig.define(
     'grade',
     {
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
+        enrollment_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: EnrollmentModel,
+                key: 'id'
+            }
+        },
+        professor_id: {
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            references: {
+                model: UserModel,
+                key: 'id'
+            }
+        },
         midterm_score: { type: DataTypes.INTEGER, allowNull: true },
         final_score: { type: DataTypes.INTEGER, allowNull: true },
         total_score: { type: DataTypes.INTEGER, allowNull: true }

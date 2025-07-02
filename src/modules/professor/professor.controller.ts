@@ -94,7 +94,6 @@ class ProfessorController {
             req.body.employment_contract_file = files?.['employment_contract_file']?.[0]
 
             const data = await validationHandling<TUpdateProfessorInferType>(req.body, updateProfessorValidation)
-            console.log('status: ', (data as any).status)
 
             const existUser = await userServices.checkExistInUpdate(Number(existProfessor.dataValues.user_id), {
                 national_code: data.national_code,
@@ -102,7 +101,13 @@ class ProfessorController {
                 email: data?.email || null
             })
 
-            if (existUser) throw new Error('کاربر در سیستم وجود دارد')
+            if (existUser) {
+                return res.status(422).json({
+                    code: 422,
+                    message: 'اطلاعات وارد شده معتبر نیست',
+                    errors: existUser
+                })
+            }
 
             const existDepartment = await departmentServices.checkExist(Number(data.department_id))
             if (!existDepartment) throw new Error('گروه آموزشی موجود نمی باشد')

@@ -179,12 +179,21 @@ class CourseController {
             const { id } = req.params
             checkValidId(id)
 
+            const checkExistCourse = await courseService.checkExistId(Number(id))
+            if (!checkExistCourse) {
+                return res.status(httpStatus.NOT_FOUND).json({
+                    status: httpStatus.NOT_FOUND,
+                    message: 'درس یافت نشد'
+                })
+            }
+
             const course = await courseService.delete(Number(id))
 
             if (course) {
                 return res.status(httpStatus.OK).json({
                     status: httpStatus.OK,
-                    message: 'درس با موفقیت حذف شد'
+                    message:
+                        'درس و تمامی اطلاعات مرتبط با آن (کلاس‌ها، برنامه‌های کلاسی، ثبت‌نام‌ها، وضعیت‌های ثبت‌نام) با موفقیت حذف شد'
                 })
             }
 
@@ -199,3 +208,4 @@ class CourseController {
 }
 
 export default new CourseController()
+

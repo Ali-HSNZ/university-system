@@ -11,6 +11,7 @@ const ClassScheduleModel = sequelizeConfig.define(
         id: { type: DataTypes.INTEGER, autoIncrement: true, primaryKey: true },
         class_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: ClassModel, key: 'id' } },
         professor_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: ProfessorModel, key: 'id' } },
+        semester_id: { type: DataTypes.INTEGER, allowNull: false, references: { model: SemesterModel, key: 'id' } },
         day_of_week: { type: DataTypes.ENUM('0', '1', '2', '3', '4', '5', '6'), allowNull: false },
         start_time: { type: DataTypes.TIME, allowNull: false },
         end_time: { type: DataTypes.TIME, allowNull: false },
@@ -27,3 +28,4 @@ ClassScheduleModel.belongsTo(SemesterModel, { foreignKey: 'semester_id', onDelet
 ClassroomModel.hasMany(ClassScheduleModel, { foreignKey: 'classroom_id' })
 
 export { ClassScheduleModel }
+

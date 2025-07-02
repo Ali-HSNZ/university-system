@@ -16,9 +16,6 @@ import { StudyModel } from '../../models/study.model'
 import { serializeFilePath } from '../../core/utils/serialize-file-path'
 import { TUpdateStudentFilesType, TUpdateStudentInferType } from './student.types'
 import { EnrollmentStatusModel } from '../../models/enrollmentStatus.model'
-import enrollmentService from '../enrollment/enrollment.service'
-import { GradeModel } from '../../models/grade.model'
-import { AttendanceModel } from '../../models/attendance.model'
 import userServices from '../user/user.service'
 
 const protocol = APP_ENV.application.protocol

@@ -171,7 +171,13 @@ class StudentController {
                 phone: data?.phone || null,
                 email: data?.email || null
             })
-            if (existUser) throw new Error('کاربر در سیستم وجود دارد')
+            if (existUser) {
+                return res.status(422).json({
+                    code: 422,
+                    message: 'اطلاعات وارد شده معتبر نیست',
+                    errors: existUser
+                })
+            }
 
             const existDepartment = await departmentServices.checkExist(Number(data.department_id))
             if (!existDepartment) throw new Error('گروه آموزشی موجود نمی باشد')

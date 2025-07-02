@@ -6,6 +6,7 @@ const loginValidation = Yup.object({
     password: Yup.string().required('رمز عبور الزامی است')
 })
 
+
 const registerStudentValidation = Yup.object({
     first_name: Yup.string().required('نام الزامی است'),
     last_name: Yup.string().required('نام خانوادگی الزامی است'),
@@ -46,7 +47,7 @@ const registerStudentValidation = Yup.object({
     avatar: validateFile({
         title: 'تصویر پروفایل',
         uniqueTitle: 'check-auth-student-avatar',
-        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'avif'],
         maxSize: 10 * 1024 * 1024
     }),
     national_card_image: validateFile({
@@ -114,7 +115,7 @@ const updateStudentValidation = Yup.object({
     avatar: validateFile({
         title: 'تصویر پروفایل',
         uniqueTitle: 'check-auth-student-avatar',
-        validTypes: ['png', 'jpg', 'jpeg', 'webp'],
+        validTypes: ['png', 'jpg', 'jpeg', 'webp', 'avif'],
         maxSize: 10 * 1024 * 1024,
         required: false
     }),

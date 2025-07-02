@@ -65,7 +65,7 @@ const studentPanelService = {
                 avatar: userDTO.avatar,
                 name: userDTO.first_name + ' ' + userDTO.last_name,
                 national_code: userDTO.national_code,
-                birth_date: moment(userDTO.birth_date, 'YYYY-MM-DD').format('jYYYY/jMM/jDD'),
+                birth_date: userDTO.birth_date,
                 gender: userDTO.gender === 'male' ? 'مرد' : 'زن',
                 phone: userDTO.phone,
                 email: userDTO.email,
@@ -82,7 +82,7 @@ const studentPanelService = {
             },
             diploma_information: {
                 name: highSchoolDiploma?.dataValues?.school_name,
-                diploma_date: moment(highSchoolDiploma?.dataValues?.diploma_date).format('jYYYY/jMM/jDD'),
+                diploma_date: highSchoolDiploma?.dataValues?.diploma_date,
                 study: preStudy?.dataValues?.name,
                 grade: highSchoolDiploma?.dataValues.grade
             }
@@ -307,7 +307,7 @@ const studentPanelService = {
             degree: degree?.dataValues?.name,
             study: study?.dataValues?.name,
             department: department?.dataValues?.name,
-            entry_year: moment(studentDTO.entry_year, 'YYYY').format('jYYYY'),
+            entry_year: studentDTO.entry_year,
             current_semester: currentSemester
         }
     },
@@ -841,4 +841,5 @@ const studentPanelService = {
 }
 
 export default studentPanelService
+
 

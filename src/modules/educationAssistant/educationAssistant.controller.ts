@@ -19,7 +19,6 @@ import departmentServices from '../department/department.service'
 import { updateEducationAssistantValidation } from '../auth/auth.validation'
 import { UseMiddleware } from '../../decorators/router.decorator'
 import { fileUpload } from '../../core/utils/file-upload'
-import { ValidationError } from 'yup'
 
 @Controller('/education-assistant')
 class EducationAssistantController {

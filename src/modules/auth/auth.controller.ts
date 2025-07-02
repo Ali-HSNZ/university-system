@@ -38,7 +38,6 @@ class AuthController {
     async login(req: Request, res: Response, next: NextFunction) {
         try {
             const data = await validationHandling<TLoginInferType>(req.body, loginValidation)
-
             const user = await authServices.findOne(data.username)
 
             if (!user)
@@ -46,21 +45,17 @@ class AuthController {
                     status: httpStatus.BAD_REQUEST,
                     message: 'کاربری با این مشخصات یافت نشد'
                 })
-
             const isPasswordValid = compareHash(data.password, user.dataValues.password)
             if (!isPasswordValid)
                 return res.status(httpStatus.BAD_REQUEST).json({
                     status: httpStatus.BAD_REQUEST,
-                    message: 'رمز عبور اشتباه است'
+                    message: 'کاربری با این مشخصات یافت نشد'
                 })
-
-            await authServices.checkValidUser(user.dataValues.id, user.dataValues.role)
 
             const token = tokenGenerator({
                 role: user.dataValues.role,
                 nationalCode: user.dataValues.national_code
             })
-
             return res.status(httpStatus.OK).json({
                 status: httpStatus.OK,
                 message: 'ورود با موفقیت انجام شد',

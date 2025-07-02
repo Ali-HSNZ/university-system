@@ -20,11 +20,15 @@ import {
 } from './auth.types'
 
 const authServices = {
+
+
     findOne: async (nationalCode: TBaseUserDataType['national_code']) => {
         const user = await UserModel.findOne({ where: { national_code: nationalCode } })
         return user
     },
 
+
+    
     registerUser: async (data: TBaseUserDataType) => {
         const user = await UserModel.create(data)
         return user
